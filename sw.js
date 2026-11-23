@@ -1,5 +1,42 @@
-const CACHE_NAME='census-2027-enumerator-v1';
-const APP_SHELL=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
-self.addEventListener('install',event=>event.waitUntil((async()=>{const c=await caches.open(CACHE_NAME);await c.addAll(APP_SHELL);const cdn=['https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css','https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css','https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'];await Promise.allSettled(cdn.map(async u=>{try{const r=await fetch(u,{mode:'no-cors'});await c.put(u,r)}catch(_){}}));await self.skipWaiting()})()));
-self.addEventListener('activate',event=>event.waitUntil((async()=>{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('census-2027-')&&k!==CACHE_NAME).map(k=>caches.delete(k)));await self.clients.claim()})()));
-self.addEventListener('fetch',event=>{const q=event.request;if(q.method!=='GET')return;const u=new URL(q.url);if(u.origin===self.location.origin||u.hostname==='cdn.jsdelivr.net'||u.hostname==='cdnjs.cloudflare.com'){event.respondWith((async()=>{const hit=await caches.match(q);if(hit)return hit;try{const r=await fetch(q);const c=await caches.open(CACHE_NAME);c.put(q,r.clone());return r}catch(_){return u.origin===self.location.origin?(await caches.match('./index.html'))||Response.error():Response.error()}})())}});
+const CACHE_NAME = 'census-2027-enumerator-v2';
+const APP_SHELL = [
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './icon-192.png',
+  './icon-512.png'
+];
+self.addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.addAll(APP_SHELL);
+    await self.skipWaiting();
+  })());
+});
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key.startsWith('census-2027-enumerator-') && key !== CACHE_NAME).map(key => caches.delete(key)));
+    await self.clients.claim();
+  })());
+});
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+  event.respondWith((async () => {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    try {
+      const response = await fetch(request);
+      if (response && response.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, response.clone());
+      }
+      return response;
+    } catch (_) {
+      return (await caches.match('./index.html')) || Response.error();
+    }
+  })());
+});
