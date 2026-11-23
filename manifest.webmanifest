@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "Census 2027 – Enumerator",
+  "short_name": "Census 2027",
+  "description": "Offline Census 2027 household data manager",
+  "lang": "hi-IN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1f4f8",
+  "theme_color": "#0a3d62",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
