@@ -289,7 +289,7 @@
                     <h5 class="mb-0 text-light opacity-90">परिवार अनुसूची - 40 प्रश्नों का ऑनलाइन अभ्यास सॉफ्टवेयर</h5>
                 </div>
                 <div class="text-end mt-2 mt-md-0">
-                    <span class="badge bg-warning text-dark fs-6"><i class="fas fa-flask me-1"></i> प्रायोगिक संस्करण 5.9 Smart Suggestions</span>
+                    <span class="badge bg-warning text-dark fs-6"><i class="fas fa-flask me-1"></i> प्रायोगिक संस्करण 6.0 Smart Family Fast Entry</span>
                 </div>
             </div>
 
@@ -338,6 +338,21 @@
             </div>
         </div>
 
+        <div class="card mb-3 border-success shadow-sm" id="family-suggestions-panel">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                    <div><h6 class="mb-1 fw-bold text-success"><i class="fas fa-bolt me-2"></i>परिवार की सामान्य जानकारी — Smart Suggestions</h6>
+                    <small class="text-muted">एक सदस्य से सुझाव सेव करें, फिर दूसरे सदस्यों के खाली उत्तरों में लगाएं। कोई उत्तर अपने-आप अंतिम नहीं माना जाएगा।</small></div>
+                    <span class="badge bg-success-subtle text-success-emphasis" id="family-suggestions-status">अभी सुझाव सेव नहीं हैं</span>
+                </div>
+                <div class="row g-2">
+                    <div class="col-12 col-md-6"><button class="btn btn-outline-success w-100" type="button" onclick="saveFamilySuggestionsFromCurrentMember()"><i class="fas fa-save me-1"></i> वर्तमान सदस्य से सुझाव सेव करें</button></div>
+                    <div class="col-12 col-md-6"><button class="btn btn-success w-100" type="button" onclick="applyFamilySuggestionsToCurrentMember()"><i class="fas fa-magic me-1"></i> इस सदस्य के खाली उत्तरों में सुझाव लगाएं</button></div>
+                </div>
+                <div class="small text-muted mt-2">सुझाव वाले प्रश्न: 8 राष्ट्रीयता, 9 धर्म, 14 मातृभाषा/अन्य भाषाएं। हर व्यक्ति से पुष्टि करें। अलग उत्तर होने पर PE App में सही उत्तर ही भरें।</div>
+            </div>
+        </div>
+
         <div class="control-bar">
             <div class="d-flex gap-2 align-items-center flex-wrap">
                 <span class="fw-bold text-dark me-2"><i class="fas fa-sliders-h me-1"></i> कार्य शैली:</span>
@@ -354,7 +369,7 @@
 
             <div class="d-flex gap-2 flex-wrap">
                 <button class="btn btn-warning btn-sm fw-bold text-dark" onclick="downloadThisSoftware()">
-                    <i class="fas fa-download me-1"></i> सॉफ्टवेयर डाउनलोड करें (v5.9)
+                    <i class="fas fa-download me-1"></i> सॉफ्टवेयर डाउनलोड करें (v6.0)
                 </button>
 
                 <button class="btn btn-share btn-sm" onclick="shareDataOnWhatsApp()">
@@ -1638,7 +1653,7 @@
             }
             activeHouseholdId = Object.keys(households)[0];
             loadActiveHousehold(); refreshHouseholdUI(); renderFormQuestions(); renderMemberSelector();
-            setupSecurityWatchdog(); updateConditionalLocks(); updateMembersRemainingBadge();
+            setupSecurityWatchdog(); updateConditionalLocks(); updateMembersRemainingBadge(); renderFamilySuggestionsStatus();
         }
         function loadActiveHousehold() {
             const h=households[activeHouseholdId];
@@ -1655,6 +1670,7 @@
             try { localStorage.setItem('census_manager_fallback', JSON.stringify({activeHouseholdId,households})); } catch(e) {}
             if (censusDB) dbRequest('readwrite','put',h).then(()=>{ const el=document.getElementById('db-status'); if(el) el.textContent='डेटा IndexedDB में सेव हो गया'; }).catch(()=>{});
             refreshHouseholdUI();
+            renderFamilySuggestionsStatus();
         }
         function refreshHouseholdUI() {
             const sel=document.getElementById('household-select'); if(!sel) return;
@@ -1667,6 +1683,64 @@
             const ids=Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
             sel.innerHTML=ids.map(id=>`<option value="${escapeHTML(id)}" ${id===currentActiveMember?'selected':''}>सदस्य ${escapeHTML(id)}${familyCensusData[id]?.[1]?' — '+escapeHTML(familyCensusData[id][1]):''}</option>`).join('');
         }
+        function saveFamilySuggestionsFromCurrentMember() {
+            const m = getCurrentMemberData();
+            const profile = {
+                nationality: String(m['8'] || '').trim(),
+                religion: String(m['9'] || '').trim(),
+                motherTongue: String(m['q14_mother_tongue'] || '').trim(),
+                lang1: String(m['q14_lang1'] || '').trim(),
+                lang2: String(m['q14_lang2'] || '').trim()
+            };
+            if (!Object.values(profile).some(Boolean)) {
+                showToastNotice('पहले वर्तमान सदस्य में प्रश्न 8, 9 या 14 की जानकारी भरें।');
+                return;
+            }
+            const h = households[activeHouseholdId];
+            if (!h) return;
+            h.familySuggestions = profile;
+            saveLocalState();
+            renderFamilySuggestionsStatus();
+            showToastNotice('परिवार के सुझाव सेव हो गए। अब अन्य सदस्यों में खाली उत्तर भर सकते हैं।');
+        }
+
+        function applyFamilySuggestionsToCurrentMember() {
+            const h = households[activeHouseholdId];
+            const p = h && h.familySuggestions;
+            if (!p || !Object.values(p).some(Boolean)) {
+                showToastNotice('पहले किसी सदस्य से परिवार के सुझाव सेव करें।');
+                return;
+            }
+            const m = getCurrentMemberData();
+            let count = 0;
+            const apply = (key, value, flag) => {
+                if (value && (m[key] === undefined || m[key] === null || String(m[key]).trim() === '')) {
+                    m[key] = value;
+                    m[flag] = true;
+                    count++;
+                }
+            };
+            apply('8', p.nationality, 'q8_family_suggested');
+            apply('9', p.religion, 'q9_family_suggested');
+            apply('q14_mother_tongue', p.motherTongue, 'q14_mother_tongue_family_suggested');
+            apply('q14_lang1', p.lang1, 'q14_lang1_family_suggested');
+            apply('q14_lang2', p.lang2, 'q14_lang2_family_suggested');
+            saveLocalState();
+            renderFormQuestions();
+            renderMemberSelector();
+            updateConditionalLocks();
+            updateMembersRemainingBadge();
+            showToastNotice(count ? count + ' खाली उत्तरों में सुझाव लगाए गए। प्रश्न 8, 9 और 14 की व्यक्ति से पुष्टि करें।' : 'इस सदस्य के संबंधित उत्तर पहले से भरे हैं; कोई बदलाव नहीं किया गया।');
+        }
+
+        function renderFamilySuggestionsStatus() {
+            const el = document.getElementById('family-suggestions-status');
+            if (!el) return;
+            const p = households[activeHouseholdId]?.familySuggestions;
+            const n = p ? Object.values(p).filter(v => String(v || '').trim()).length : 0;
+            el.textContent = n ? n + ' सुझाव सेव हैं' : 'अभी सुझाव सेव नहीं हैं';
+        }
+
         async function addHousehold() {
             const next=String(Math.max(0,...Object.values(households).map(h=>Number(h.houseNo)||0))+1).padStart(3,'0');
             const id='HH-'+next;
@@ -1726,6 +1800,12 @@
             const mData = getCurrentMemberData();
             mData[key] = value;
             if(String(key) === '5') mData.q5_auto_suggested = false;
+            const suggestionFlags = {
+                '8':'q8_family_suggested', '9':'q9_family_suggested',
+                'q14_mother_tongue':'q14_mother_tongue_family_suggested',
+                'q14_lang1':'q14_lang1_family_suggested', 'q14_lang2':'q14_lang2_family_suggested'
+            };
+            if (suggestionFlags[String(key)]) delete mData[suggestionFlags[String(key)]];
             saveLocalState();
             updateConditionalLocks();
             updateMembersRemainingBadge();
@@ -1809,7 +1889,11 @@
                             <label class="form-check-label fw-medium" for="q_${q.id}_${idx}">${opt}</label>
                         </div>`;
                     });
-                    return rHtml;
+                    const familySuggestionNote = q.id === 8 && mData.q8_family_suggested
+                        ? '<div class="alert alert-info py-2 mt-2 mb-0 small">परिवार से लिया गया सुझाव — इस व्यक्ति से पुष्टि करें।</div>'
+                        : q.id === 9 && mData.q9_family_suggested
+                        ? '<div class="alert alert-info py-2 mt-2 mb-0 small">परिवार से लिया गया सुझाव — इस व्यक्ति से पुष्टि करें।</div>' : '';
+                    return rHtml + familySuggestionNote;
 
                 case 'composite_4':
                     const dd = mData['q4_dd'] || '';
@@ -2027,7 +2111,8 @@
                             <label class="form-label fw-bold">14 (ग) अन्य भाषा 2</label>
                             <input type="text" class="form-control" placeholder="तीसरी भाषा" value="${escapeAttr(mData['q14_lang2'] || '')}" oninput="updateValue('q14_lang2', this.value)">
                         </div>
-                    </div>`;
+                    </div>` + ((mData.q14_mother_tongue_family_suggested || mData.q14_lang1_family_suggested || mData.q14_lang2_family_suggested)
+                        ? '<div class="alert alert-info py-2 mt-2 mb-0 small">परिवार से लिए गए सुझाव — इस व्यक्ति से मातृभाषा और अन्य भाषाओं की पुष्टि करें।</div>' : '');
 
                 case 'literacy_block':
                     const lit = mData['q15_lit'] || '';
