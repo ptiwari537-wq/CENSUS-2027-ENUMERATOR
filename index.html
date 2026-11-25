@@ -1925,34 +1925,48 @@
             if (!h) { showToastNotice("पहले परिवार चुनें।"); return; }
             const members = Object.entries(h.members || {}).sort((a,b)=>Number(a[0])-Number(b[0]));
             if (!members.length) { showToastNotice("इस परिवार में सदस्य दर्ज नहीं हैं।"); return; }
+
             const esc = v => String(v == null ? "" : v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-            const getName = ([id,d]) => String((d && d[1]) || ("सदस्य "+id));
-            const questionKeys = (data,id) => Object.keys(data || {}).filter(k => String(k) === String(id) || String(k).startsWith("q"+id+"_")).sort();
-            const display = (data,id) => {
-                const keys = questionKeys(data,id);
-                if (!keys.length) return "";
-                return keys.map(k => {
-                    const v=data[k];
-                    if (v === "" || v === null || v === undefined || (Array.isArray(v) && !v.length)) return "";
-                    const label = k === String(id) ? "" : k.replace(/^q\d+_?/,"").replace(/_/g," ");
-                    const value = Array.isArray(v) ? v.join(", ") : (typeof v === "object" ? JSON.stringify(v) : String(v));
-                    return (label ? label+": " : "") + value;
-                }).filter(Boolean).join(" | ");
-            };
-            const common=[], individual=[];
-            CENSUS_QUESTIONS.forEach(q => {
-                const rows=members.map(([id,d])=>({id,name:getName([id,d]),value:display(d,q.id)}));
-                const filled=rows.filter(x=>x.value.trim());
-                const distinct=[...new Set(filled.map(x=>x.value))];
-                if (filled.length>1 && distinct.length===1 && filled.length===rows.length) {
-                    common.push({q, value:distinct[0], names:filled.map(x=>x.name)});
-                } else {
-                    individual.push({q, rows});
-                }
+            const memberName = ([id,d]) => String((d && d[1]) || ("सदस्य "+id));
+            const keysFor = (data,id) => Object.keys(data || {}).filter(k => String(k)===String(id) || String(k).startsWith("q"+id+"_")).sort();
+            const valueFor = (data,id) => keysFor(data,id).map(k => {
+                const v=data[k];
+                if(v==="" || v===null || v===undefined || (Array.isArray(v)&&!v.length)) return "";
+                const label = k===String(id) ? "" : k.replace(/^q\d+_?/,"").replace(/_/g," ");
+                const value = Array.isArray(v) ? v.join(", ") : (typeof v==="object" ? Object.entries(v).map(([a,b])=>a+": "+b).join("; ") : String(v));
+                return (label ? label+" — " : "")+value;
+            }).filter(Boolean).join(" ; ");
+
+            const common = [];
+            const individualByMember = members.map(([id,data])=>({id,data,name:memberName([id,data]),items:[]}));
+            CENSUS_QUESTIONS.forEach(q=>{
+                const vals=members.map(([,d])=>valueFor(d,q.id));
+                const allSame=vals.length>1 && vals.every(v=>v.trim()!=="") && vals.every(v=>v===vals[0]);
+                if(allSame) common.push({q,value:vals[0]});
+                else members.forEach(([,d],i)=>individualByMember[i].items.push({q,value:valueFor(d,q.id)}));
             });
-            const renderCommon = common.length ? common.map(x=>'<tr><td>प्र. '+x.q.id+'</td><td>'+esc(x.q.title)+'</td><td>'+esc(x.value)+'</td><td>'+esc(x.names.join(", "))+'</td></tr>').join("") : '<tr><td colspan="4">सभी सदस्यों में समान उत्तर वाला कोई भरा हुआ प्रश्न नहीं मिला।</td></tr>';
-            const renderIndividual = individual.map(x=>'<section class="q"><h3>प्र. '+x.q.id+' — '+esc(x.q.title)+'</h3><table><thead><tr><th>सदस्य</th><th>उत्तर / विवरण</th></tr></thead><tbody>'+x.rows.map(r=>'<tr><td>'+esc(r.name)+'</td><td>'+(r.value.trim()?esc(r.value):'<span class="blank">उत्तर दर्ज नहीं</span>')+'</td></tr>').join("")+'</tbody></table></section>').join("");
-            const html='<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>परिवार के 40 प्रश्नों का विवरण</title><style>body{font-family:Arial,"Noto Sans Devanagari",sans-serif;color:#172033;margin:24px;font-size:12px}h1{font-size:20px;margin:0 0 8px}h2{font-size:16px;margin:24px 0 8px;color:#123b66}h3{font-size:13px;margin:12px 0 5px;color:#123b66}.meta{margin-bottom:16px;line-height:1.7}.note{background:#fff4d6;padding:9px;border:1px solid #e8d49a;margin:12px 0}table{width:100%;border-collapse:collapse;margin:6px 0 12px;table-layout:fixed}th,td{border:1px solid #aab4c0;padding:6px;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#edf2f7}.q{break-inside:avoid;margin-bottom:10px}.blank{color:#777;font-style:italic}.actions{margin:14px 0}.actions button{padding:8px 14px;font-size:14px}@media print{body{margin:12mm}.actions{display:none}h2,h3{break-after:avoid}table{break-inside:avoid}}@page{size:A4;margin:12mm}</style></head><body><div class="actions"><button onclick="window.print()">PDF सेव / Print करें</button></div><h1>परिवार के सभी सदस्यों का 40 प्रश्नों का विवरण</h1><div class="meta">मकान संख्या: <b>'+esc(h.houseNo||"—")+'</b><br>मुखिया: <b>'+esc(h.headName||getName(members[0]))+'</b><br>कुल सदस्य: <b>'+members.length+'</b><br>रिपोर्ट दिनांक: '+esc(new Date().toLocaleDateString("hi-IN"))+'</div><div class="note">यह रिपोर्ट आपके इस Offline Demo App में दर्ज डेटा से बनी है। समान उत्तर वाले प्रश्न ऊपर एक साथ दिखाए गए हैं; अलग/अधूरे उत्तर नीचे सदस्यवार हैं। इसे आधिकारिक PE App में प्रविष्टि के लिए सहायक नोट मानें। प्रत्येक उत्तर मूल स्रोत/उत्तरदाता से मिलाकर ही दर्ज करें।</div><h2>भाग 1 — सभी सदस्यों के समान उत्तर</h2><table><thead><tr><th>प्रश्न</th><th>प्रश्न का नाम</th><th>समान उत्तर</th><th>सदस्य</th></tr></thead><tbody>'+renderCommon+'</tbody></table><h2>भाग 2 — अलग-अलग / अधूरे उत्तर (सदस्यवार)</h2>'+renderIndividual+'<p style="margin-top:24px;font-size:10px;color:#555">नोट: प्रश्नों के नाम इस Demo App में उपलब्ध सूची के अनुसार हैं। यह सरकारी प्रमाणपत्र या आधिकारिक जनगणना फॉर्म नहीं है।</p></body></html>';
+
+            const commonHtml = common.length ? common.map(x=>'<div class="common-item"><b>प्रश्न '+x.q.id+'. '+esc(x.q.title)+'</b><div>'+esc(x.value)+'</div></div>').join("") : '<p class="muted">कोई ऐसा प्रश्न नहीं मिला जिसका उत्तर सभी सदस्यों में समान और भरा हुआ हो।</p>';
+            const memberPages = individualByMember.map(m=>{
+                const rows=m.items.map(x=>'<div class="answer-row"><div class="question"><b>प्र. '+x.q.id+'</b> '+esc(x.q.title)+'</div><div class="answer">'+(x.value.trim()?esc(x.value):'<span class="blank">____________________________</span>')+'</div></div>').join("");
+                return '<section class="member-page"><div class="member-head"><span>सदस्य '+esc(m.id)+'</span><h2>'+esc(m.name)+'</h2></div><p class="hint">नीचे केवल वे प्रश्न हैं जिनका उत्तर परिवार के सभी सदस्यों में समान नहीं मिला। खाली स्थान पर उत्तरदाता से जानकारी लेकर भरें।</p>'+rows+'</section>';
+            }).join("");
+
+            const html='<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>परिवार जनगणना कार्यपत्रक</title><style>
+            *{box-sizing:border-box}body{font-family:Arial,"Noto Sans Devanagari",sans-serif;color:#172033;margin:0;font-size:12px;line-height:1.5}
+            .page{padding:12mm}.top{border-bottom:2px solid #243f60;padding-bottom:10px;margin-bottom:14px}h1{font-size:20px;margin:0 0 7px}h2{font-size:17px;margin:0}.meta{display:flex;flex-wrap:wrap;gap:8px 22px;color:#39485b}.note{margin:12px 0;padding:9px 11px;background:#f3f6f9;border-left:3px solid #58738f}
+            h3{font-size:14px;margin:0 0 8px}.common-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.common-item{border:1px solid #cbd3dc;border-radius:5px;padding:7px 9px;break-inside:avoid}.common-item div{margin-top:3px}
+            .member-page{padding:10mm 12mm;break-before:page}.member-head{display:flex;align-items:center;gap:14px;border-bottom:2px solid #243f60;padding-bottom:8px;margin-bottom:8px}.member-head span{background:#eaf0f6;padding:5px 9px;border-radius:4px;font-weight:bold}.hint,.muted{color:#657184;font-size:11px;margin:5px 0 12px}
+            .answer-row{display:grid;grid-template-columns:40% 60%;border-bottom:1px solid #d9dfe6;padding:7px 4px;break-inside:avoid;min-height:35px}.question{padding-right:8px}.question b{color:#234b70}.answer{overflow-wrap:anywhere}.blank{color:#777}
+            .actions{padding:12px;text-align:center;background:#f4f6f8}.actions button{padding:9px 18px;font-size:14px}.foot{font-size:10px;color:#687386;margin-top:14px}
+            @media print{.actions{display:none}.page{padding:0}.member-page{padding:0;break-before:page}body{font-size:11px}}
+            @page{size:A4;margin:12mm}</style></head><body>
+            <div class="actions"><button onclick="window.print()">PDF सेव / Print करें</button></div>
+            <main class="page"><div class="top"><h1>परिवार का जनगणना कार्यपत्रक</h1><div class="meta"><span>मकान संख्या: <b>'+esc(h.houseNo||"—")+'</b></span><span>मुखिया: <b>'+esc(h.headName||memberName(members[0]))+'</b></span><span>कुल सदस्य: <b>'+members.length+'</b></span><span>दिनांक: '+esc(new Date().toLocaleDateString("hi-IN"))+'</span></div></div>
+            <div class="note">इस पृष्ठ पर केवल सभी सदस्यों के बिल्कुल समान और भरे हुए उत्तर दिए गए हैं। इन्हें हर सदस्य के लिए अलग-अलग दोहराने की जरूरत नहीं—फिर भी मूल उत्तरदाता से पुष्टि करें।</div>
+            <h3>भाग A — सभी सदस्यों के समान उत्तर</h3><div class="common-grid">'+commonHtml+'</div>
+            <p class="foot">यह निजी सहायक कार्यपत्रक है, आधिकारिक Census दस्तावेज नहीं। आधिकारिक PE App में वही जानकारी दर्ज करें जिसकी उत्तरदाता से पुष्टि हुई हो।</p></main>
+            <div class="actions"><button onclick="window.print()">PDF सेव / Print करें</button></div>'+memberPages+'</body></html>';
             const win=window.open("","_blank");
             if(!win){showToastNotice("PDF बनाने के लिए popup अनुमति दें।");return;}
             win.document.open(); win.document.write(html); win.document.close();
