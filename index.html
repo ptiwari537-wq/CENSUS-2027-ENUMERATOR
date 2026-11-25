@@ -346,7 +346,7 @@
             <div class="card-body">
                 <div class="row g-2 align-items-end">
                     <div class="col-12"><h6 class="fw-bold mb-1">एक साथ सदस्य जोड़ें (केवल प्रश्न 1–3)</h6><small class="text-muted">नाम, संबंध और लिंग भरें। बाकी प्रश्न प्रत्येक व्यक्ति से पूछकर अलग-अलग भरें।</small></div>
-                    <div class="col-12 col-md-4"><label class="form-label">सदस्य का नाम</label><input id="fast-member-name" class="form-control" maxlength="100" placeholder="पूरा नाम"></div>
+                    <div class="col-12 col-md-4"><label class="form-label">सदस्य का नाम</label><input id="fast-member-name" class="form-control" maxlength="100" placeholder="पूरा नाम" oninput="autoSelectFastGender(this.value)"></div>
                     <div class="col-6 col-md-4"><label class="form-label">मुखिया से संबंध</label><select id="fast-member-relation" class="form-select"><option value="">चुनें</option><option>मुखिया - 01</option><option>पति/पत्नी - 02</option><option>पुत्र/पुत्री - 03</option><option>पुत्रवधू/दामाद - 04</option><option>पोता/पोती - 05</option><option>माता/पिता - 06</option><option>भाई/बहन - 07</option><option>अन्य रिश्तेदार - 08</option><option>गैर-रिश्तेदार - 09</option></select></div>
                     <div class="col-6 col-md-2"><label class="form-label">लिंग</label><select id="fast-member-gender" class="form-select"><option value="">चुनें</option><option>पुरुष</option><option>महिला</option><option>ट्रांसजेंडर व्यक्ति</option></select></div>
                     <div class="col-12 col-md-2"><button class="btn btn-success w-100" onclick="fastAddFamilyMember()"><i class="fas fa-user-plus me-1"></i> जोड़ें</button></div>
@@ -1640,6 +1640,7 @@
             const male=['राम','श्याम','मोहन','सोहन','राजेश','रमेश','सुरेश','प्रवीण','अमित','सुमित','रोहित','मनीष','दीपक','विकास','आकाश','अंकित','अजय','विजय','संजय','राहुल','अरविंद','दिनेश','महेश','गणेश','कृष्ण','शिवम','अभिषेक','आशीष','अनिल','सुनील'];
             if(female.includes(last)||/(ा|ी|या)$/.test(last))return 'महिला'; if(male.includes(last)||/(ेश|ंंत|ीप|कुमार|पाल|नाथ|वीर|राज)$/.test(last))return 'पुरुष'; return '';
         }
+        function autoSelectFastGender(name){const el=document.getElementById('fast-member-gender');if(el){const g=guessIndianNameGender(name);if(g)el.value=g;}}
         function fastAddFamilyMember() {
             const name=(document.getElementById('fast-member-name')?.value||'').trim();
             const relation=document.getElementById('fast-member-relation')?.value||'';
