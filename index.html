@@ -1837,7 +1837,7 @@
                     const st = mData['q10_st'] || '';
                     const st_name = mData['q10_st_name'] || '';
                     const other_caste_opt = mData['q10_other_opt'] || '';
-                    const other_caste_name = mData['q10_other_name'] || '';
+                    const other_caste_name = (mData['q10_other_name'] !== undefined && mData['q10_other_name'] !== null) ? mData['q10_other_name'] : 'राजभर';
 
                     // Logic:
                     // If SC == 'हाँ', ST (10ख) and Other (10ग) are locked.
