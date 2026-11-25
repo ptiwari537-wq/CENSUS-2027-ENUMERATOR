@@ -289,7 +289,7 @@
                     <h5 class="mb-0 text-light opacity-90">परिवार अनुसूची - 40 प्रश्नों का ऑनलाइन अभ्यास सॉफ्टवेयर</h5>
                 </div>
                 <div class="text-end mt-2 mt-md-0">
-                    <span class="badge bg-warning text-dark fs-6"><i class="fas fa-flask me-1"></i> प्रायोगिक संस्करण 6.0 Smart Family Fast Entry</span>
+                    <span class="badge bg-warning text-dark fs-6"><i class="fas fa-flask me-1"></i> प्रायोगिक संस्करण 6.1 Smart Review & Safe Entry</span>
                 </div>
             </div>
 
@@ -349,7 +349,8 @@
                     <div class="col-12 col-md-6"><button class="btn btn-outline-success w-100" type="button" onclick="saveFamilySuggestionsFromCurrentMember()"><i class="fas fa-save me-1"></i> वर्तमान सदस्य से सुझाव सेव करें</button></div>
                     <div class="col-12 col-md-6"><button class="btn btn-success w-100" type="button" onclick="applyFamilySuggestionsToCurrentMember()"><i class="fas fa-magic me-1"></i> इस सदस्य के खाली उत्तरों में सुझाव लगाएं</button></div>
                 </div>
-                <div class="small text-muted mt-2">सुझाव वाले प्रश्न: 8 राष्ट्रीयता, 9 धर्म, 14 मातृभाषा/अन्य भाषाएं। हर व्यक्ति से पुष्टि करें। अलग उत्तर होने पर PE App में सही उत्तर ही भरें।</div>
+                <div class="d-grid mt-2"><button class="btn btn-outline-warning" id="review-suggestions-btn" type="button" onclick="reviewNextFamilySuggestion()" disabled><i class="fas fa-clipboard-check me-1"></i> पुष्टि बाकी देखें (0)</button></div>
+                <div class="small text-muted mt-2">सुझाव वाले प्रश्न: 8 राष्ट्रीयता, 9 धर्म, 14 मातृभाषा/अन्य भाषाएं। हर व्यक्ति से पुष्टि करें। अलग उत्तर होने पर PE App में सही उत्तर ही भरें। प्रश्न 10 जाति/समुदाय स्वतः नहीं भरा जाएगा।</div>
             </div>
         </div>
 
@@ -369,7 +370,7 @@
 
             <div class="d-flex gap-2 flex-wrap">
                 <button class="btn btn-warning btn-sm fw-bold text-dark" onclick="downloadThisSoftware()">
-                    <i class="fas fa-download me-1"></i> सॉफ्टवेयर डाउनलोड करें (v6.0)
+                    <i class="fas fa-download me-1"></i> सॉफ्टवेयर डाउनलोड करें (v6.1)
                 </button>
 
                 <button class="btn btn-share btn-sm" onclick="shareDataOnWhatsApp()">
@@ -1734,12 +1735,58 @@
             showToastNotice(count ? count + ' खाली उत्तरों में सुझाव लगाए गए। प्रश्न 8, 9 और 14 की व्यक्ति से पुष्टि करें।' : 'इस सदस्य के संबंधित उत्तर पहले से भरे हैं; कोई बदलाव नहीं किया गया।');
         }
 
+        function getPendingFamilySuggestionItems() {
+            const fields = [
+                { key:'8', flag:'q8_family_suggested', question:8, label:'राष्ट्रीयता' },
+                { key:'9', flag:'q9_family_suggested', question:9, label:'धर्म' },
+                { key:'q14_mother_tongue', flag:'q14_mother_tongue_family_suggested', question:14, label:'मातृभाषा' },
+                { key:'q14_lang1', flag:'q14_lang1_family_suggested', question:14, label:'अन्य भाषा 1' },
+                { key:'q14_lang2', flag:'q14_lang2_family_suggested', question:14, label:'अन्य भाषा 2' }
+            ];
+            const pending = [];
+            Object.entries(households).forEach(([houseId, house]) => {
+                Object.entries(house.members || {}).forEach(([memberId, member]) => {
+                    fields.forEach(field => {
+                        if(member && member[field.flag] === true) pending.push({
+                            houseId, memberId, question:field.question, label:field.label,
+                            memberName:String(member[1] || ('सदस्य '+memberId))
+                        });
+                    });
+                });
+            });
+            return pending;
+        }
+
         function renderFamilySuggestionsStatus() {
             const el = document.getElementById('family-suggestions-status');
             if (!el) return;
             const p = households[activeHouseholdId]?.familySuggestions;
             const n = p ? Object.values(p).filter(v => String(v || '').trim()).length : 0;
-            el.textContent = n ? n + ' सुझाव सेव हैं' : 'अभी सुझाव सेव नहीं हैं';
+            const pending = getPendingFamilySuggestionItems().filter(x => x.houseId === activeHouseholdId).length;
+            el.textContent = (n ? n + ' सुझाव सेव' : 'सुझाव सेव नहीं') + ' | पुष्टि बाकी: ' + pending;
+            const review = document.getElementById('review-suggestions-btn');
+            if(review) {
+                review.disabled = pending === 0;
+                review.innerHTML = '<i class="fas fa-clipboard-check me-1"></i> पुष्टि बाकी देखें (' + pending + ')';
+            }
+        }
+
+        function reviewNextFamilySuggestion() {
+            const pending = getPendingFamilySuggestionItems().filter(x => x.houseId === activeHouseholdId);
+            if(!pending.length) {
+                showToastNotice('इस घर में कोई सुझाव पुष्टि के लिए बाकी नहीं है।');
+                return;
+            }
+            const item = pending[0];
+            currentActiveMember = String(item.memberId);
+            currentActiveQuestion = item.question;
+            renderFormQuestions();
+            renderMemberSelector();
+            updateConditionalLocks();
+            switchView('single');
+            const card = document.getElementById('q-card-' + item.question);
+            if(card) card.scrollIntoView({behavior:'smooth',block:'start'});
+            showToastNotice(item.memberName + ' — प्रश्न ' + item.question + ' (' + item.label + ') की पुष्टि करें।');
         }
 
         async function addHousehold() {
@@ -2396,25 +2443,13 @@
         function updateConditionalLocks() {
             const mData = getCurrentMemberData();
 
-            // Convenience prefill for this user's local workflow only; confirm each person's actual response.
-            // Apply once per member, only when both SC and ST are explicitly marked 'नहीं'.
-            if(mData['q10_sc'] === 'नहीं' && mData['q10_st'] === 'नहीं' && !mData.q10_other_auto_suggested) {
-                if(!mData['q10_other_opt']) mData['q10_other_opt'] = 'जाति का नाम लिखें';
-                if(mData['q10_other_opt'] === 'जाति का नाम लिखें' && !mData['q10_other_name']) {
-                    mData['q10_other_name'] = 'राजभर';
-                    mData.q10_other_auto_suggested = true;
-                    saveLocalState();
-                } else if(mData['q10_other_opt'] !== 'जाति का नाम लिखें') {
-                    // Respect an already selected response such as refusal or no caste.
-                    mData.q10_other_auto_suggested = true;
-                    saveLocalState();
-                }
-                const otherRadio = document.getElementById('q10_other_1');
-                if(otherRadio && mData['q10_other_opt'] === 'जाति का नाम लिखें') otherRadio.checked = true;
-                const otherBox = document.getElementById('box-other-caste-text');
-                if(otherBox && mData['q10_other_opt'] === 'जाति का नाम लिखें') otherBox.classList.remove('d-none');
-                const casteInput = document.querySelector('#box-other-caste-text input');
-                if(casteInput && mData['q10_other_opt'] === 'जाति का नाम लिखें') casteInput.value = mData['q10_other_name'] || '';
+            // Q10 जाति/समुदाय की जानकारी कभी स्वतः न भरें। यदि पुराने संस्करण ने
+            // 'राजभर' स्वतः भरा था और उपयोगकर्ता ने उसे नहीं बदला, तो उसे हटाकर पुष्टि मांगें।
+            if(mData.q10_other_auto_suggested === true) {
+                if(mData['q10_other_name'] === 'राजभर') mData['q10_other_name'] = '';
+                mData['q10_other_opt'] = '';
+                mData.q10_other_auto_suggested = false;
+                saveLocalState();
             }
 
             // Convenience suggestion only (not an official age-based census rule):
