@@ -322,6 +322,7 @@
                     <div class="col-6 col-md-4"><div class="d-flex gap-2"><button class="btn btn-outline-primary flex-fill" type="button" onclick="exportCurrentHouseholdBackup()">इस घर का Backup</button><button class="btn btn-outline-danger" type="button" onclick="deleteCurrentHousehold()" title="घर हटाएँ"><i class="fas fa-trash"></i></button></div></div>
                 </div>
                 <div class="mt-3 d-flex flex-wrap gap-3 small"><span id="household-count">कुल घर: 1</span><span id="db-status" class="text-success">Offline Database तैयार</span><span id="pe-progress">PE App Entry: Pending</span></div>
+                <div id="restore-status" class="small mt-2 text-primary fw-semibold" role="status" aria-live="polite">Backup स्थिति: अभी जाँच नहीं हुई</div>
             </div>
         </div>
         <div class="member-select-bar d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -2882,7 +2883,14 @@
             if (!file) { showToastNotice('पहले JSON बैकअप फ़ाइल चुनें।'); return; }
             if (input) input.value = '';
 
-            showToastNotice('JSON बैकअप पढ़ा जा रहा है...');
+            const status = document.getElementById('restore-status');
+            const setStatus = (message, isError=false) => {
+                if (status) {
+                    status.textContent = 'Backup स्थिति: ' + message;
+                    status.className = 'small mt-2 fw-semibold ' + (isError ? 'text-danger' : 'text-primary');
+                }
+            };
+            setStatus('फ़ाइल पढ़ी जा रही है — ' + file.name);
             const reader = new FileReader();
 
             reader.onload = async function(e) {
@@ -2901,49 +2909,72 @@
                         incoming['HH-RESTORED'] = { id:'HH-RESTORED', houseNo:'RESTORED', headName:'Restored Family', members:imported.members, peStatus:'pending', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString() };
                         preferredActiveId = 'HH-RESTORED';
                     } else {
-                        throw new Error('इस JSON में पहचाने जाने योग्य घरों का डेटा नहीं मिला।');
+                        throw new Error('यह Census Manager का पहचाना हुआ JSON बैकअप नहीं है।');
                     }
 
-                    const validEntries = Object.entries(incoming).filter(([id, h]) => h && typeof h === 'object' && (h.members || typeof h === 'object'));
-                    if (!validEntries.length) throw new Error('JSON में कोई परिवार नहीं मिला।');
+                    const validEntries = Object.entries(incoming).filter(([id, h]) => h && typeof h === 'object' && h.members && typeof h.members === 'object');
+                    if (!validEntries.length) throw new Error('JSON में कोई सही परिवार डेटा नहीं मिला।');
 
                     const normalized = {};
                     validEntries.forEach(([key, h], index) => {
                         const id = String(h.id || key || ('HH-' + (index + 1)));
-                        normalized[id] = {
-                            ...h,
-                            id,
-                            houseNo: h.houseNo || String(index + 1).padStart(3, '0'),
-                            members: (h.members && typeof h.members === 'object') ? h.members : {'1':{}}
-                        };
+                        normalized[id] = { ...h, id, houseNo: h.houseNo || String(index + 1).padStart(3, '0'), members: h.members };
                     });
 
+                    const totalHouses = Object.keys(normalized).length;
+                    const totalMembers = Object.values(normalized).reduce((sum, h) => sum + Object.keys(h.members || {}).length, 0);
+                    const preview = Object.values(normalized).map(h => 'घर ' + h.houseNo + ' — ' + (h.headName || 'मुखिया का नाम नहीं') + ' (' + Object.keys(h.members || {}).length + ' सदस्य)').join('\n');
+                    setStatus('फ़ाइल सही है: ' + totalHouses + ' परिवार, ' + totalMembers + ' सदस्य। पुष्टि की प्रतीक्षा।');
+
+                    const approved = confirm('JSON बैकअप जाँच सफल।\n\nकुल परिवार: ' + totalHouses + '\nकुल सदस्य: ' + totalMembers + '\n\n' + preview + '\n\nOK दबाने पर इस ऐप का वर्तमान स्थानीय परिवार डेटा इस बैकअप से बदला जाएगा। Cancel दबाने पर कोई डेटा नहीं बदलेगा।\n\nक्या Restore करना है?');
+                    if (!approved) {
+                        setStatus('Restore रद्द किया गया। पुराना डेटा नहीं बदला।');
+                        showToastNotice('Restore रद्द किया गया; कोई डेटा नहीं बदला।');
+                        return;
+                    }
+
+                    setStatus('डेटाबेस में सुरक्षित रूप से सेव हो रहा है...');
                     if (!censusDB) await openCensusDB();
-                    households = { ...households, ...normalized };
+
+                    await new Promise((resolve, reject) => {
+                        const tx = censusDB.transaction(DB_STORE, 'readwrite');
+                        const store = tx.objectStore(DB_STORE);
+                        store.clear();
+                        Object.values(normalized).forEach(h => store.put(h));
+                        tx.oncomplete = () => resolve();
+                        tx.onerror = () => reject(tx.error || new Error('डेटाबेस सेव विफल'));
+                        tx.onabort = () => reject(tx.error || new Error('डेटाबेस सेव रद्द हुआ'));
+                    });
+
+                    households = normalized;
                     activeHouseholdId = (preferredActiveId && households[preferredActiveId]) ? preferredActiveId : Object.keys(normalized)[0];
                     loadActiveHousehold();
+                    try { localStorage.setItem('census_manager_fallback', JSON.stringify({activeHouseholdId, households})); }
+                    catch(storageError) { console.warn('Local fallback could not be written:', storageError); }
 
-                    for (const h of Object.values(normalized)) await dbRequest('readwrite', 'put', h);
-                    saveLocalState();
                     refreshHouseholdUI();
                     renderFormQuestions();
                     renderMemberSelector();
                     updateConditionalLocks();
                     updateMembersRemainingBadge();
+                    const selector = document.getElementById('household-select');
+                    if (selector) selector.value = activeHouseholdId;
 
-                    const total = Object.keys(normalized).length;
-                    showToastNotice('रीस्टोर सफल: ' + total + ' परिवार लोड हुए। घरों की सूची जाँचें।');
+                    setStatus('सफल — ' + totalHouses + ' परिवार और ' + totalMembers + ' सदस्य लोड हुए।');
+                    showToastNotice('रीस्टोर सफल: ' + totalHouses + ' परिवार, ' + totalMembers + ' सदस्य। घरों की सूची देखें।');
                 } catch(err) {
                     console.error('JSON restore failed:', err);
+                    setStatus('विफल — ' + (err && err.message ? err.message : 'अज्ञात त्रुटि'), true);
                     showToastNotice('रीस्टोर नहीं हुआ: ' + (err && err.message ? err.message : 'JSON फ़ाइल पढ़ने में समस्या'));
                 }
             };
             reader.onerror = function() {
+                setStatus('फ़ाइल पढ़ी नहीं जा सकी।', true);
                 showToastNotice('JSON फ़ाइल पढ़ी नहीं जा सकी। Downloads से फ़ाइल दोबारा चुनें।');
             };
             reader.readAsText(file);
         }
-        
+
         function toggleParentIsMember(keyP, isChecked) {
             updateValue(keyP + '_is_member', isChecked ? 'हाँ' : 'नहीं');
             if(isChecked) {
