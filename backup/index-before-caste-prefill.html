@@ -1,0 +1,2981 @@
+<html lang="hi"><head>
+    <meta charset="UTF-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=2cabcaf4-79cc-4dc2-99ee-7a05c2737f3b
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a3d62">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <title>भारत की जनगणना 2027 - परिवार अनुसूची (प्रायोगिक अभ्यास सॉफ्टवेयर)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gov: #0a3d62;
+            --secondary-gov: #1e3799;
+            --accent-gold: #f6b93b;
+            --accent-orange: #e67e22;
+            --lock-red: #b71540;
+            --bg-light: #f8f9fa;
+        }
+
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            background-color: #f1f4f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2c3e50;
+            padding-bottom: 60px;
+        }
+
+        .gov-header {
+            background: linear-gradient(135deg, var(--primary-gov) 0%, var(--secondary-gov) 100%);
+            color: white;
+            padding: 18px 20px;
+            border-bottom: 5px solid var(--accent-gold);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .author-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 5px solid var(--accent-gold);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .author-name {
+            color: #f8c291;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .author-designation {
+            color: #dcdde1;
+            font-size: 0.9rem;
+        }
+
+        .lock-status-tag {
+            background-color: var(--lock-red);
+            color: white;
+            font-size: 0.78rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+            font-weight: bold;
+        }
+
+        .member-select-bar {
+            background: #ffffff;
+            border-left: 6px solid var(--accent-orange);
+            border-radius: 10px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .q-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e1e8ed;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .q-card:hover {
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .q-header {
+            background-color: #f7f9fa;
+            border-bottom: 1px solid #e1e8ed;
+            padding: 12px 18px;
+            font-weight: 700;
+            color: var(--primary-gov);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .q-number {
+            background: var(--primary-gov);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            margin-right: 8px;
+        }
+
+        .q-body {
+            padding: 18px;
+        }
+
+        .q-card.conditionally-locked {
+            opacity: 0.65;
+            background-color: #f8d7da33;
+            border-color: #f5c6cb;
+        }
+
+        .q-card.conditionally-locked .q-body {
+            pointer-events: none;
+        }
+
+        .lock-overlay-banner {
+            background-color: #721c24;
+            color: white;
+            font-size: 0.82rem;
+            padding: 5px 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--secondary-gov);
+            border-color: var(--secondary-gov);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-gov);
+            box-shadow: 0 0 0 0.25rem rgba(30, 55, 153, 0.25);
+        }
+
+        .control-bar {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-share {
+            background-color: #25D366;
+            color: white;
+            font-weight: 600;
+        }
+        .btn-share:hover {
+            background-color: #128C7E;
+            color: white;
+        }
+
+        .member-action-panel {
+            background: #ffffff;
+            border: 2px solid #0066cc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            box-shadow: 0 4px 15px rgba(0,102,204,0.1);
+            text-align: center;
+        }
+
+        .btn-save-member {
+            background-color: #1a73e8;
+            color: white;
+            font-weight: 700;
+            font-size: 1.05rem;
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 10px rgba(26,115,232,0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-save-member:hover {
+            background-color: #1557b0;
+            transform: translateY(-1px);
+        }
+
+        .btn-next-member-q7 {
+            background-color: #8ab4f8;
+            color: #041e49;
+            font-weight: 700;
+            font-size: 0.98rem;
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: none;
+            width: 100%;
+            max-width: 450px;
+            margin-top: 10px;
+        }
+
+        .member-remaining-badge {
+            color: #4a5568;
+            font-size: 0.92rem;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+
+        .security-watermark {
+            position: fixed;
+            bottom: 12px;
+            right: 15px;
+            background: rgba(10, 61, 98, 0.92);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 25px;
+            font-size: 0.78rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 9999;
+            pointer-events: none;
+            border: 1px solid var(--accent-gold);
+        }
+
+        .sub-q-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--secondary-gov);
+            padding: 12px 15px;
+            border-radius: 4px;
+            margin-top: 12px;
+        }
+
+        .custom-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            min-width: 300px;
+        }
+
+        .info-notice-banner {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body class="no-select" oncontextmenu="return showLockNotice(event);">
+
+    <header class="gov-header" id="immutable-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <span class="lock-status-tag" style="background-color: #e67e22;"><i class="fas fa-flask me-1"></i> प्रायोगिक (डेमो) मॉडल</span>
+                    <h2 class="mb-1 fw-bold"><i class="fas fa-clipboard-list me-2"></i>भारत की जनगणना 2027 (प्रायोगिक)</h2>
+                    <h5 class="mb-0 text-light opacity-90">परिवार अनुसूची - 40 प्रश्नों का ऑनलाइन अभ्यास सॉफ्टवेयर</h5>
+                </div>
+                <div class="text-end mt-2 mt-md-0">
+                    <span class="badge bg-warning text-dark fs-6"><i class="fas fa-flask me-1"></i> प्रायोगिक संस्करण 5.8 Fast Entry</span>
+                </div>
+            </div>
+
+            <div class="alert alert-warning py-2 px-3 mt-2 mb-2 border-0 fw-semibold text-dark shadow-sm" style="font-size: 0.92rem; background-color: #fff3cd; border-left: 5px solid #ff9f43 !important;">
+                <i class="fas fa-exclamation-triangle text-danger me-2"></i><strong>महत्वपूर्ण सूचना:</strong> यह एक <strong>प्रायोगिक (Demo) जनगणना सॉफ्टवेयर</strong> है। यह आधिकारिक नहीं है। PE App में डेटा स्वतः ट्रांसफर नहीं होता; अंतिम प्रविष्टि आधिकारिक PE App में स्वयं करें।
+            </div>
+
+            <div class="author-badge" id="immutable-author-box">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-shield fs-3 text-warning me-3"></i>
+                    <div>
+                        <div class="author-name" id="author-name-text">मार्गदर्शन एवं सॉफ्टवेयर निर्माण: आदित्य कुमार द्विवेदी</div>
+                        <div class="author-designation" id="author-desig-text">सहायक अध्यापक, शहीद-ए-आजम सरदार भगत सिंह इंटर कॉलेज, गोंडा (उत्तर प्रदेश)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mt-4">
+        <div class="card mb-3 border-primary shadow-sm">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div><h5 class="mb-1 fw-bold text-primary"><i class="fas fa-house-user me-2"></i>बहु-परिवार Offline Census Manager</h5><small class="text-muted">डेटा इसी मोबाइल में IndexedDB में सेव होगा। PE App में स्वतः transfer नहीं होगा।</small></div>
+                    <button class="btn btn-success" type="button" onclick="addHousehold()"><i class="fas fa-plus me-1"></i> नया घर जोड़ें</button>
+                </div>
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-md-5"><label class="form-label fw-bold">सक्रिय घर / मकान संख्या</label><select id="household-select" class="form-select" onchange="switchHousehold(this.value)"></select></div>
+                    <div class="col-6 col-md-3"><label class="form-label fw-bold">PE App स्थिति</label><select id="pe-status" class="form-select" onchange="updatePEStatus(this.value)"><option value="pending">Pending</option><option value="completed">Completed</option></select></div>
+                    <div class="col-6 col-md-4"><div class="d-flex gap-2"><button class="btn btn-outline-primary flex-fill" type="button" onclick="exportCurrentHouseholdBackup()">इस घर का Backup</button><button class="btn btn-outline-danger" type="button" onclick="deleteCurrentHousehold()" title="घर हटाएँ"><i class="fas fa-trash"></i></button></div></div>
+                </div>
+                <div class="mt-3 d-flex flex-wrap gap-3 small"><span id="household-count">कुल घर: 1</span><span id="db-status" class="text-success">Offline Database तैयार</span><span id="pe-progress">PE App Entry: Pending</span></div>
+            </div>
+        </div>
+        <div class="member-select-bar d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-users text-primary fs-4"></i>
+                <label for="member-select" class="fw-bold text-dark mb-0 fs-6">सदस्य का क्रमांक:</label>
+                <select id="member-select" class="form-select form-select-sm fw-bold border-primary" style="width: auto; min-width: 130px;" onchange="changeActiveMember(this.value)"></select>
+                <button type="button" class="btn btn-primary btn-sm" onclick="addFamilyMember()"><i class="fas fa-user-plus me-1"></i> सदस्य जोड़ें</button>
+            </div>
+            <div class="text-muted small fw-semibold">
+                <i class="fas fa-info-circle me-1 text-info"></i> सदस्यवार या प्रश्नवार तरीका चुनकर डेटा भरें
+            </div>
+        </div>
+
+        <div class="control-bar">
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+                <span class="fw-bold text-dark me-2"><i class="fas fa-sliders-h me-1"></i> कार्य शैली:</span>
+                <button class="btn btn-outline-success btn-sm active" id="btn-workflow-member" onclick="switchWorkflowMode('member')">सदस्यवार</button>
+                <button class="btn btn-outline-success btn-sm" id="btn-workflow-question" onclick="switchWorkflowMode('question')">प्रश्नवार</button>
+                <span class="fw-bold text-dark ms-2 me-1">डिस्प्ले:</span>
+                <button class="btn btn-outline-primary btn-sm active" id="btn-view-all" onclick="switchView('all')">
+                    <i class="fas fa-list-ol me-1"></i> सभी 40 प्रश्न (Full Form)
+                </button>
+                <button class="btn btn-outline-primary btn-sm" id="btn-view-single" onclick="switchView('single')">
+                    <i class="fas fa-square-full me-1"></i> एकल प्रश्न मोड (Step Mode)
+                </button>
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                <button class="btn btn-warning btn-sm fw-bold text-dark" onclick="downloadThisSoftware()">
+                    <i class="fas fa-download me-1"></i> सॉफ्टवेयर डाउनलोड करें (v5.8)
+                </button>
+
+                <button class="btn btn-share btn-sm" onclick="shareDataOnWhatsApp()">
+                    <i class="fab fa-whatsapp me-1"></i> व्हाट्सएप पर शेयर करें
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="exportJSONBackup()">
+                    <i class="fas fa-download me-1"></i> JSON बैकअप
+                </button>
+                <button class="btn btn-outline-info btn-sm" onclick="document.getElementById('file-import').click()">
+                    <i class="fas fa-upload me-1"></i> रीस्टोर
+                </button>
+                <input type="file" id="file-import" accept=".json" style="display:none" onchange="importJSONBackup(event)">
+                <button class="btn btn-danger btn-sm" onclick="resetFormConfirmation()">
+                    <i class="fas fa-undo me-1"></i> रीसेट
+                </button>
+            </div>
+        </div>
+
+        <div id="single-nav-bar" class="card mb-3 p-3 bg-white d-none shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+                <button class="btn btn-secondary btn-sm" id="btn-prev-q" onclick="workflowMode === 'question' ? advanceQuestionWise(-1) : navigateQuestion(-1)"><i class="fas fa-arrow-left me-1"></i> पिछला प्रश्न</button>
+                <span class="fw-bold text-primary" id="single-q-indicator">प्रश्न 1 / 40</span>
+                <button class="btn btn-primary btn-sm" id="btn-next-q" onclick="workflowMode === 'question' ? advanceQuestionWise(1) : navigateQuestion(1)">अगला प्रश्न <i class="fas fa-arrow-right ms-1"></i></button>
+            </div>
+        </div>
+
+        <form id="census-form" onsubmit="event.preventDefault();">
+            <div id="questions-wrapper-part1"><div class="q-card" id="q-card-1">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 1</span>
+                            <span>व्यक्ति का नाम</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-1">
+                        <input type="text" class="form-control" placeholder="परिवार के सदस्य का नाम लिखें (परिवार के मुखिया से प्रारंभ करें)" value="" oninput="updateValue(1, this.value)">
+                    </div>
+                </div><div class="q-card" id="q-card-2">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 2</span>
+                            <span>मुखिया से संबंध</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-2">
+                        <select class="form-select" onchange="updateValue(2, this.value)"><option value="">-- स्थिति/संबंध चुनें --</option><option value="मुखिया - 01">मुखिया - 01</option><option value="पति/पत्नी - 02">पति/पत्नी - 02</option><option value="पुत्र/पुत्री - 03">पुत्र/पुत्री - 03</option><option value="पुत्रवधू/दामाद - 04">पुत्रवधू/दामाद - 04</option><option value="पोता/पोती - 05">पोता/पोती - 05</option><option value="माता/पिता - 06">माता/पिता - 06</option><option value="भाई/बहन - 07">भाई/बहन - 07</option><option value="अन्य रिश्तेदार - 08">अन्य रिश्तेदार - 08</option><option value="गैर-रिश्तेदार - 09">गैर-रिश्तेदार - 09</option></select>
+                    </div>
+                </div><div class="q-card" id="q-card-3">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 3</span>
+                            <span>लिंग</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_3" id="q_3_0" value="पुरुष" onchange="updateValue(3, this.value)">
+                            <label class="form-check-label fw-medium" for="q_3_0">पुरुष</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_3" id="q_3_1" value="महिला" onchange="updateValue(3, this.value)">
+                            <label class="form-check-label fw-medium" for="q_3_1">महिला</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_3" id="q_3_2" value="ट्रांसजेंडर व्यक्ति" onchange="updateValue(3, this.value)">
+                            <label class="form-check-label fw-medium" for="q_3_2">ट्रांसजेंडर व्यक्ति</label>
+                        </div>
+                    </div>
+                </div><div class="q-card" id="q-card-4">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 4</span>
+                            <span>जन्म तिथि और आयु</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-4">
+                        
+                    <div class="mb-3 " id="q4_dob_container">
+                        <label class="form-label fw-bold">
+                            4(क). जन्म तिथि
+                            <span id="q4_dob_badge"></span>
+                        </label>
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <input type="number" id="q4_dd_input" min="1" max="31" class="form-control text-center" placeholder="DD" value="" oninput="handleDobInputChange('q4_dd', this.value)">
+                            </div>
+                            <div class="col-4">
+                                <input type="number" id="q4_mm_input" min="1" max="12" class="form-control text-center" placeholder="MM" value="" oninput="handleDobInputChange('q4_mm', this.value)">
+                            </div>
+                            <div class="col-4">
+                                <input type="number" id="q4_yyyy_input" min="1900" max="2027" class="form-control text-center" placeholder="YYYY" value="" oninput="handleDobInputChange('q4_yyyy', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2 " id="q4_age_container">
+                        <label class="form-label fw-bold">
+                            4(ख). आयु (पूर्ण वर्षों में)
+                            <span id="q4_age_badge"></span>
+                        </label>
+                        <input type="number" id="q4_age_input" min="0" max="120" class="form-control" placeholder="आयु दर्ज करें" value="" oninput="handleAgeInputChange(this.value)">
+                    </div>
+                    <div class="info-notice-banner">
+                        <i class="fas fa-exclamation-circle text-warning fs-5"></i>
+                        <span>उत्तर प्रदेश के लिए आयु की गणना 5 जनवरी 2027 की संदर्भ तारीख के अनुसार करें।</span>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-5">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 5</span>
+                            <span>वर्तमान वैवाहिक स्थिति</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-5">
+                        <select class="form-select" onchange="updateValue(5, this.value)"><option value="">-- स्थिति/संबंध चुनें --</option><option value="अविवाहित - 1">अविवाहित - 1</option><option value="वर्तमान में विवाहित - 2">वर्तमान में विवाहित - 2</option><option value="विधवा/विधुर - 3">विधवा/विधुर - 3</option><option value="संबंध विच्छेदित - 4">संबंध विच्छेदित - 4</option><option value="तलाकशुदा - 5">तलाकशुदा - 5</option></select>
+                    </div>
+                </div><div class="q-card" id="q-card-6">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 6</span>
+                            <span>विवाह के समय आयु</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-6">
+                        <input type="number" min="0" class="form-control" placeholder="आयु दर्ज करें" value="" oninput="updateValue(6, this.value)">
+                    </div>
+                </div></div>
+            
+            <div class="member-action-panel">
+                <button class="btn-save-member" onclick="saveCurrentMemberData()">
+                    <i class="fas fa-save me-2"></i>सदस्य का विवरण सेव करें
+                </button>
+                <div class="member-remaining-badge" id="members-remaining-text">जानकारी भरने के लिए 6 सदस्य बाकी हैं</div>
+                <button class="btn-next-member-q7" onclick="scrollToQuestion7()">
+                    प्रश्न 7 से सदस्य की जानकारी डालें। <i class="fas fa-arrow-down ms-1"></i>
+                </button>
+            </div>
+
+            <div id="questions-wrapper-part2"><div class="q-card" id="q-card-7">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 7</span>
+                            <span>पति/पत्नी का नाम</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-7">
+                        <input type="text" class="form-control" placeholder="पति/पत्नी का नाम लिखें (यदि लागू हो)" value="" oninput="updateValue(7, this.value)">
+                    </div>
+                </div><div class="q-card" id="q-card-8">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 8</span>
+                            <span>घोषित राष्ट्रीयता</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-8">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_8" id="q_8_0" value="भारतीय" onchange="updateValue(8, this.value)">
+                            <label class="form-check-label fw-medium" for="q_8_0">भारतीय</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_8" id="q_8_1" value="अन्य" onchange="updateValue(8, this.value)">
+                            <label class="form-check-label fw-medium" for="q_8_1">अन्य</label>
+                        </div>
+                    </div>
+                </div><div class="q-card" id="q-card-9">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 9</span>
+                            <span>धर्म</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-9">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_9" id="q_9_0" value="हिन्दू" onchange="updateValue(9, this.value)">
+                            <label class="form-check-label fw-medium" for="q_9_0">हिन्दू</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_9" id="q_9_1" value="मुस्लिम" onchange="updateValue(9, this.value)">
+                            <label class="form-check-label fw-medium" for="q_9_1">मुस्लिम</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_9" id="q_9_2" value="ईसाई" onchange="updateValue(9, this.value)">
+                            <label class="form-check-label fw-medium" for="q_9_2">ईसाई</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_9" id="q_9_3" value="सिख" onchange="updateValue(9, this.value)">
+                            <label class="form-check-label fw-medium" for="q_9_3">सिख</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_9" id="q_9_4" value="बौद्ध" onchange="updateValue(9, this.value)">
+                            <label class="form-check-label fw-medium" for="q_9_4">बौद्ध</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_9" id="q_9_5" value="जैन" onchange="updateValue(9, this.value)">
+                            <label class="form-check-label fw-medium" for="q_9_5">जैन</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_9" id="q_9_6" value="अन्य" onchange="updateValue(9, this.value)">
+                            <label class="form-check-label fw-medium" for="q_9_6">अन्य</label>
+                        </div>
+                    </div>
+                </div><div class="q-card" id="q-card-10">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 10</span>
+                            <span>अनुसूचित जाति (अ.जा.) / अनुसूचित जनजाति (अ.ज.जा.) / जाति</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-10">
+                        
+                    <div class="sub-q-box mb-3 ">
+                        <div class="fw-bold text-dark mb-2">
+                            10 (क) क्या यह व्यक्ति अनुसूचित जाति (अ.जा.) है?
+                            
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q10_sc" id="q10_sc_yes" value="हाँ" onchange="handleCasteSelection('sc', 'हाँ')">
+                            <label class="form-check-label" for="q10_sc_yes">हाँ</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q10_sc" id="q10_sc_no" value="नहीं" onchange="handleCasteSelection('sc', 'नहीं')">
+                            <label class="form-check-label" for="q10_sc_no">नहीं</label>
+                        </div>
+                        <div id="box-sc-name" class="d-none mt-2">
+                            <input type="text" class="form-control form-control-sm" placeholder="अनुसूचित जाति (अ.जा.) का नाम लिखें" value="" oninput="updateValue('q10_sc_name', this.value)">
+                        </div>
+                    </div>
+
+                    <div class="sub-q-box mb-3 ">
+                        <div class="fw-bold text-dark mb-2">
+                            10 (ख) क्या यह व्यक्ति अनुसूचित जनजाति (अ.ज.जा.) है?
+                            
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q10_st" id="q10_st_yes" value="हाँ" onchange="handleCasteSelection('st', 'हाँ')">
+                            <label class="form-check-label" for="q10_st_yes">हाँ</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q10_st" id="q10_st_no" value="नहीं" onchange="handleCasteSelection('st', 'नहीं')">
+                            <label class="form-check-label" for="q10_st_no">नहीं</label>
+                        </div>
+                        <div id="box-st-name" class="d-none mt-2">
+                            <input type="text" class="form-control form-control-sm" placeholder="अनुसूचित जनजाति (अ.ज.जा.) का नाम लिखें" value="" oninput="updateValue('q10_st_name', this.value)">
+                        </div>
+                    </div>
+
+                    <div class="sub-q-box opacity-50 pe-none" id="box-other-caste">
+                        <div class="fw-bold text-dark mb-2">
+                            10 (ग) यदि अ.जा./अ.ज.जा. में 'नहीं' है तो अन्य जाति विवरण:
+                            <span class="badge bg-danger ms-1"><i class="fas fa-lock me-1"></i>लॉक (10क एवं 10ख में "नहीं" चुनने पर ही खुलेगा)</span>
+                        </div>
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="radio" name="q10_other_opt" id="q10_other_1" value="जाति का नाम लिखें" disabled="" onchange="handleCasteSelection('other', 'जाति का नाम लिखें')">
+                            <label class="form-check-label" for="q10_other_1">जाति का नाम लिखें</label>
+                        </div>
+                        <div id="box-other-caste-text" class="d-none ms-4 my-2">
+                            <input type="text" class="form-control form-control-sm" list="other-caste-suggestions" placeholder="जाति का नाम दर्ज करें (जैसे राजभर)" value="" oninput="updateValue('q10_other_name', this.value)">
+                            <datalist id="other-caste-suggestions"><option value="राजभर"></option></datalist>
+                        </div>
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="radio" name="q10_other_opt" id="q10_other_2" value="जाति का नाम नहीं बताना चाहते" disabled="" onchange="handleCasteSelection('other', 'जाति का नाम नहीं बताना चाहते')">
+                            <label class="form-check-label" for="q10_other_2">जाति का नाम नहीं बताना चाहते</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="q10_other_opt" id="q10_other_3" value="कोई जाति नहीं" disabled="" onchange="handleCasteSelection('other', 'कोई जाति नहीं')">
+                            <label class="form-check-label" for="q10_other_3">कोई जाति नहीं</label>
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-11">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 11</span>
+                            <span>पिता का विवरण</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-11">
+                        
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="q11_is_member" onchange="toggleParentIsMember('q11', this.checked)">
+                        <label class="form-check-label fw-bold" for="q11_is_member">यदि पिता इस परिवार के सदस्य हैं, तो चेक (टिक) करें</label>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">सदस्य क्रमांक</label>
+                            <select class="form-select border-primary fw-bold" onchange="autoFillParentFromMember('q11', this.value)" disabled="">
+                                <option value="">-- क्रमांक चुनें --</option>
+                                <option value="1">सदस्य 1</option><option value="2">सदस्य 2</option><option value="3">सदस्य 3</option><option value="4">सदस्य 4</option><option value="5">सदस्य 5</option><option value="6">सदस्य 6</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">क) नाम</label>
+                            <input type="text" id="q11_name_input" class="form-control" placeholder="पिता का नाम" value="" oninput="updateValue('q11_name', this.value)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ख) जन्म तिथि</label>
+                            <input type="date" id="q11_dob_input" class="form-control" value="" onchange="updateValue('q11_dob', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ग) जन्म स्थान</label>
+                            <select class="form-select mb-2" onchange="updateValue('q11_place', this.value)">
+                                <option value="भारत में" selected="">भारत में</option>
+                                <option value="भारत के बाहर">भारत के बाहर</option>
+                            </select>
+                            <input type="text" class="form-control" placeholder="गाँव/नगर/मोहल्ला या देश का नाम" value="" oninput="updateValue('q11_place_name', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">घ) धर्म</label>
+                            <select id="q11_religion_select" class="form-select" onchange="updateValue('q11_religion', this.value)">
+                                <option value="">-- धर्म का चयन करें --</option>
+                                <option value="हिन्दू">हिन्दू</option><option value="मुस्लिम">मुस्लिम</option><option value="ईसाई">ईसाई</option><option value="सिख">सिख</option><option value="बौद्ध">बौद्ध</option><option value="जैन">जैन</option><option value="अन्य">अन्य</option>
+                            </select>
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-12">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 12</span>
+                            <span>माता का विवरण</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-12">
+                        
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="q12_is_member" onchange="toggleParentIsMember('q12', this.checked)">
+                        <label class="form-check-label fw-bold" for="q12_is_member">यदि माता इस परिवार के सदस्य हैं, तो चेक (टिक) करें</label>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">सदस्य क्रमांक</label>
+                            <select class="form-select border-primary fw-bold" onchange="autoFillParentFromMember('q12', this.value)" disabled="">
+                                <option value="">-- क्रमांक चुनें --</option>
+                                <option value="1">सदस्य 1</option><option value="2">सदस्य 2</option><option value="3">सदस्य 3</option><option value="4">सदस्य 4</option><option value="5">सदस्य 5</option><option value="6">सदस्य 6</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">क) नाम</label>
+                            <input type="text" id="q12_name_input" class="form-control" placeholder="माता का नाम" value="" oninput="updateValue('q12_name', this.value)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ख) जन्म तिथि</label>
+                            <input type="date" id="q12_dob_input" class="form-control" value="" onchange="updateValue('q12_dob', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ग) जन्म स्थान</label>
+                            <select class="form-select mb-2" onchange="updateValue('q12_place', this.value)">
+                                <option value="भारत में" selected="">भारत में</option>
+                                <option value="भारत के बाहर">भारत के बाहर</option>
+                            </select>
+                            <input type="text" class="form-control" placeholder="गाँव/नगर/मोहल्ला या देश का नाम" value="" oninput="updateValue('q12_place_name', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">घ) धर्म</label>
+                            <select id="q12_religion_select" class="form-select" onchange="updateValue('q12_religion', this.value)">
+                                <option value="">-- धर्म का चयन करें --</option>
+                                <option value="हिन्दू">हिन्दू</option><option value="मुस्लिम">मुस्लिम</option><option value="ईसाई">ईसाई</option><option value="सिख">सिख</option><option value="बौद्ध">बौद्ध</option><option value="जैन">जैन</option><option value="अन्य">अन्य</option>
+                            </select>
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-13">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 13</span>
+                            <span>दिव्यांगता</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-13">
+                        
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">13 (क) क्या इस व्यक्ति को कोई दिव्यांगता है?</label><br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q13_has" id="q13_has_yes" value="हाँ" onchange="updateValue('q13_has', 'हाँ')">
+                            <label class="form-check-label" for="q13_has_yes">हाँ</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q13_has" id="q13_has_no" value="नहीं" checked="" onchange="updateValue('q13_has', 'नहीं')">
+                            <label class="form-check-label" for="q13_has_no">नहीं</label>
+                        </div>
+                    </div>
+                    <div id="q13-types-box" class="d-none sub-q-box">
+                        <div class="fw-bold mb-2 text-dark">13 (ख) यदि 'हाँ', तो उपयुक्त विकल्प/विकल्पों पर सही का निशान लगाएँ (अधिकतम 3 विकल्प):</div>
+                        <div class="row"><div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input dis-type-cb" type="checkbox" id="dis_0" value="देखने में" onchange="toggleDisabilityOption('देखने में')">
+                                <label class="form-check-label" for="dis_0">देखने में</label>
+                            </div>
+                        </div><div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input dis-type-cb" type="checkbox" id="dis_1" value="सुनने में" onchange="toggleDisabilityOption('सुनने में')">
+                                <label class="form-check-label" for="dis_1">सुनने में</label>
+                            </div>
+                        </div><div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input dis-type-cb" type="checkbox" id="dis_2" value="बोलने में" onchange="toggleDisabilityOption('बोलने में')">
+                                <label class="form-check-label" for="dis_2">बोलने में</label>
+                            </div>
+                        </div><div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input dis-type-cb" type="checkbox" id="dis_3" value="चलने-फिरने में" onchange="toggleDisabilityOption('चलने-फिरने में')">
+                                <label class="form-check-label" for="dis_3">चलने-फिरने में</label>
+                            </div>
+                        </div><div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input dis-type-cb" type="checkbox" id="dis_4" value="बौद्धिक दिव्यांगता" onchange="toggleDisabilityOption('बौद्धिक दिव्यांगता')">
+                                <label class="form-check-label" for="dis_4">बौद्धिक दिव्यांगता</label>
+                            </div>
+                        </div><div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input dis-type-cb" type="checkbox" id="dis_5" value="मानसिक रोग" onchange="toggleDisabilityOption('मानसिक रोग')">
+                                <label class="form-check-label" for="dis_5">मानसिक रोग</label>
+                            </div>
+                        </div><div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input dis-type-cb" type="checkbox" id="dis_6" value="तेजाब हमले के कारण" onchange="toggleDisabilityOption('तेजाब हमले के कारण')">
+                                <label class="form-check-label" for="dis_6">तेजाब हमले के कारण</label>
+                            </div>
+                        </div><div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input dis-type-cb" type="checkbox" id="dis_7" value="पुराने तंत्रिका रोग के कारण" onchange="toggleDisabilityOption('पुराने तंत्रिका रोग के कारण')">
+                                <label class="form-check-label" for="dis_7">पुराने तंत्रिका रोग के कारण</label>
+                            </div>
+                        </div><div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input dis-type-cb" type="checkbox" id="dis_8" value="रक्त विकार के कारण" onchange="toggleDisabilityOption('रक्त विकार के कारण')">
+                                <label class="form-check-label" for="dis_8">रक्त विकार के कारण</label>
+                            </div>
+                        </div></div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-14">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 14</span>
+                            <span>मातृभाषा एवं अन्य भाषाओं का ज्ञान</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-14">
+                        
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">14 (क) मातृभाषा</label>
+                            <input type="text" class="form-control" placeholder="मातृभाषा का नाम लिखें" value="" oninput="updateValue('q14_mother_tongue', this.value)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">14 (ख) अन्य भाषा 1</label>
+                            <input type="text" class="form-control" placeholder="प्रवीनता के क्रम में दूसरी भाषा" value="" oninput="updateValue('q14_lang1', this.value)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">14 (ग) अन्य भाषा 2</label>
+                            <input type="text" class="form-control" placeholder="तीसरी भाषा" value="" oninput="updateValue('q14_lang2', this.value)">
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-15">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 15</span>
+                            <span>साक्षरता एवं डिजिटल साक्षरता की स्थिति</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-15">
+                        
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">15 (क) साक्षरता की स्थिति</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q15_lit" id="q15_lit_1" value="साक्षर" onchange="handleLiteracyChange('साक्षर')">
+                                <label class="form-check-label" for="q15_lit_1">साक्षर</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q15_lit" id="q15_lit_2" value="निरक्षर" onchange="handleLiteracyChange('निरक्षर')">
+                                <label class="form-check-label" for="q15_lit_2">निरक्षर</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 opacity-50 pe-none">
+                            <label class="form-label fw-bold">15 (ख) यदि साक्षर है तो, क्या डिजिटल रूप से साक्षर है? <span class="badge bg-danger ms-1"><i class="fas fa-lock me-1"></i>लॉक</span></label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q15_digi" id="q15_digi_1" value="हाँ" disabled="" onchange="updateValue('q15_digital', 'हाँ')">
+                                <label class="form-check-label" for="q15_digi_1">हाँ</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q15_digi" id="q15_digi_2" value="नहीं" disabled="" onchange="updateValue('q15_digital', 'नहीं')">
+                                <label class="form-check-label" for="q15_digi_2">नहीं</label>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-16">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 16</span>
+                            <span>शैक्षणिक संस्थान में शिक्षा ग्रहण की स्थिति</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-16">
+                        <div class="row"><div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q16_status" id="q16_0" value="स्कूल" onchange="updateValue('q16_status', 'स्कूल')">
+                                <label class="form-check-label" for="q16_0">स्कूल</label>
+                            </div>
+                        </div><div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q16_status" id="q16_1" value="कॉलेज" onchange="updateValue('q16_status', 'कॉलेज')">
+                                <label class="form-check-label" for="q16_1">कॉलेज</label>
+                            </div>
+                        </div><div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q16_status" id="q16_2" value="व्यावसायिक संस्थान" onchange="updateValue('q16_status', 'व्यावसायिक संस्थान')">
+                                <label class="form-check-label" for="q16_2">व्यावसायिक संस्थान</label>
+                            </div>
+                        </div><div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q16_status" id="q16_3" value="पेशेवर" onchange="updateValue('q16_status', 'पेशेवर')">
+                                <label class="form-check-label" for="q16_3">पेशेवर</label>
+                            </div>
+                        </div><div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q16_status" id="q16_4" value="दिव्यांगजन के लिए विशेष संस्थान" onchange="updateValue('q16_status', 'दिव्यांगजन के लिए विशेष संस्थान')">
+                                <label class="form-check-label" for="q16_4">दिव्यांगजन के लिए विशेष संस्थान</label>
+                            </div>
+                        </div><div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q16_status" id="q16_5" value="साक्षरता केंद्र" onchange="updateValue('q16_status', 'साक्षरता केंद्र')">
+                                <label class="form-check-label" for="q16_5">साक्षरता केंद्र</label>
+                            </div>
+                        </div><div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q16_status" id="q16_6" value="अन्य संस्थान" onchange="updateValue('q16_status', 'अन्य संस्थान')">
+                                <label class="form-check-label" for="q16_6">अन्य संस्थान</label>
+                            </div>
+                        </div><div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q16_status" id="q16_7" value="पहले कभी शिक्षा ग्रहण की है" onchange="updateValue('q16_status', 'पहले कभी शिक्षा ग्रहण की है')">
+                                <label class="form-check-label" for="q16_7">पहले कभी शिक्षा ग्रहण की है</label>
+                            </div>
+                        </div><div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q16_status" id="q16_8" value="कभी शिक्षा ग्रहण नहीं की है" onchange="updateValue('q16_status', 'कभी शिक्षा ग्रहण नहीं की है')">
+                                <label class="form-check-label" for="q16_8">कभी शिक्षा ग्रहण नहीं की है</label>
+                            </div>
+                        </div></div>
+                    </div>
+                </div><div class="q-card" id="q-card-17">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 17</span>
+                            <span>प्राप्त शिक्षा का उच्चतम स्तर तथा संकाय/विषय</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-17">
+                        
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">17 (क) प्राप्त शिक्षा का उच्चतम स्तर</label>
+                            <select class="form-select" onchange="updateValue('q17_level', this.value)">
+                                <option value="">-- स्तर का चयन करें --</option>
+                                <option value="पूर्व-प्राथमिक">पूर्व-प्राथमिक</option><option value="कक्षा 1 से 12">कक्षा 1 से 12</option><option value="आईटीआई">आईटीआई</option><option value="डिप्लोमा/प्रमाण पत्र">डिप्लोमा/प्रमाण पत्र</option><option value="स्नातक/पूर्व-स्नातक">स्नातक/पूर्व-स्नातक</option><option value="स्नातकोत्तर डिप्लोमा">स्नातकोत्तर डिप्लोमा</option><option value="स्नातकोत्तर/परास्नातक">स्नातकोत्तर/परास्नातक</option><option value="एम.फिल">एम.फिल</option><option value="डॉक्टरेट एवं उच्च">डॉक्टरेट एवं उच्च</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">17 (ख) संकाय/विषय (कक्षा 11 या उच्चतर के लिए)</label>
+                            <select class="form-select" onchange="updateValue('q17_stream', this.value)">
+                                <option value="">-- संकाय का चयन करें --</option>
+                                <option value="कला/सामाजिक विज्ञान">कला/सामाजिक विज्ञान</option><option value="विज्ञान">विज्ञान</option><option value="वाणिज्य">वाणिज्य</option><option value="सूचना प्रौद्योगिकी एवं कंप्यूटर">सूचना प्रौद्योगिकी एवं कंप्यूटर</option><option value="भाषा">भाषा</option><option value="चिकित्सा विज्ञान">चिकित्सा विज्ञान</option><option value="अभियांत्रिकी एवं प्रौद्योगिकी">अभियांत्रिकी एवं प्रौद्योगिकी</option><option value="प्रबंधन">प्रबंधन</option><option value="विधि">विधि</option><option value="कृषि एवं उससे संबंधित विषय">कृषि एवं उससे संबंधित विषय</option><option value="शिक्षा">शिक्षा</option><option value="अन्य">अन्य</option>
+                            </select>
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-18">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 18</span>
+                            <span>पिछले वर्ष किसी भी समय कोई कामकाज किया</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-18">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_18" id="q_18_0" value="दीर्घकालिक कर्मी (यदि 6 माह या उससे ज्यादा काम किया हो)" onchange="updateValue(18, this.value)">
+                            <label class="form-check-label fw-medium" for="q_18_0">दीर्घकालिक कर्मी (यदि 6 माह या उससे ज्यादा काम किया हो)</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_18" id="q_18_1" value="अल्पकालिक कर्मी (यदि 3 माह या उससे ज्यादा लेकिन 6 माह से कम काम किया हो)" onchange="updateValue(18, this.value)">
+                            <label class="form-check-label fw-medium" for="q_18_1">अल्पकालिक कर्मी (यदि 3 माह या उससे ज्यादा लेकिन 6 माह से कम काम किया हो)</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_18" id="q_18_2" value="अर्ध-अल्पकालिक कर्मी (यदि 3 माह से कम काम किया हो)" onchange="updateValue(18, this.value)">
+                            <label class="form-check-label fw-medium" for="q_18_2">अर्ध-अल्पकालिक कर्मी (यदि 3 माह से कम काम किया हो)</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_18" id="q_18_3" value="गैर कर्मी (यदि कोई काम नहीं किया)" onchange="updateValue(18, this.value)">
+                            <label class="form-check-label fw-medium" for="q_18_3">गैर कर्मी (यदि कोई काम नहीं किया)</label>
+                        </div>
+                    </div>
+                </div><div class="q-card" id="q-card-19">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 19</span>
+                            <span>आर्थिक कार्यकलाप की श्रेणी</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-19">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_19" id="q_19_0" value="काश्तकार" onchange="updateValue(19, this.value)">
+                            <label class="form-check-label fw-medium" for="q_19_0">काश्तकार</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_19" id="q_19_1" value="खेतिहर मजदूर" onchange="updateValue(19, this.value)">
+                            <label class="form-check-label fw-medium" for="q_19_1">खेतिहर मजदूर</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_19" id="q_19_2" value="पारिवारिक उद्योग कर्मी" onchange="updateValue(19, this.value)">
+                            <label class="form-check-label fw-medium" for="q_19_2">पारिवारिक उद्योग कर्मी</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_19" id="q_19_3" value="अन्य कर्मी" onchange="updateValue(19, this.value)">
+                            <label class="form-check-label fw-medium" for="q_19_3">अन्य कर्मी</label>
+                        </div>
+                    </div>
+                </div><div class="q-card" id="q-card-20">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 20</span>
+                            <span>व्यवसाय</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-20">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_20" id="q_20_0" value="वृक्षारोपण, पशुपालन, वानिकी, मछली पकड़ना, शिकार करना एवं इससे संबंधित कार्यकलाप" onchange="updateValue(20, this.value)">
+                            <label class="form-check-label fw-medium" for="q_20_0">वृक्षारोपण, पशुपालन, वानिकी, मछली पकड़ना, शिकार करना एवं इससे संबंधित कार्यकलाप</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_20" id="q_20_1" value="विनिर्माण कार्यकलाप" onchange="updateValue(20, this.value)">
+                            <label class="form-check-label fw-medium" for="q_20_1">विनिर्माण कार्यकलाप</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_20" id="q_20_2" value="निर्माण कार्यकलाप" onchange="updateValue(20, this.value)">
+                            <label class="form-check-label fw-medium" for="q_20_2">निर्माण कार्यकलाप</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_20" id="q_20_3" value="सेवा कार्यकलाप" onchange="updateValue(20, this.value)">
+                            <label class="form-check-label fw-medium" for="q_20_3">सेवा कार्यकलाप</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_20" id="q_20_4" value="अन्य कार्यकलाप" onchange="updateValue(20, this.value)">
+                            <label class="form-check-label fw-medium" for="q_20_4">अन्य कार्यकलाप</label>
+                        </div>
+                    </div>
+                </div><div class="q-card" id="q-card-21">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 21</span>
+                            <span>उद्योग, व्यापार अथवा सेवा का स्वरूप</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-21">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_21" id="q_21_0" value="सेवा" onchange="updateValue(21, this.value)">
+                            <label class="form-check-label fw-medium" for="q_21_0">सेवा</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_21" id="q_21_1" value="व्यापार" onchange="updateValue(21, this.value)">
+                            <label class="form-check-label fw-medium" for="q_21_1">व्यापार</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_21" id="q_21_2" value="उद्योग" onchange="updateValue(21, this.value)">
+                            <label class="form-check-label fw-medium" for="q_21_2">उद्योग</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_21" id="q_21_3" value="अन्य" onchange="updateValue(21, this.value)">
+                            <label class="form-check-label fw-medium" for="q_21_3">अन्य</label>
+                        </div>
+                    </div>
+                </div><div class="q-card" id="q-card-22">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 22</span>
+                            <span>कर्मी का वर्ग</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-22">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_22" id="q_22_0" value="मालिक" onchange="updateValue(22, this.value)">
+                            <label class="form-check-label fw-medium" for="q_22_0">मालिक</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_22" id="q_22_1" value="एकल कर्मी" onchange="updateValue(22, this.value)">
+                            <label class="form-check-label fw-medium" for="q_22_1">एकल कर्मी</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_22" id="q_22_2" value="कर्मचारी" onchange="updateValue(22, this.value)">
+                            <label class="form-check-label fw-medium" for="q_22_2">कर्मचारी</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_22" id="q_22_3" value="पारिवारिक कर्मी" onchange="updateValue(22, this.value)">
+                            <label class="form-check-label fw-medium" for="q_22_3">पारिवारिक कर्मी</label>
+                        </div>
+                    </div>
+                </div><div class="q-card" id="q-card-23">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 23</span>
+                            <span>गैर-आर्थिक कार्यकलाप (गैर-कर्मी के लिए)</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-23">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_23" id="q_23_0" value="विद्यार्थी" onchange="updateValue(23, this.value)">
+                            <label class="form-check-label fw-medium" for="q_23_0">विद्यार्थी</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_23" id="q_23_1" value="गृह कार्य" onchange="updateValue(23, this.value)">
+                            <label class="form-check-label fw-medium" for="q_23_1">गृह कार्य</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_23" id="q_23_2" value="आश्रित" onchange="updateValue(23, this.value)">
+                            <label class="form-check-label fw-medium" for="q_23_2">आश्रित</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_23" id="q_23_3" value="पेंशनभोगी" onchange="updateValue(23, this.value)">
+                            <label class="form-check-label fw-medium" for="q_23_3">पेंशनभोगी</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_23" id="q_23_4" value="किरायाभोगी" onchange="updateValue(23, this.value)">
+                            <label class="form-check-label fw-medium" for="q_23_4">किरायाभोगी</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_23" id="q_23_5" value="अन्य" onchange="updateValue(23, this.value)">
+                            <label class="form-check-label fw-medium" for="q_23_5">अन्य</label>
+                        </div>
+                    </div>
+                </div><div class="q-card" id="q-card-24">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 24</span>
+                            <span>काम की खोज में अथवा काम के लिए उपलब्ध</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-24">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_24" id="q_24_0" value="हाँ - पूर्णकालिक कार्य" onchange="updateValue(24, this.value)">
+                            <label class="form-check-label" for="q_24_0">हाँ - पूर्णकालिक कार्य</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_24" id="q_24_1" value="हाँ - अंशकालिक कार्य" onchange="updateValue(24, this.value)">
+                            <label class="form-check-label" for="q_24_1">हाँ - अंशकालिक कार्य</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_24" id="q_24_2" value="नहीं" onchange="updateValue(24, this.value)">
+                            <label class="form-check-label" for="q_24_2">नहीं</label>
+                        </div>
+                    </div>
+                </div><div class="q-card" id="q-card-25">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 25</span>
+                            <span>कार्यस्थल तक की यात्रा</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-25">
+                        
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">25 (क) (i) निवास से कार्यस्थल तक दूरी (कि.मी. में)</label>
+                            <input type="number" step="0.1" class="form-control" placeholder="दूरी दर्ज करें" value="" oninput="updateValue('q25_dist', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">25 (क) (ii) यात्रा समय (घंटे एवं मिनट)</label>
+                            <input type="text" class="form-control" placeholder="उदा. 0 घंटे 45 मिनट" value="" oninput="updateValue('q25_time', this.value)">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">25 (ख) यात्रा का साधन</label>
+                            <select class="form-select" onchange="updateValue('q25_mode', this.value)">
+                                <option value="">-- साधन का चयन करें --</option>
+                                <option value="पैदल">पैदल</option><option value="साइकिल">साइकिल</option><option value="मोपेड/स्कूटर/मोटर साइकिल">मोपेड/स्कूटर/मोटर साइकिल</option><option value="कार/जीप/वैन">कार/जीप/वैन</option><option value="टेम्पो/ऑटोरिक्शा/टैक्सी">टेम्पो/ऑटोरिक्शा/टैक्सी</option><option value="बस">बस</option><option value="ट्रेन/मेट्रो रेल">ट्रेन/मेट्रो रेल</option><option value="जल परिवहन">जल परिवहन</option><option value="अन्य साधन">अन्य साधन</option><option value="यात्रा नहीं">यात्रा नहीं</option>
+                            </select>
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-26">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 26</span>
+                            <span>जन्म स्थान</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-26">
+                        
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <select class="form-select" onchange="updateValue('q26_type', this.value)">
+                                <option value="भारत में">भारत में</option>
+                                <option value="भारत के बाहर">भारत के बाहर</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" placeholder="गाँव/नगर (मोहल्ला) या देश का नाम लिखें" value="" oninput="updateValue('q26_name', this.value)">
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-27">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 27</span>
+                            <span>पूर्व निवास स्थान</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-27">
+                        
+                    <div class="sub-q-box mb-3">
+                        <div class="fw-bold mb-2">27 (क) पूर्व निवास स्थान का विवरण</div>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <select class="form-select" onchange="updateValue('q27_loc_type', this.value)">
+                                    <option value="भारत में">भारत में</option>
+                                    <option value="भारत के बाहर">भारत के बाहर</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="गाँव/नगर (मोहल्ला) का नाम" value="" oninput="updateValue('q27_loc_name', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-q-box">
+                        <div class="fw-bold mb-2">27 (ख) स्थान परिवर्तन के समय (पूर्व निवास की स्थिति)</div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q27_area" id="q27_rural" value="ग्रामीण" onchange="updateValue('q27_area', 'ग्रामीण')">
+                            <label class="form-check-label" for="q27_rural">ग्रामीण</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q27_area" id="q27_urban" value="नगरीय" onchange="updateValue('q27_area', 'नगरीय')">
+                            <label class="form-check-label" for="q27_urban">नगरीय</label>
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-28">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 28</span>
+                            <span>स्थान परिवर्तन का कारण</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-28">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_28" id="q_28_0" value="कामकाज/रोजगार" onchange="updateValue(28, this.value)">
+                            <label class="form-check-label fw-medium" for="q_28_0">कामकाज/रोजगार</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_28" id="q_28_1" value="व्यापार" onchange="updateValue(28, this.value)">
+                            <label class="form-check-label fw-medium" for="q_28_1">व्यापार</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_28" id="q_28_2" value="शिक्षा" onchange="updateValue(28, this.value)">
+                            <label class="form-check-label fw-medium" for="q_28_2">शिक्षा</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_28" id="q_28_3" value="विवाह" onchange="updateValue(28, this.value)">
+                            <label class="form-check-label fw-medium" for="q_28_3">विवाह</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_28" id="q_28_4" value="जन्म के पश्चात" onchange="updateValue(28, this.value)">
+                            <label class="form-check-label fw-medium" for="q_28_4">जन्म के पश्चात</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_28" id="q_28_5" value="परिवार के साथ" onchange="updateValue(28, this.value)">
+                            <label class="form-check-label fw-medium" for="q_28_5">परिवार के साथ</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_28" id="q_28_6" value="प्राकृतिक आपदाएं" onchange="updateValue(28, this.value)">
+                            <label class="form-check-label fw-medium" for="q_28_6">प्राकृतिक आपदाएं</label>
+                        </div><div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_28" id="q_28_7" value="कोई अन्य" onchange="updateValue(28, this.value)">
+                            <label class="form-check-label fw-medium" for="q_28_7">कोई अन्य</label>
+                        </div>
+                    </div>
+                </div><div class="q-card" id="q-card-29">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 29</span>
+                            <span>स्थान परिवर्तन के पश्चात् इस गाँव/नगर में निवास की अवधि (पूर्ण वर्षों में)</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-29">
+                        <input type="number" min="0" class="form-control" placeholder="निवास की अवधि वर्षों में दर्ज करें" value="" oninput="updateValue(29, this.value)">
+                    </div>
+                </div><div class="q-card" id="q-card-30">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 30</span>
+                            <span>स्थायी निवास स्थान का पता</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-30">
+                        
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="q30_type" id="q30_t1" value="वर्तमान समान" checked="" onchange="updateValue('q30_type', 'वर्तमान समान')">
+                            <label class="form-check-label" for="q30_t1">स्थायी पता वर्तमान पते के समान है</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="q30_type" id="q30_t2" value="मुखिया समान" onchange="updateValue('q30_type', 'मुखिया समान')">
+                            <label class="form-check-label" for="q30_t2">स्थायी पता परिवार के मुखिया के समान है</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="q30_type" id="q30_t3" value="अन्य विवरण" onchange="updateValue('q30_type', 'अन्य विवरण')">
+                            <label class="form-check-label" for="q30_t3">अन्य स्थायी पता (नीचे दर्ज करें)</label>
+                        </div>
+                    </div>
+                    <div id="q30-details" class="d-none sub-q-box">
+                        <div class="row g-2">
+                            <div class="col-md-6"><input type="text" class="form-control" placeholder="राज्य" value="" oninput="updateValue('q30_state', this.value)"></div>
+                            <div class="col-md-6"><input type="text" class="form-control" placeholder="जिला" value="" oninput="updateValue('q30_district', this.value)"></div>
+                            <div class="col-md-6"><input type="text" class="form-control" placeholder="गाँव/नगर" value="" oninput="updateValue('q30_town', this.value)"></div>
+                            <div class="col-md-6"><input type="text" class="form-control" placeholder="मकान सं. एवं मोहल्ला" value="" oninput="updateValue('q30_house', this.value)"></div>
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-31">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 31</span>
+                            <span>वर्तमान में जीवित बच्चों की संख्या</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-31">
+                        
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">पुत्रों की संख्या</label>
+                            <input type="number" min="0" class="form-control" placeholder="संख्या" value="" oninput="updateValue('q31_sons', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">पुत्रियों की संख्या</label>
+                            <input type="number" min="0" class="form-control" placeholder="संख्या" value="" oninput="updateValue('q31_daughters', this.value)">
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-32">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 32</span>
+                            <span>कभी भी जीवित पैदा हुए बच्चों की संख्या</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-32">
+                        
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">पुत्रों की संख्या</label>
+                            <input type="number" min="0" class="form-control" placeholder="संख्या" value="" oninput="updateValue('q32_sons', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">पुत्रियों की संख्या</label>
+                            <input type="number" min="0" class="form-control" placeholder="संख्या" value="" oninput="updateValue('q32_daughters', this.value)">
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-33">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 33</span>
+                            <span>पिछले एक वर्ष के दौरान जीवित पैदा हुए बच्चों की संख्या</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-33">
+                        
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">पुत्रों की संख्या</label>
+                            <input type="number" min="0" class="form-control" placeholder="संख्या" value="" oninput="updateValue('q33_sons', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">पुत्रियों की संख्या</label>
+                            <input type="number" min="0" class="form-control" placeholder="संख्या" value="" oninput="updateValue('q33_daughters', this.value)">
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-34">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 34</span>
+                            <span>क्या कोविड-19 का टीकाकरण कराया गया है?</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-34">
+                        
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">टीकाकरण स्थिति</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q34_v" id="q34_v1" value="हाँ" onchange="updateValue('q34_vaccinated', 'हाँ')">
+                                <label class="form-check-label" for="q34_v1">हाँ</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q34_v" id="q34_v2" value="नहीं" onchange="updateValue('q34_vaccinated', 'नहीं')">
+                                <label class="form-check-label" for="q34_v2">नहीं</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-none" id="q34-loc-box">
+                            <label class="form-label fw-bold">टीकाकरण स्थान</label>
+                            <select class="form-select" onchange="updateValue('q34_loc', this.value)">
+                                <option value="भारत में" selected="">भारत में</option>
+                                <option value="भारत के बाहर">भारत के बाहर</option>
+                            </select>
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-35">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 35</span>
+                            <span>बैंक खातों की कुल संख्या</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-35">
+                        <input type="number" min="0" class="form-control" placeholder="बैंक खातों की संख्या दर्ज करें" value="" oninput="updateValue(35, this.value)">
+                    </div>
+                </div><div class="q-card" id="q-card-36">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 36</span>
+                            <span>क्या मोबाइल नंबर उपलब्ध है?</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-36">
+                        
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q36_has" id="q36_y" value="हाँ" onchange="updateValue('q36_has', 'हाँ')">
+                                <label class="form-check-label" for="q36_y">हाँ</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q36_has" id="q36_n" value="नहीं" onchange="updateValue('q36_has', 'नहीं')">
+                                <label class="form-check-label" for="q36_n">नहीं</label>
+                            </div>
+                        </div>
+                        <div class="col-md-8 d-none" id="box-id-36">
+                            <input type="text" class="form-control" placeholder="10 अंकों का मोबाइल नंबर दर्ज करें" value="" oninput="updateValue('q36_val', this.value)">
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-37">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 37</span>
+                            <span>क्या आधार नंबर उपलब्ध है?</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-37">
+                        
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q37_has" id="q37_y" value="हाँ" onchange="updateValue('q37_has', 'हाँ')">
+                                <label class="form-check-label" for="q37_y">हाँ</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q37_has" id="q37_n" value="नहीं" onchange="updateValue('q37_has', 'नहीं')">
+                                <label class="form-check-label" for="q37_n">नहीं</label>
+                            </div>
+                        </div>
+                        <div class="col-md-8 d-none" id="box-id-37">
+                            <input type="text" class="form-control" placeholder="12 अंकों का आधार नंबर दर्ज करें" value="" oninput="updateValue('q37_val', this.value)">
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-38">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 38</span>
+                            <span>क्या वोटर आईडी नंबर उपलब्ध है?</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-38">
+                        
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q38_has" id="q38_y" value="हाँ" onchange="updateValue('q38_has', 'हाँ')">
+                                <label class="form-check-label" for="q38_y">हाँ</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q38_has" id="q38_n" value="नहीं" onchange="updateValue('q38_has', 'नहीं')">
+                                <label class="form-check-label" for="q38_n">नहीं</label>
+                            </div>
+                        </div>
+                        <div class="col-md-8 d-none" id="box-id-38">
+                            <input type="text" class="form-control" placeholder="मतदाता पहचान पत्र संख्या (EPIC) दर्ज करें" value="" oninput="updateValue('q38_val', this.value)">
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-39">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 39</span>
+                            <span>क्या भारतीय पासपोर्ट उपलब्ध है?</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-39">
+                        
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q39_has" id="q39_y" value="हाँ" onchange="updateValue('q39_has', 'हाँ')">
+                                <label class="form-check-label" for="q39_y">हाँ</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q39_has" id="q39_n" value="नहीं" onchange="updateValue('q39_has', 'नहीं')">
+                                <label class="form-check-label" for="q39_n">नहीं</label>
+                            </div>
+                        </div>
+                        <div class="col-md-8 d-none" id="box-id-39">
+                            <input type="text" class="form-control" placeholder="पासपोर्ट संख्या दर्ज करें" value="" oninput="updateValue('q39_val', this.value)">
+                        </div>
+                    </div>
+                    </div>
+                </div><div class="q-card" id="q-card-40">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. 40</span>
+                            <span>क्या ड्राइविंग लाइसेंस उपलब्ध है?</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-40">
+                        
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q40_has" id="q40_y" value="हाँ" onchange="updateValue('q40_has', 'हाँ')">
+                                <label class="form-check-label" for="q40_y">हाँ</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q40_has" id="q40_n" value="नहीं" onchange="updateValue('q40_has', 'नहीं')">
+                                <label class="form-check-label" for="q40_n">नहीं</label>
+                            </div>
+                        </div>
+                        <div class="col-md-8 d-none" id="box-id-40">
+                            <input type="text" class="form-control" placeholder="ड्राइविंग लाइसेंस संख्या दर्ज करें" value="" oninput="updateValue('q40_val', this.value)">
+                        </div>
+                    </div>
+                    </div>
+                </div></div>
+        </form>
+
+        <div class="card mt-4 mb-5 border-success shadow-sm">
+            <div class="card-header bg-success text-white fw-bold">
+                <i class="fas fa-check-circle me-2"></i>फॉर्म सबमिशन एवं डेटा शेयरिंग रिपोर्ट
+            </div>
+            <div class="card-body">
+                <p class="text-muted">आप सभी 6 सदस्यों के भरे गए उत्तरों की समीक्षा कर सकते हैं तथा इसे शेयर कर सकते हैं।</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <button class="btn btn-success fw-bold px-4" onclick="generateSummaryReport()">
+                        <i class="fas fa-file-alt me-2"></i>सम्पूर्ण डेटा समीक्षा / रिपोर्ट देखें
+                    </button>
+                </div>
+                <div id="summary-output-container" class="mt-3 d-none">
+                    <div class="p-3 bg-light border rounded">
+                        <h6 class="fw-bold text-dark border-bottom pb-2">जनगणना परिवार अनुसूची - सम्पूर्ण डेटा सारांश</h6>
+                        <pre id="summary-text" class="mb-2" style="white-space: pre-wrap; font-family: inherit; font-size: 0.9rem;"></pre>
+                        <button class="btn btn-sm btn-outline-primary" onclick="copySummaryText()">
+                            <i class="fas fa-copy me-1"></i> टेक्स्ट कॉपी करें
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="security-watermark">
+        <i class="fas fa-lock me-1"></i> सुरक्षित सॉफ्टवेयर | सर्वाधिकार सुरक्षित: <strong>आदित्य कुमार द्विवेदी</strong>
+    </div>
+
+    <div class="toast custom-toast text-white bg-dark border-0" id="lock-toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-shield-alt text-warning me-2"></i>
+                <span id="toast-message">यह सॉफ्टवेयर सुरक्षित एवं लॉक है। इसमें प्रश्नों व नाम का संपादन निषिद्ध है।</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const IMMUTABLE_AUTHOR = "आदित्य कुमार द्विवेदी";
+        const IMMUTABLE_COLLEGE = "शहीद-ए-आजम सरदार भगत सिंह इंटर कॉलेज, गोंडा";
+
+        let currentActiveMember = "1";
+        let currentActiveQuestion = 1;
+        let currentDisplayMode = 'all';
+        let workflowMode = 'member'; // member = one member at a time; question = same question across all members
+        const DB_NAME = 'DhurdaJangleCensusDB';
+        const DB_STORE = 'households';
+        let censusDB = null;
+        let households = {};
+        let activeHouseholdId = 'HH-001';
+        let familyCensusData = { "1": {} };
+        let saveTimer = null;
+
+        const CENSUS_QUESTIONS = [
+            { id: 1, title: "व्यक्ति का नाम", type: "text", placeholder: "परिवार के सदस्य का नाम लिखें (परिवार के मुखिया से प्रारंभ करें)" },
+            { id: 2, title: "मुखिया से संबंध", type: "select", options: ["मुखिया - 01", "पति/पत्नी - 02", "पुत्र/पुत्री - 03", "पुत्रवधू/दामाद - 04", "पोता/पोती - 05", "माता/पिता - 06", "भाई/बहन - 07", "अन्य रिश्तेदार - 08", "गैर-रिश्तेदार - 09"] },
+            { id: 3, title: "लिंग", type: "radio", options: ["पुरुष", "महिला", "ट्रांसजेंडर व्यक्ति"] },
+            { id: 4, title: "जन्म तिथि और आयु", type: "composite_4" },
+            { id: 5, title: "वर्तमान वैवाहिक स्थिति", type: "select", options: ["अविवाहित - 1", "वर्तमान में विवाहित - 2", "विधवा/विधुर - 3", "संबंध विच्छेदित - 4", "तलाकशुदा - 5"] },
+            { id: 6, title: "विवाह के समय आयु", type: "number", placeholder: "आयु दर्ज करें" },
+            { id: 7, title: "पति/पत्नी का नाम", type: "text", placeholder: "पति/पत्नी का नाम लिखें (यदि लागू हो)" },
+            { id: 8, title: "घोषित राष्ट्रीयता", type: "radio", options: ["भारतीय", "अन्य"] },
+            { id: 9, title: "धर्म", type: "radio", options: ["हिन्दू", "मुस्लिम", "ईसाई", "सिख", "बौद्ध", "जैन", "अन्य"] },
+            { id: 10, title: "अनुसूचित जाति (अ.जा.) / अनुसूचित जनजाति (अ.ज.जा.) / जाति", type: "caste_block" },
+            { id: 11, title: "पिता का विवरण", type: "parent_block", relation: "पिता" },
+            { id: 12, title: "माता का विवरण", type: "parent_block", relation: "माता" },
+            { id: 13, title: "दिव्यांगता", type: "disability_block" },
+            { id: 14, title: "मातृभाषा एवं अन्य भाषाओं का ज्ञान", type: "language_block" },
+            { id: 15, title: "साक्षरता एवं डिजिटल साक्षरता की स्थिति", type: "literacy_block" },
+            { id: 16, title: "शैक्षणिक संस्थान में शिक्षा ग्रहण की स्थिति", type: "education_status_block" },
+            { id: 17, title: "प्राप्त शिक्षा का उच्चतम स्तर तथा संकाय/विषय", type: "education_level_block" },
+            { id: 18, title: "पिछले वर्ष किसी भी समय कोई कामकाज किया", type: "radio", options: ["दीर्घकालिक कर्मी (यदि 6 माह या उससे ज्यादा काम किया हो)", "अल्पकालिक कर्मी (यदि 3 माह या उससे ज्यादा लेकिन 6 माह से कम काम किया हो)", "अर्ध-अल्पकालिक कर्मी (यदि 3 माह से कम काम किया हो)", "गैर कर्मी (यदि कोई काम नहीं किया)"] },
+            { id: 19, title: "आर्थिक कार्यकलाप की श्रेणी", type: "radio", options: ["काश्तकार", "खेतिहर मजदूर", "पारिवारिक उद्योग कर्मी", "अन्य कर्मी"] },
+            { id: 20, title: "व्यवसाय", type: "radio", options: ["वृक्षारोपण, पशुपालन, वानिकी, मछली पकड़ना, शिकार करना एवं इससे संबंधित कार्यकलाप", "विनिर्माण कार्यकलाप", "निर्माण कार्यकलाप", "सेवा कार्यकलाप", "अन्य कार्यकलाप"] },
+            { id: 21, title: "उद्योग, व्यापार अथवा सेवा का स्वरूप", type: "radio", options: ["सेवा", "व्यापार", "उद्योग", "अन्य"] },
+            { id: 22, title: "कर्मी का वर्ग", type: "radio", options: ["मालिक", "एकल कर्मी", "कर्मचारी", "पारिवारिक कर्मी"] },
+            { id: 23, title: "गैर-आर्थिक कार्यकलाप (गैर-कर्मी के लिए)", type: "radio", options: ["विद्यार्थी", "गृह कार्य", "आश्रित", "पेंशनभोगी", "किरायाभोगी", "अन्य"] },
+            { id: 24, title: "काम की खोज में अथवा काम के लिए उपलब्ध", type: "radio_text", options: ["हाँ - पूर्णकालिक कार्य", "हाँ - अंशकालिक कार्य", "नहीं"] },
+            { id: 25, title: "कार्यस्थल तक की यात्रा", type: "travel_block" },
+            { id: 26, title: "जन्म स्थान", type: "location_block", prefix: "q26" },
+            { id: 27, title: "पूर्व निवास स्थान", type: "migration_block" },
+            { id: 28, title: "स्थान परिवर्तन का कारण", type: "radio", options: ["कामकाज/रोजगार", "व्यापार", "शिक्षा", "विवाह", "जन्म के पश्चात", "परिवार के साथ", "प्राकृतिक आपदाएं", "कोई अन्य"] },
+            { id: 29, title: "स्थान परिवर्तन के पश्चात् इस गाँव/नगर में निवास की अवधि (पूर्ण वर्षों में)", type: "number", placeholder: "निवास की अवधि वर्षों में दर्ज करें" },
+            { id: 30, title: "स्थायी निवास स्थान का पता", type: "address_block" },
+            { id: 31, title: "वर्तमान में जीवित बच्चों की संख्या", type: "children_count", prefix: "q31" },
+            { id: 32, title: "कभी भी जीवित पैदा हुए बच्चों की संख्या", type: "children_count", prefix: "q32" },
+            { id: 33, title: "पिछले एक वर्ष के दौरान जीवित पैदा हुए बच्चों की संख्या", type: "children_count", prefix: "q33" },
+            { id: 34, title: "क्या कोविड-19 का टीकाकरण कराया गया है?", type: "covid_block" },
+            { id: 35, title: "बैंक खातों की कुल संख्या", type: "number", placeholder: "बैंक खातों की संख्या दर्ज करें" },
+            { id: 36, title: "क्या मोबाइल नंबर उपलब्ध है?", type: "yes_no_input", placeholder: "10 अंकों का मोबाइल नंबर दर्ज करें" },
+            { id: 37, title: "क्या आधार नंबर उपलब्ध है?", type: "yes_no_input", placeholder: "12 अंकों का आधार नंबर दर्ज करें" },
+            { id: 38, title: "क्या वोटर आईडी नंबर उपलब्ध है?", type: "yes_no_input", placeholder: "मतदाता पहचान पत्र संख्या (EPIC) दर्ज करें" },
+            { id: 39, title: "क्या भारतीय पासपोर्ट उपलब्ध है?", type: "yes_no_input", placeholder: "पासपोर्ट संख्या दर्ज करें" },
+            { id: 40, title: "क्या ड्राइविंग लाइसेंस उपलब्ध है?", type: "yes_no_input", placeholder: "ड्राइविंग लाइसेंस संख्या दर्ज करें" }
+        ];
+
+        function openCensusDB() {
+            return new Promise((resolve, reject) => {
+                if (!('indexedDB' in window)) return reject(new Error('IndexedDB उपलब्ध नहीं है'));
+                const req = indexedDB.open(DB_NAME, 1);
+                req.onupgradeneeded = () => { const db = req.result; if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE, { keyPath: 'id' }); };
+                req.onsuccess = () => { censusDB = req.result; resolve(censusDB); };
+                req.onerror = () => reject(req.error);
+            });
+        }
+        function dbRequest(mode, action, value) {
+            return new Promise((resolve, reject) => {
+                const tx = censusDB.transaction(DB_STORE, mode); const store = tx.objectStore(DB_STORE);
+                const req = action === 'getAll' ? store.getAll() : action === 'put' ? store.put(value) : store.delete(value);
+                req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error);
+            });
+        }
+        async function initApp() {
+            try {
+                await openCensusDB();
+                const rows = await dbRequest('readonly', 'getAll');
+                rows.forEach(h => households[h.id] = h);
+                if (!Object.keys(households).length) {
+                    let legacy = null; try { legacy = JSON.parse(localStorage.getItem('census_2027_family_data') || 'null'); } catch(e) {}
+                    households['HH-001'] = { id:'HH-001', houseNo:'001', headName:'', members: (legacy && legacy.members) ? legacy.members : (legacy || { '1': {} }), peStatus:'pending', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString() };
+                    await dbRequest('readwrite','put',households['HH-001']);
+                }
+                document.getElementById('db-status').textContent = 'IndexedDB तैयार — Offline Save चालू';
+            } catch(e) {
+                document.getElementById('db-status').textContent = 'IndexedDB उपलब्ध नहीं; Backup तुरंत लें';
+                document.getElementById('db-status').className = 'text-danger';
+                try { const raw=JSON.parse(localStorage.getItem('census_manager_fallback')||'{}'); households=raw.households||{}; } catch(err) {}
+                if (!Object.keys(households).length) households['HH-001']={id:'HH-001',houseNo:'001',headName:'',members:{'1':{}},peStatus:'pending',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+            }
+            activeHouseholdId = Object.keys(households)[0];
+            loadActiveHousehold(); refreshHouseholdUI(); renderFormQuestions(); renderMemberSelector();
+            setupSecurityWatchdog(); updateConditionalLocks(); updateMembersRemainingBadge();
+        }
+        function loadActiveHousehold() {
+            const h=households[activeHouseholdId];
+            if (!h) return;
+            familyCensusData = h.members || {'1':{}};
+            if (!Object.keys(familyCensusData).length) familyCensusData={'1':{}};
+            currentActiveMember = Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b))[0] || '1';
+        }
+        function saveLocalState() {
+            const h=households[activeHouseholdId];
+            if (!h) return;
+            h.members=familyCensusData; h.updatedAt=new Date().toISOString();
+            const head=familyCensusData['1'] || {}; h.headName=head[1] || h.headName || '';
+            try { localStorage.setItem('census_manager_fallback', JSON.stringify({activeHouseholdId,households})); } catch(e) {}
+            if (censusDB) dbRequest('readwrite','put',h).then(()=>{ const el=document.getElementById('db-status'); if(el) el.textContent='डेटा IndexedDB में सेव हो गया'; }).catch(()=>{});
+            refreshHouseholdUI();
+        }
+        function refreshHouseholdUI() {
+            const sel=document.getElementById('household-select'); if(!sel) return;
+            sel.innerHTML=Object.values(households).sort((a,b)=>Number(a.houseNo)-Number(b.houseNo)).map(h=>`<option value="${escapeHTML(h.id)}" ${h.id===activeHouseholdId?'selected':''}>घर ${escapeHTML(h.houseNo)} — ${escapeHTML(h.headName||'मुखिया का नाम नहीं')}</option>`).join('');
+            document.getElementById('household-count').textContent='कुल घर: '+Object.keys(households).length;
+            const h=households[activeHouseholdId]; if(h){document.getElementById('pe-status').value=h.peStatus||'pending';document.getElementById('pe-progress').textContent='PE App Entry: '+((h.peStatus==='completed')?'Completed':'Pending');}
+        }
+        function renderMemberSelector() {
+            const sel=document.getElementById('member-select'); if(!sel) return;
+            const ids=Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
+            sel.innerHTML=ids.map(id=>`<option value="${escapeHTML(id)}" ${id===currentActiveMember?'selected':''}>सदस्य ${escapeHTML(id)}${familyCensusData[id]?.[1]?' — '+escapeHTML(familyCensusData[id][1]):''}</option>`).join('');
+        }
+        async function addHousehold() {
+            const next=String(Math.max(0,...Object.values(households).map(h=>Number(h.houseNo)||0))+1).padStart(3,'0');
+            const id='HH-'+next;
+            households[id]={id,houseNo:next,headName:'',members:{'1':{}},peStatus:'pending',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+            activeHouseholdId=id; loadActiveHousehold(); saveLocalState(); refreshHouseholdUI(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
+            showToastNotice('नया घर '+next+' बनाया गया।');
+        }
+        function switchHousehold(id) {
+            if(!households[id]) return; saveLocalState(); activeHouseholdId=id; loadActiveHousehold();
+            renderFormQuestions(); renderMemberSelector(); refreshHouseholdUI(); updateConditionalLocks(); updateMembersRemainingBadge();
+        }
+        function addFamilyMember() {
+            const next=String(Math.max(0,...Object.keys(familyCensusData).map(Number))+1);
+            familyCensusData[next]={}; currentActiveMember=next; saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
+            showToastNotice('सदस्य '+next+' जोड़ा गया।');
+        }
+        function updatePEStatus(value) { const h=households[activeHouseholdId]; if(h){h.peStatus=value;saveLocalState();refreshHouseholdUI();} }
+        function deleteCurrentHousehold() {
+            if(Object.keys(households).length<=1){showToastNotice('कम से कम एक घर रखना जरूरी है।');return;}
+            if(!confirm('क्या इस घर और इसके सभी सदस्यों का डेटा हटाना चाहते हैं?')) return;
+            const old=activeHouseholdId; delete households[old]; if(censusDB) dbRequest('readwrite','delete',old);
+            activeHouseholdId=Object.keys(households)[0];loadActiveHousehold();saveLocalState();refreshHouseholdUI();renderFormQuestions();renderMemberSelector();updateConditionalLocks();updateMembersRemainingBadge();
+        }
+        function exportCurrentHouseholdBackup() {
+            const h=households[activeHouseholdId]; if(!h)return;
+            downloadJSON({format:'CensusManager-House-v1',household:h},`Census_House_${h.houseNo}.json`);
+        }
+        function downloadJSON(data,name) { const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url); }
+
+
+        function getCurrentMemberData() {
+            if(!familyCensusData[currentActiveMember]) {
+                familyCensusData[currentActiveMember] = {};
+            }
+            return familyCensusData[currentActiveMember];
+        }
+
+        function updateValue(key, value) {
+            const mData = getCurrentMemberData();
+            mData[key] = value;
+            if(String(key) === '5') mData.q5_auto_suggested = false;
+            saveLocalState();
+            updateConditionalLocks();
+            updateMembersRemainingBadge();
+        }
+
+        function changeActiveMember(mNum) {
+            currentActiveMember = String(mNum);
+            renderFormQuestions(); renderMemberSelector();
+            updateConditionalLocks();
+            showToastNotice(`सदस्य ${mNum} का डेटा लोड किया गया।`);
+        }
+
+        function renderFormQuestions() {
+            const wrapper1 = document.getElementById('questions-wrapper-part1');
+            const wrapper2 = document.getElementById('questions-wrapper-part2');
+            
+            let html1 = '';
+            let html2 = '';
+
+            CENSUS_QUESTIONS.forEach(q => {
+                const cardHtml = `<div class="q-card" id="q-card-${q.id}">
+                    <div class="q-header">
+                        <div>
+                            <span class="q-number">प्र. ${q.id}</span>
+                            <span>${q.title}</span>
+                        </div>
+                        <i class="fas fa-lock text-muted fs-6"></i>
+                    </div>
+                    <div class="q-body" id="q-body-${q.id}">
+                        ${renderQuestionBody(q)}
+                    </div>
+                </div>`;
+
+                if(q.id <= 6) {
+                    html1 += cardHtml;
+                } else {
+                    html2 += cardHtml;
+                }
+            });
+
+            wrapper1.innerHTML = html1;
+            wrapper2.innerHTML = html2;
+
+            if(currentDisplayMode === 'single') {
+                switchView('single');
+            }
+        }
+
+        function renderQuestionBody(q) {
+            const mData = getCurrentMemberData();
+            const val = mData[q.id] || '';
+
+            switch(q.type) {
+                case 'text':
+                    if (q.id === 7) {
+                        const spouseChoices = Object.entries(familyCensusData || {})
+                            .filter(([memberId, data]) => memberId !== String(currentActiveMember) && data && String(data[1] || '').trim())
+                            .map(([memberId, data]) => `<option value="${escapeAttr(String(data[1]).trim())}"></option>`).join('');
+                        return `<input type="text" class="form-control" list="spouse-name-options" placeholder="सूची से पति/पत्नी का नाम चुनें या लिखें" value="${escapeAttr(val)}" oninput="updateValue(7, this.value)"><datalist id="spouse-name-options">${spouseChoices}</datalist><div class="form-text">परिवार में दर्ज अन्य सदस्यों के नाम सुझाव में दिखेंगे। सही नाम की पुष्टि करें।</div>`;
+                    }
+                    return `<input type="text" class="form-control" placeholder="${q.placeholder}" value="${escapeAttr(val)}" oninput="updateValue(${q.id}, this.value)">`;
+
+                case 'number':
+                    return `<input type="number" min="0" class="form-control" placeholder="${q.placeholder}" value="${escapeAttr(val)}" oninput="updateValue(${q.id}, this.value)">`;
+
+                case 'select':
+                    let opts = `<option value="">-- स्थिति/संबंध चुनें --</option>`;
+                    const selectedValue = (q.id === 5 && !val && Number(mData['q4_age'] || 999) <= 14) ? 'अविवाहित - 1' : val;
+                    q.options.forEach(opt => {
+                        opts += `<option value="${opt}" ${selectedValue === opt ? 'selected' : ''}>${opt}</option>`;
+                    });
+                    const suggestionNote = (q.id === 5 && mData.q5_auto_suggested) ? `<div class="small text-warning-emphasis mt-2">उम्र के आधार पर सुझाया गया विकल्प — वास्तविक वैवाहिक स्थिति की पुष्टि करें। जरूरत हो तो बदल दें।</div>` : '';
+                    return `<select class="form-select" onchange="updateValue(${q.id}, this.value)">${opts}</select>${suggestionNote}`;
+
+                case 'radio':
+                    let rHtml = '';
+                    q.options.forEach((opt, idx) => {
+                        const checked = val === opt ? 'checked' : '';
+                        rHtml += `<div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_${q.id}" id="q_${q.id}_${idx}" value="${opt}" ${checked} onchange="updateValue(${q.id}, this.value)">
+                            <label class="form-check-label fw-medium" for="q_${q.id}_${idx}">${opt}</label>
+                        </div>`;
+                    });
+                    return rHtml;
+
+                case 'composite_4':
+                    const dd = mData['q4_dd'] || '';
+                    const mm = mData['q4_mm'] || '';
+                    const yyyy = mData['q4_yyyy'] || '';
+                    const age = mData['q4_age'] || '';
+
+                    const hasAgeOnly = age !== '' && (dd === '' && mm === '' && yyyy === '');
+                    const hasDobFull = dd !== '' && mm !== '' && yyyy !== '';
+
+                    return `
+                    <div class="mb-3 ${hasAgeOnly ? 'opacity-50' : ''}" id="q4_dob_container">
+                        <label class="form-label fw-bold">
+                            4(क). जन्म तिथि
+                            <span id="q4_dob_badge">${hasAgeOnly ? '<span class="badge bg-danger ms-1"><i class="fas fa-lock me-1"></i>लॉक (आयु दर्ज है)</span>' : ''}</span>
+                        </label>
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <input type="number" id="q4_dd_input" min="1" max="31" class="form-control text-center" placeholder="DD" value="${escapeAttr(dd)}" ${hasAgeOnly ? 'disabled' : ''} oninput="handleDobInputChange('q4_dd', this.value)">
+                            </div>
+                            <div class="col-4">
+                                <input type="number" id="q4_mm_input" min="1" max="12" class="form-control text-center" placeholder="MM" value="${escapeAttr(mm)}" ${hasAgeOnly ? 'disabled' : ''} oninput="handleDobInputChange('q4_mm', this.value)">
+                            </div>
+                            <div class="col-4">
+                                <input type="number" id="q4_yyyy_input" min="1900" max="2027" class="form-control text-center" placeholder="YYYY" value="${escapeAttr(yyyy)}" ${hasAgeOnly ? 'disabled' : ''} oninput="handleDobInputChange('q4_yyyy', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2 ${hasDobFull ? 'opacity-75' : ''}" id="q4_age_container">
+                        <label class="form-label fw-bold">
+                            4(ख). आयु (पूर्ण वर्षों में)
+                            <span id="q4_age_badge">${hasDobFull ? '<span class="badge bg-success ms-1"><i class="fas fa-calculator me-1"></i>स्वचालित गणना (5 जनवरी 2027)</span>' : ''}</span>
+                        </label>
+                        <input type="number" id="q4_age_input" min="0" max="120" class="form-control" placeholder="आयु दर्ज करें" value="${escapeAttr(age)}" ${hasDobFull ? 'readonly style="background-color: #e9ecef;"' : ''} oninput="handleAgeInputChange(this.value)">
+                    </div>
+                    <div class="info-notice-banner">
+                        <i class="fas fa-exclamation-circle text-warning fs-5"></i>
+                        <span>उत्तर प्रदेश के लिए आयु की गणना 5 जनवरी 2027 की संदर्भ तारीख के अनुसार करें।</span>
+                    </div>`;
+
+                case 'caste_block':
+                    const sc = mData['q10_sc'] || '';
+                    const sc_name = mData['q10_sc_name'] || '';
+                    const st = mData['q10_st'] || '';
+                    const st_name = mData['q10_st_name'] || '';
+                    const other_caste_opt = mData['q10_other_opt'] || '';
+                    const other_caste_name = mData['q10_other_name'] || '';
+
+                    // Logic:
+                    // If SC == 'हाँ', ST (10ख) and Other (10ग) are locked.
+                    // If ST == 'हाँ', SC (10क) and Other (10ग) are locked.
+                    // If SC == 'नहीं' AND ST == 'नहीं', 10ग Other opens!
+                    const isScYes = sc === 'हाँ';
+                    const isStYes = st === 'हाँ';
+                    const isBothNo = sc === 'नहीं' && st === 'नहीं';
+
+                    const scLocked = isStYes; // SC locked if ST is YES
+                    const stLocked = isScYes; // ST locked if SC is YES
+                    const otherLocked = !isBothNo; // 10ग locked unless BOTH SC and ST are 'नहीं'
+
+                    return `
+                    <div class="sub-q-box mb-3 ${scLocked ? 'opacity-50 pe-none' : ''}">
+                        <div class="fw-bold text-dark mb-2">
+                            10 (क) क्या यह व्यक्ति अनुसूचित जाति (अ.जा.) है?
+                            ${scLocked ? '<span class="badge bg-danger ms-1"><i class="fas fa-lock me-1"></i>लॉक (10 ख = हाँ)</span>' : ''}
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q10_sc" id="q10_sc_yes" value="हाँ" ${sc === 'हाँ' ? 'checked' : ''} ${scLocked ? 'disabled' : ''} onchange="handleCasteSelection('sc', 'हाँ')">
+                            <label class="form-check-label" for="q10_sc_yes">हाँ</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q10_sc" id="q10_sc_no" value="नहीं" ${sc === 'नहीं' ? 'checked' : ''} ${scLocked ? 'disabled' : ''} onchange="handleCasteSelection('sc', 'नहीं')">
+                            <label class="form-check-label" for="q10_sc_no">नहीं</label>
+                        </div>
+                        <div id="box-sc-name" class="${sc === 'हाँ' && !scLocked ? '' : 'd-none'} mt-2">
+                            <input type="text" class="form-control form-control-sm" placeholder="अनुसूचित जाति (अ.जा.) का नाम लिखें" value="${escapeAttr(sc_name)}" oninput="updateValue('q10_sc_name', this.value)">
+                        </div>
+                    </div>
+
+                    <div class="sub-q-box mb-3 ${stLocked ? 'opacity-50 pe-none' : ''}">
+                        <div class="fw-bold text-dark mb-2">
+                            10 (ख) क्या यह व्यक्ति अनुसूचित जनजाति (अ.ज.जा.) है?
+                            ${stLocked ? '<span class="badge bg-danger ms-1"><i class="fas fa-lock me-1"></i>लॉक (10 क = हाँ)</span>' : ''}
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q10_st" id="q10_st_yes" value="हाँ" ${st === 'हाँ' ? 'checked' : ''} ${stLocked ? 'disabled' : ''} onchange="handleCasteSelection('st', 'हाँ')">
+                            <label class="form-check-label" for="q10_st_yes">हाँ</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q10_st" id="q10_st_no" value="नहीं" ${st === 'नहीं' ? 'checked' : ''} ${stLocked ? 'disabled' : ''} onchange="handleCasteSelection('st', 'नहीं')">
+                            <label class="form-check-label" for="q10_st_no">नहीं</label>
+                        </div>
+                        <div id="box-st-name" class="${st === 'हाँ' && !stLocked ? '' : 'd-none'} mt-2">
+                            <input type="text" class="form-control form-control-sm" placeholder="अनुसूचित जनजाति (अ.ज.जा.) का नाम लिखें" value="${escapeAttr(st_name)}" oninput="updateValue('q10_st_name', this.value)">
+                        </div>
+                    </div>
+
+                    <div class="sub-q-box ${otherLocked ? 'opacity-50 pe-none' : ''}" id="box-other-caste">
+                        <div class="fw-bold text-dark mb-2">
+                            10 (ग) यदि अ.जा./अ.ज.जा. में 'नहीं' है तो अन्य जाति विवरण:
+                            ${otherLocked ? '<span class="badge bg-danger ms-1"><i class="fas fa-lock me-1"></i>लॉक (10क एवं 10ख में "नहीं" चुनने पर ही खुलेगा)</span>' : '<span class="badge bg-success ms-1"><i class="fas fa-unlock me-1"></i>खुला (अनलॉक)</span>'}
+                        </div>
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="radio" name="q10_other_opt" id="q10_other_1" value="जाति का नाम लिखें" ${other_caste_opt === 'जाति का नाम लिखें' ? 'checked' : ''} ${otherLocked ? 'disabled' : ''} onchange="handleCasteSelection('other', 'जाति का नाम लिखें')">
+                            <label class="form-check-label" for="q10_other_1">जाति का नाम लिखें</label>
+                        </div>
+                        <div id="box-other-caste-text" class="${other_caste_opt === 'जाति का नाम लिखें' && !otherLocked ? '' : 'd-none'} ms-4 my-2">
+                            <input type="text" class="form-control form-control-sm" list="other-caste-suggestions" placeholder="जाति का नाम दर्ज करें (जैसे राजभर)" value="${escapeAttr(other_caste_name)}" oninput="updateValue('q10_other_name', this.value)">
+                            <datalist id="other-caste-suggestions"><option value="राजभर"></option></datalist>
+                        </div>
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="radio" name="q10_other_opt" id="q10_other_2" value="जाति का नाम नहीं बताना चाहते" ${other_caste_opt === 'जाति का नाम नहीं बताना चाहते' ? 'checked' : ''} ${otherLocked ? 'disabled' : ''} onchange="handleCasteSelection('other', 'जाति का नाम नहीं बताना चाहते')">
+                            <label class="form-check-label" for="q10_other_2">जाति का नाम नहीं बताना चाहते</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="q10_other_opt" id="q10_other_3" value="कोई जाति नहीं" ${other_caste_opt === 'कोई जाति नहीं' ? 'checked' : ''} ${otherLocked ? 'disabled' : ''} onchange="handleCasteSelection('other', 'कोई जाति नहीं')">
+                            <label class="form-check-label" for="q10_other_3">कोई जाति नहीं</label>
+                        </div>
+                    </div>`;
+
+                case 'parent_block':
+                    const rel = q.relation;
+                    const keyP = q.id === 11 ? 'q11' : 'q12';
+                    const isMem = mData[keyP + '_is_member'] || 'नहीं';
+                    const memNum = mData[keyP + '_member_no'] || '';
+                    const pName = mData[keyP + '_name'] || '';
+                    const pDob = mData[keyP + '_dob'] || '';
+                    const pLoc = mData[keyP + '_place'] || 'भारत में';
+                    const pLocVal = mData[keyP + '_place_name'] || '';
+                    const pRelig = mData[keyP + '_religion'] || '';
+
+                    return `
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="${keyP}_is_member" ${isMem === 'हाँ' ? 'checked' : ''} onchange="toggleParentIsMember('${keyP}', this.checked)">
+                        <label class="form-check-label fw-bold" for="${keyP}_is_member">यदि ${rel} इस परिवार के सदस्य हैं, तो चेक (टिक) करें</label>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">सदस्य क्रमांक</label>
+                            <select class="form-select border-primary fw-bold" onchange="autoFillParentFromMember('${keyP}', this.value)" ${isMem === 'हाँ' ? '' : 'disabled'}>
+                                <option value="">-- क्रमांक चुनें --</option>
+                                ${Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b)).map(n => `<option value="${n}" ${String(memNum) === String(n) ? 'selected' : ''}>सदस्य ${n}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">क) नाम</label>
+                            <input type="text" id="${keyP}_name_input" class="form-control" placeholder="${rel} का नाम" value="${escapeAttr(pName)}" oninput="updateValue('${keyP}_name', this.value)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ख) जन्म तिथि</label>
+                            <input type="date" id="${keyP}_dob_input" class="form-control" value="${pDob}" onchange="updateValue('${keyP}_dob', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ग) जन्म स्थान</label>
+                            <select class="form-select mb-2" onchange="updateValue('${keyP}_place', this.value)">
+                                <option value="भारत में" ${pLoc === 'भारत में' ? 'selected' : ''}>भारत में</option>
+                                <option value="भारत के बाहर" ${pLoc === 'भारत के बाहर' ? 'selected' : ''}>भारत के बाहर</option>
+                            </select>
+                            <input type="text" class="form-control" placeholder="गाँव/नगर/मोहल्ला या देश का नाम" value="${escapeAttr(pLocVal)}" oninput="updateValue('${keyP}_place_name', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">घ) धर्म</label>
+                            <select id="${keyP}_religion_select" class="form-select" onchange="updateValue('${keyP}_religion', this.value)">
+                                <option value="">-- धर्म का चयन करें --</option>
+                                ${["हिन्दू", "मुस्लिम", "ईसाई", "सिख", "बौद्ध", "जैन", "अन्य"].map(d => `<option value="${d}" ${pRelig === d ? 'selected' : ''}>${d}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>`;
+
+                case 'disability_block':
+                    const hasDis = mData['q13_has'] || 'नहीं';
+                    const selectedDis = mData['q13_types'] || [];
+                    const disOpts = ["देखने में", "सुनने में", "बोलने में", "चलने-फिरने में", "बौद्धिक दिव्यांगता", "मानसिक रोग", "तेजाब हमले के कारण", "पुराने तंत्रिका रोग के कारण", "रक्त विकार के कारण"];
+
+                    let disTypeHtml = '';
+                    disOpts.forEach((dOpt, idx) => {
+                        const checked = selectedDis.includes(dOpt) ? 'checked' : '';
+                        disTypeHtml += `<div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input dis-type-cb" type="checkbox" id="dis_${idx}" value="${dOpt}" ${checked} onchange="toggleDisabilityOption('${dOpt}')">
+                                <label class="form-check-label" for="dis_${idx}">${dOpt}</label>
+                            </div>
+                        </div>`;
+                    });
+
+                    return `
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">13 (क) क्या इस व्यक्ति को कोई दिव्यांगता है?</label><br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q13_has" id="q13_has_yes" value="हाँ" ${hasDis === 'हाँ' ? 'checked' : ''} onchange="updateValue('q13_has', 'हाँ')">
+                            <label class="form-check-label" for="q13_has_yes">हाँ</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q13_has" id="q13_has_no" value="नहीं" ${hasDis === 'नहीं' ? 'checked' : ''} onchange="updateValue('q13_has', 'नहीं')">
+                            <label class="form-check-label" for="q13_has_no">नहीं</label>
+                        </div>
+                    </div>
+                    <div id="q13-types-box" class="${hasDis === 'हाँ' ? '' : 'd-none'} sub-q-box">
+                        <div class="fw-bold mb-2 text-dark">13 (ख) यदि 'हाँ', तो उपयुक्त विकल्प/विकल्पों पर सही का निशान लगाएँ (अधिकतम 3 विकल्प):</div>
+                        <div class="row">${disTypeHtml}</div>
+                    </div>`;
+
+                case 'language_block':
+                    return `
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">14 (क) मातृभाषा</label>
+                            <input type="text" class="form-control" placeholder="मातृभाषा का नाम लिखें" value="${escapeAttr(mData['q14_mother_tongue'] || '')}" oninput="updateValue('q14_mother_tongue', this.value)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">14 (ख) अन्य भाषा 1</label>
+                            <input type="text" class="form-control" placeholder="प्रवीनता के क्रम में दूसरी भाषा" value="${escapeAttr(mData['q14_lang1'] || '')}" oninput="updateValue('q14_lang1', this.value)">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">14 (ग) अन्य भाषा 2</label>
+                            <input type="text" class="form-control" placeholder="तीसरी भाषा" value="${escapeAttr(mData['q14_lang2'] || '')}" oninput="updateValue('q14_lang2', this.value)">
+                        </div>
+                    </div>`;
+
+                case 'literacy_block':
+                    const lit = mData['q15_lit'] || '';
+                    const digi = mData['q15_digital'] || '';
+                    const isLit = lit === 'साक्षर';
+                    return `
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">15 (क) साक्षरता की स्थिति</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q15_lit" id="q15_lit_1" value="साक्षर" ${lit === 'साक्षर' ? 'checked' : ''} onchange="handleLiteracyChange('साक्षर')">
+                                <label class="form-check-label" for="q15_lit_1">साक्षर</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q15_lit" id="q15_lit_2" value="निरक्षर" ${lit === 'निरक्षर' ? 'checked' : ''} onchange="handleLiteracyChange('निरक्षर')">
+                                <label class="form-check-label" for="q15_lit_2">निरक्षर</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 ${isLit ? '' : 'opacity-50 pe-none'}">
+                            <label class="form-label fw-bold">15 (ख) यदि साक्षर है तो, क्या डिजिटल रूप से साक्षर है? ${!isLit ? '<span class="badge bg-danger ms-1"><i class="fas fa-lock me-1"></i>लॉक</span>' : ''}</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q15_digi" id="q15_digi_1" value="हाँ" ${digi === 'हाँ' ? 'checked' : ''} ${isLit ? '' : 'disabled'} onchange="updateValue('q15_digital', 'हाँ')">
+                                <label class="form-check-label" for="q15_digi_1">हाँ</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q15_digi" id="q15_digi_2" value="नहीं" ${digi === 'नहीं' ? 'checked' : ''} ${isLit ? '' : 'disabled'} onchange="updateValue('q15_digital', 'नहीं')">
+                                <label class="form-check-label" for="q15_digi_2">नहीं</label>
+                            </div>
+                        </div>
+                    </div>`;
+
+                case 'education_status_block':
+                    const eduStatus = mData['q16_status'] || '';
+                    const eduOptions = [
+                        "स्कूल", "कॉलेज", "व्यावसायिक संस्थान", "पेशेवर", 
+                        "दिव्यांगजन के लिए विशेष संस्थान", "साक्षरता केंद्र", "अन्य संस्थान",
+                        "पहले कभी शिक्षा ग्रहण की है", "कभी शिक्षा ग्रहण नहीं की है"
+                    ];
+                    let eduHtml = '';
+                    eduOptions.forEach((opt, idx) => {
+                        eduHtml += `<div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q16_status" id="q16_${idx}" value="${opt}" ${eduStatus === opt ? 'checked' : ''} onchange="updateValue('q16_status', '${opt}')">
+                                <label class="form-check-label" for="q16_${idx}">${opt}</label>
+                            </div>
+                        </div>`;
+                    });
+                    return `<div class="row">${eduHtml}</div>`;
+
+                case 'education_level_block':
+                    const level = mData['q17_level'] || '';
+                    const stream = mData['q17_stream'] || '';
+                    const levels = ["पूर्व-प्राथमिक", "कक्षा 1 से 12", "आईटीआई", "डिप्लोमा/प्रमाण पत्र", "स्नातक/पूर्व-स्नातक", "स्नातकोत्तर डिप्लोमा", "स्नातकोत्तर/परास्नातक", "एम.फिल", "डॉक्टरेट एवं उच्च"];
+                    const streams = ["कला/सामाजिक विज्ञान", "विज्ञान", "वाणिज्य", "सूचना प्रौद्योगिकी एवं कंप्यूटर", "भाषा", "चिकित्सा विज्ञान", "अभियांत्रिकी एवं प्रौद्योगिकी", "प्रबंधन", "विधि", "कृषि एवं उससे संबंधित विषय", "शिक्षा", "अन्य"];
+
+                    return `
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">17 (क) प्राप्त शिक्षा का उच्चतम स्तर</label>
+                            <select class="form-select" onchange="updateValue('q17_level', this.value)">
+                                <option value="">-- स्तर का चयन करें --</option>
+                                ${levels.map(l => `<option value="${l}" ${level === l ? 'selected' : ''}>${l}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">17 (ख) संकाय/विषय (कक्षा 11 या उच्चतर के लिए)</label>
+                            <select class="form-select" onchange="updateValue('q17_stream', this.value)">
+                                <option value="">-- संकाय का चयन करें --</option>
+                                ${streams.map(s => `<option value="${s}" ${stream === s ? 'selected' : ''}>${s}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>`;
+
+                case 'travel_block':
+                    return `
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">25 (क) (i) निवास से कार्यस्थल तक दूरी (कि.मी. में)</label>
+                            <input type="number" step="0.1" class="form-control" placeholder="दूरी दर्ज करें" value="${escapeAttr(mData['q25_dist'] || '')}" oninput="updateValue('q25_dist', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">25 (क) (ii) यात्रा समय (घंटे एवं मिनट)</label>
+                            <input type="text" class="form-control" placeholder="उदा. 0 घंटे 45 मिनट" value="${escapeAttr(mData['q25_time'] || '')}" oninput="updateValue('q25_time', this.value)">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">25 (ख) यात्रा का साधन</label>
+                            <select class="form-select" onchange="updateValue('q25_mode', this.value)">
+                                <option value="">-- साधन का चयन करें --</option>
+                                ${["पैदल", "साइकिल", "मोपेड/स्कूटर/मोटर साइकिल", "कार/जीप/वैन", "टेम्पो/ऑटोरिक्शा/टैक्सी", "बस", "ट्रेन/मेट्रो रेल", "जल परिवहन", "अन्य साधन", "यात्रा नहीं"].map(m => `<option value="${m}" ${mData['q25_mode'] === m ? 'selected' : ''}>${m}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>`;
+
+                case 'location_block':
+                    const locKey = q.prefix;
+                    return `
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <select class="form-select" onchange="updateValue('${locKey}_type', this.value)">
+                                <option value="भारत में" ${mData[locKey + '_type'] === 'भारत में' ? 'selected' : ''}>भारत में</option>
+                                <option value="भारत के बाहर" ${mData[locKey + '_type'] === 'भारत के बाहर' ? 'selected' : ''}>भारत के बाहर</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" placeholder="गाँव/नगर (मोहल्ला) या देश का नाम लिखें" value="${escapeAttr(mData[locKey + '_name'] || '')}" oninput="updateValue('${locKey}_name', this.value)">
+                        </div>
+                    </div>`;
+
+                case 'migration_block':
+                    return `
+                    <div class="sub-q-box mb-3">
+                        <div class="fw-bold mb-2">27 (क) पूर्व निवास स्थान का विवरण</div>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <select class="form-select" onchange="updateValue('q27_loc_type', this.value)">
+                                    <option value="भारत में" ${mData['q27_loc_type'] === 'भारत में' ? 'selected' : ''}>भारत में</option>
+                                    <option value="भारत के बाहर" ${mData['q27_loc_type'] === 'भारत के बाहर' ? 'selected' : ''}>भारत के बाहर</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="गाँव/नगर (मोहल्ला) का नाम" value="${escapeAttr(mData['q27_loc_name'] || '')}" oninput="updateValue('q27_loc_name', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sub-q-box">
+                        <div class="fw-bold mb-2">27 (ख) स्थान परिवर्तन के समय (पूर्व निवास की स्थिति)</div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q27_area" id="q27_rural" value="ग्रामीण" ${mData['q27_area'] === 'ग्रामीण' ? 'checked' : ''} onchange="updateValue('q27_area', 'ग्रामीण')">
+                            <label class="form-check-label" for="q27_rural">ग्रामीण</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="q27_area" id="q27_urban" value="नगरीय" ${mData['q27_area'] === 'नगरीय' ? 'checked' : ''} onchange="updateValue('q27_area', 'नगरीय')">
+                            <label class="form-check-label" for="q27_urban">नगरीय</label>
+                        </div>
+                    </div>`;
+
+                case 'address_block':
+                    const addType = mData['q30_type'] || 'वर्तमान समान';
+                    return `
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="q30_type" id="q30_t1" value="वर्तमान समान" ${addType === 'वर्तमान समान' ? 'checked' : ''} onchange="updateValue('q30_type', 'वर्तमान समान')">
+                            <label class="form-check-label" for="q30_t1">स्थायी पता वर्तमान पते के समान है</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="q30_type" id="q30_t2" value="मुखिया समान" ${addType === 'मुखिया समान' ? 'checked' : ''} onchange="updateValue('q30_type', 'मुखिया समान')">
+                            <label class="form-check-label" for="q30_t2">स्थायी पता परिवार के मुखिया के समान है</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="q30_type" id="q30_t3" value="अन्य विवरण" ${addType === 'अन्य विवरण' ? 'checked' : ''} onchange="updateValue('q30_type', 'अन्य विवरण')">
+                            <label class="form-check-label" for="q30_t3">अन्य स्थायी पता (नीचे दर्ज करें)</label>
+                        </div>
+                    </div>
+                    <div id="q30-details" class="${addType === 'अन्य विवरण' ? '' : 'd-none'} sub-q-box">
+                        <div class="row g-2">
+                            <div class="col-md-6"><input type="text" class="form-control" placeholder="राज्य" value="${escapeAttr(mData['q30_state'] || '')}" oninput="updateValue('q30_state', this.value)"></div>
+                            <div class="col-md-6"><input type="text" class="form-control" placeholder="जिला" value="${escapeAttr(mData['q30_district'] || '')}" oninput="updateValue('q30_district', this.value)"></div>
+                            <div class="col-md-6"><input type="text" class="form-control" placeholder="गाँव/नगर" value="${escapeAttr(mData['q30_town'] || '')}" oninput="updateValue('q30_town', this.value)"></div>
+                            <div class="col-md-6"><input type="text" class="form-control" placeholder="मकान सं. एवं मोहल्ला" value="${escapeAttr(mData['q30_house'] || '')}" oninput="updateValue('q30_house', this.value)"></div>
+                        </div>
+                    </div>`;
+
+                case 'children_count':
+                    const pref = q.prefix;
+                    return `
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">पुत्रों की संख्या</label>
+                            <input type="number" min="0" class="form-control" placeholder="संख्या" value="${escapeAttr(mData[pref + '_sons'] || '')}" oninput="updateValue('${pref}_sons', this.value)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">पुत्रियों की संख्या</label>
+                            <input type="number" min="0" class="form-control" placeholder="संख्या" value="${escapeAttr(mData[pref + '_daughters'] || '')}" oninput="updateValue('${pref}_daughters', this.value)">
+                        </div>
+                    </div>`;
+
+                case 'covid_block':
+                    const cov = mData['q34_vaccinated'] || '';
+                    const covLoc = mData['q34_loc'] || 'भारत में';
+                    return `
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">टीकाकरण स्थिति</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q34_v" id="q34_v1" value="हाँ" ${cov === 'हाँ' ? 'checked' : ''} onchange="updateValue('q34_vaccinated', 'हाँ')">
+                                <label class="form-check-label" for="q34_v1">हाँ</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q34_v" id="q34_v2" value="नहीं" ${cov === 'नहीं' ? 'checked' : ''} onchange="updateValue('q34_vaccinated', 'नहीं')">
+                                <label class="form-check-label" for="q34_v2">नहीं</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 ${cov === 'हाँ' ? '' : 'd-none'}" id="q34-loc-box">
+                            <label class="form-label fw-bold">टीकाकरण स्थान</label>
+                            <select class="form-select" onchange="updateValue('q34_loc', this.value)">
+                                <option value="भारत में" ${covLoc === 'भारत में' ? 'selected' : ''}>भारत में</option>
+                                <option value="भारत के बाहर" ${covLoc === 'भारत के बाहर' ? 'selected' : ''}>भारत के बाहर</option>
+                            </select>
+                        </div>
+                    </div>`;
+
+                case 'radio_text':
+                    let rtHtml = '';
+                    q.options.forEach((opt, idx) => {
+                        rtHtml += `<div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="q_${q.id}" id="q_${q.id}_${idx}" value="${opt}" ${val === opt ? 'checked' : ''} onchange="updateValue(${q.id}, this.value)">
+                            <label class="form-check-label" for="q_${q.id}_${idx}">${opt}</label>
+                        </div>`;
+                    });
+                    return rtHtml;
+
+                case 'yes_no_input':
+                    const hasId = mData['q' + q.id + '_has'] || '';
+                    const idVal = mData['q' + q.id + '_val'] || '';
+                    return `
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q${q.id}_has" id="q${q.id}_y" value="हाँ" ${hasId === 'हाँ' ? 'checked' : ''} onchange="updateValue('q${q.id}_has', 'हाँ')">
+                                <label class="form-check-label" for="q${q.id}_y">हाँ</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="q${q.id}_has" id="q${q.id}_n" value="नहीं" ${hasId === 'नहीं' ? 'checked' : ''} onchange="updateValue('q${q.id}_has', 'नहीं')">
+                                <label class="form-check-label" for="q${q.id}_n">नहीं</label>
+                            </div>
+                        </div>
+                        <div class="col-md-8 ${hasId === 'हाँ' ? '' : 'd-none'}" id="box-id-${q.id}">
+                            <input type="text" class="form-control" placeholder="${q.placeholder}" value="${escapeAttr(idVal)}" oninput="updateValue('q${q.id}_val', this.value)">
+                        </div>
+                    </div>`;
+
+                default:
+                    return '';
+            }
+        }
+
+        function handleCasteSelection(category, value) {
+            if(category === 'sc') {
+                updateValue('q10_sc', value);
+                if(value === 'हाँ') {
+                    // Selecting SC locks ST and Other Castes
+                    updateValue('q10_st', '');
+                    updateValue('q10_st_name', '');
+                    updateValue('q10_other_opt', '');
+                    updateValue('q10_other_name', '');
+                }
+            } else if(category === 'st') {
+                updateValue('q10_st', value);
+                if(value === 'हाँ') {
+                    // Selecting ST locks SC and Other Castes
+                    updateValue('q10_sc', '');
+                    updateValue('q10_sc_name', '');
+                    updateValue('q10_other_opt', '');
+                    updateValue('q10_other_name', '');
+                }
+            } else if(category === 'other') {
+                updateValue('q10_other_opt', value);
+            }
+
+            renderFormQuestions();
+            updateConditionalLocks();
+        }
+
+        function toggleDisabilityOption(dOpt) {
+            const mData = getCurrentMemberData();
+            let list = mData['q13_types'] || [];
+            if(list.includes(dOpt)) {
+                list = list.filter(x => x !== dOpt);
+            } else {
+                if(list.length >= 3) {
+                    showToastNotice("अधिकतम 3 दिव्यांगता विकल्पों का चयन किया जा सकता है।");
+                    renderFormQuestions();
+                    return;
+                }
+                list.push(dOpt);
+            }
+            updateValue('q13_types', list);
+        }
+
+        function updateConditionalLocks() {
+            const mData = getCurrentMemberData();
+
+            // Convenience suggestion only (not an official age-based census rule):
+            // for age 0-14, preselect 'अविवाहित' if marital status is still blank.
+            // Enumerator/respondent can change it; a manual choice is never overwritten.
+            const ageRaw = mData['q4_age'];
+            const ageNow = (ageRaw === '' || ageRaw === null || ageRaw === undefined) ? NaN : Number(ageRaw);
+            if(Number.isFinite(ageNow) && ageNow >= 0 && ageNow <= 14 && !mData[5]) {
+                mData[5] = 'अविवाहित - 1';
+                mData.q5_auto_suggested = true;
+                saveLocalState();
+                const maritalSelect = document.querySelector('#q-card-5 select');
+                if(maritalSelect) maritalSelect.value = 'अविवाहित - 1';
+                const maritalBody = document.getElementById('q-body-5');
+                if(maritalBody && !maritalBody.querySelector('.age-suggestion-note')) {
+                    const note = document.createElement('div');
+                    note.className = 'small text-warning-emphasis mt-2 age-suggestion-note';
+                    note.textContent = 'उम्र के आधार पर सुझाया गया विकल्प — वास्तविक वैवाहिक स्थिति की पुष्टि करें। जरूरत हो तो बदल दें।';
+                    maritalBody.appendChild(note);
+                }
+            }
+            const isUnmarried = (mData[5] || '').includes('अविवाहित');
+            applyCardLock(6, isUnmarried, "अविवाहित व्यक्ति के लिए लागू नहीं");
+            applyCardLock(7, isUnmarried, "अविवाहित व्यक्ति के लिए लागू नहीं");
+
+            // Official questionnaire wording: Q31-32 are for ever-married women;
+            // Q33 is for currently married women. Do not infer from age alone.
+            const sex = mData[3] || '';
+            const marital = mData[5] || '';
+            const isFemale = sex === 'महिला';
+            const everMarried = isFemale && !marital.includes('अविवाहित') && !!marital;
+            const currentlyMarried = isFemale && marital.includes('वर्तमान में विवाहित');
+            applyCardLock(31, !everMarried && (sex !== '' || marital !== ''), "केवल पहले कभी विवाहित महिलाओं के लिए");
+            applyCardLock(32, !everMarried && (sex !== '' || marital !== ''), "केवल पहले कभी विवाहित महिलाओं के लिए");
+            applyCardLock(33, !currentlyMarried && (sex !== '' || marital !== ''), "केवल वर्तमान में विवाहित महिलाओं के लिए");
+
+            const isIlliterate = mData['q15_lit'] === 'निरक्षर';
+            const noEdu = isIlliterate || mData['q16_status'] === 'कभी शिक्षा ग्रहण नहीं की है';
+            applyCardLock(16, isIlliterate, "केवल साक्षर व्यक्तियों के लिए खुला (निरक्षर व्यक्ति हेतु स्वचालित लॉक)");
+            applyCardLock(17, noEdu, "निरक्षर व्यक्ति या कभी शिक्षा न पाने वालों के लिए locked");
+
+            const q18Val = mData[18] || '';
+            const isNonWorker = q18Val === 'गैर कर्मी (यदि कोई काम नहीं किया)';
+            const isWorker = q18Val.includes('कर्मी') && !isNonWorker;
+
+            applyCardLock(19, isNonWorker, "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
+            applyCardLock(20, isNonWorker, "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
+            applyCardLock(21, isNonWorker, "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
+            applyCardLock(22, isNonWorker, "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
+            applyCardLock(25, isNonWorker, "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
+
+            applyCardLock(23, isWorker, "केवल गैर-कर्मियों के लिए लागू (कर्मियों हेतु बंद)");
+
+            document.getElementById('q13-types-box')?.classList.toggle('d-none', mData['q13_has'] !== 'हाँ');
+            document.getElementById('q34-loc-box')?.classList.toggle('d-none', mData['q34_vaccinated'] !== 'हाँ');
+
+            [36, 37, 38, 39, 40].forEach(id => {
+                document.getElementById('box-id-' + id)?.classList.toggle('d-none', mData['q' + id + '_has'] !== 'हाँ');
+            });
+
+            document.getElementById('q30-details')?.classList.toggle('d-none', mData['q30_type'] !== 'अन्य विवरण');
+        }
+
+        function applyCardLock(qId, shouldLock, reasonText) {
+            const card = document.getElementById(`q-card-${qId}`);
+            if(!card) return;
+
+            if(shouldLock) {
+                card.classList.add('conditionally-locked');
+                if(!card.querySelector('.lock-overlay-banner')) {
+                    const banner = document.createElement('div');
+                    banner.className = 'lock-overlay-banner';
+                    banner.innerHTML = `<i class="fas fa-lock"></i> <span>स्वचालित लॉक: ${reasonText}</span>`;
+                    card.insertBefore(banner, card.firstChild);
+                }
+            } else {
+                card.classList.remove('conditionally-locked');
+                const banner = card.querySelector('.lock-overlay-banner');
+                if(banner) banner.remove();
+            }
+        }
+
+        function saveCurrentMemberData() {
+            saveLocalState();
+            updateMembersRemainingBadge();
+            showToastNotice(`सदस्य ${currentActiveMember} का विवरण सफलतापूर्वक सेव किया गया!`);
+        }
+
+        function updateMembersRemainingBadge() {
+            const total=Object.keys(familyCensusData).length;
+            const filled=Object.values(familyCensusData).filter(m=>m && m[1]).length;
+            document.getElementById('members-remaining-text').innerText = `कुल ${total} सदस्य | नाम दर्ज: ${filled} | जरूरत के अनुसार सदस्य जोड़ें`;
+            renderMemberSelector();
+        }
+
+        function scrollToQuestion7() {
+            const q7Card = document.getElementById('q-card-7');
+            if(q7Card) {
+                q7Card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function switchWorkflowMode(mode) {
+            workflowMode = mode;
+            document.getElementById('btn-workflow-member').classList.toggle('active', mode === 'member');
+            document.getElementById('btn-workflow-question').classList.toggle('active', mode === 'question');
+            if (mode === 'question') {
+                currentActiveQuestion = 1;
+                currentActiveMember = Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b))[0] || '1';
+                renderFormQuestions(); renderMemberSelector(); switchView('single');
+                showToastNotice('प्रश्नवार मोड: एक ही प्रश्न सभी सदस्यों के लिए भरें। अगला बटन सदस्य बदलता है; अंतिम सदस्य के बाद अगला प्रश्न खुलेगा।');
+            } else {
+                renderFormQuestions(); renderMemberSelector(); switchView('all');
+                showToastNotice('सदस्यवार मोड: एक सदस्य के सभी प्रश्न भरें, फिर अगला सदस्य चुनें।');
+            }
+        }
+
+        function advanceQuestionWise(direction) {
+            const ids = Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
+            if (!ids.length) return;
+            let idx = ids.indexOf(String(currentActiveMember)); if (idx < 0) idx = 0;
+            if (direction > 0) {
+                if (idx < ids.length - 1) { currentActiveMember = ids[idx + 1]; }
+                else { currentActiveMember = ids[0]; currentActiveQuestion = Math.min(40, currentActiveQuestion + 1); }
+            } else {
+                if (idx > 0) { currentActiveMember = ids[idx - 1]; }
+                else { currentActiveMember = ids[ids.length - 1]; currentActiveQuestion = Math.max(1, currentActiveQuestion - 1); }
+            }
+            renderFormQuestions(); renderMemberSelector(); updateConditionalLocks();
+            const q = document.getElementById('q-card-' + currentActiveQuestion);
+            if (q) q.scrollIntoView({behavior:'smooth',block:'start'});
+            updateSingleNavIndicator();
+        }
+
+        function switchView(mode) {
+            currentDisplayMode = mode;
+            document.getElementById('btn-view-all').classList.toggle('active', mode === 'all');
+            document.getElementById('btn-view-single').classList.toggle('active', mode === 'single');
+            document.getElementById('single-nav-bar').classList.toggle('d-none', mode !== 'single');
+
+            const cards = document.querySelectorAll('.q-card');
+            if(mode === 'all') {
+                cards.forEach(c => c.classList.remove('d-none'));
+            } else {
+                cards.forEach((c) => {
+                    const id = parseInt(c.id.replace('q-card-', ''));
+                    c.classList.toggle('d-none', id !== currentActiveQuestion);
+                });
+                updateSingleNavIndicator();
+            }
+        }
+
+        function navigateQuestion(step) {
+            currentActiveQuestion += step;
+            if(currentActiveQuestion < 1) currentActiveQuestion = 1;
+            if(currentActiveQuestion > 40) currentActiveQuestion = 40;
+            switchView('single');
+        }
+
+        function updateSingleNavIndicator() {
+            document.getElementById('single-q-indicator').innerText = `प्रश्न ${currentActiveQuestion} / 40${workflowMode === 'question' ? ' | सदस्य ' + currentActiveMember + '/' + Object.keys(familyCensusData).length : ''}`;
+            const ids = Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
+            const idx = ids.indexOf(String(currentActiveMember));
+            document.getElementById('btn-prev-q').disabled = workflowMode === 'question' ? (currentActiveQuestion === 1 && idx <= 0) : currentActiveQuestion === 1;
+            document.getElementById('btn-next-q').disabled = workflowMode === 'question' ? (currentActiveQuestion === 40 && idx === ids.length - 1) : currentActiveQuestion === 40;
+            document.getElementById('btn-next-q').innerHTML = workflowMode === 'question' ? 'अगला सदस्य / प्रश्न <i class="fas fa-arrow-right ms-1"></i>' : 'अगला प्रश्न <i class="fas fa-arrow-right ms-1"></i>';
+            document.getElementById('btn-prev-q').innerHTML = workflowMode === 'question' ? '<i class="fas fa-arrow-left me-1"></i> पिछला सदस्य / प्रश्न' : '<i class="fas fa-arrow-left me-1"></i> पिछला प्रश्न';
+        }
+
+        function setupSecurityWatchdog() {
+            window.addEventListener('keydown', function(e) {
+                if(e.keyCode === 123 || 
+                  (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || 
+                  (e.ctrlKey && e.keyCode === 85) || 
+                  (e.ctrlKey && e.keyCode === 83)) {
+                    e.preventDefault();
+                    showLockNotice(e);
+                    return false;
+                }
+            });
+
+            setInterval(() => {
+                const authorBox = document.getElementById('immutable-author-box');
+                const nameTxt = document.getElementById('author-name-text');
+                const desigTxt = document.getElementById('author-desig-text');
+
+                if(!authorBox || !nameTxt || !desigTxt || 
+                   !nameTxt.innerText.includes(IMMUTABLE_AUTHOR) || 
+                   !desigTxt.innerText.includes("गोंडा")) {
+                    restoreHeaderBranding();
+                }
+            }, 1000);
+        }
+
+        function restoreHeaderBranding() {
+            const authorBox = document.getElementById('immutable-author-box');
+            if(authorBox) {
+                authorBox.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-shield fs-3 text-warning me-3"></i>
+                    <div>
+                        <div class="author-name" id="author-name-text">मार्गदर्शन एवं सॉफ्टवेयर निर्माण: ${IMMUTABLE_AUTHOR}</div>
+                        <div class="author-designation" id="author-desig-text">${IMMUTABLE_COLLEGE}</div>
+                    </div>
+                </div>`;
+            }
+        }
+
+        function showLockNotice(e) {
+            if(e) e.preventDefault();
+            showToastNotice("सॉफ्टवेयर locked है। इसमें नाम एवं अभ्यास प्रश्नों में फेरबदल निषिद्ध है।");
+            return false;
+        }
+
+        function showToastNotice(msg) {
+            const target=document.getElementById('toast-message');
+            if(target) target.innerText=msg;
+            const toastEl=document.getElementById('lock-toast');
+            if(window.bootstrap && toastEl) { new bootstrap.Toast(toastEl,{delay:3000}).show(); }
+            else { alert(msg); }
+        }
+
+        function escapeHTML(str) {
+            return String(str ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        }
+
+        function escapeAttr(str) {
+            return String(str || '').replace(/"/g, '&quot;');
+        }
+
+        function generateSummaryReport() {
+            let report = `📋 *भारत की जनगणना 2027 - परिवार अनुसूची प्रविष्टि*
+`;
+            report += `👤 *मार्गदर्शन एवं निर्माता*: ${IMMUTABLE_AUTHOR} (${IMMUTABLE_COLLEGE})
+`;
+            report += `घर संख्या: ${households[activeHouseholdId]?.houseNo || ''}
+`;
+            report += `─────────────────────────
+`;
+
+            for(const i of Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b))) {
+                const mData = familyCensusData[String(i)] || {};
+                const name = mData[1] || 'अदर्ज';
+                if(name !== 'अदर्ज' || i === 1) {
+                    report += `
+🔹 *सदस्य ${i}: ${name}*
+`;
+                    report += `   • संबंध: ${mData[2] || 'अदर्ज'}
+`;
+                    report += `   • लिंग: ${mData[3] || 'अदर्ज'}
+`;
+                    report += `   • आयु: ${mData['q4_age'] || 'अदर्ज'} वर्ष
+`;
+                    report += `   • वैवाहिक स्थिति: ${mData[5] || 'अदर्ज'}
+`;
+                    report += `   • साक्षरता: ${mData['q15_lit'] || 'अदर्ज'}
+`;
+                    report += `   • कामकाज: ${mData[18] || 'अदर्ज'}
+`;
+                }
+            }
+
+            report += `
+─────────────────────────
+`;
+            report += `✔ सॉफ्टवेयर स्थिति: प्रायोगिक अभ्यास मॉडल | डेटा पूर्ण रूप से सुरक्षित।`;
+
+            document.getElementById('summary-text').innerText = report;
+            document.getElementById('summary-output-container').classList.remove('d-none');
+            return report;
+        }
+
+        function shareDataOnWhatsApp() {
+            const text = generateSummaryReport();
+            const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
+            window.open(url, '_blank');
+        }
+
+        function copySummaryText() {
+            const text = document.getElementById('summary-text').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                showToastNotice("समीक्षा रिपोर्ट क्लिपबोर्ड पर कॉपी हो गई है!");
+            }).catch(() => {
+                showToastNotice("कॉपी करने में विफल।");
+            });
+        }
+
+        function exportJSONBackup() {
+            saveLocalState();
+            downloadJSON({format:'DhurdaJangle-CensusManager-v1',exportedAt:new Date().toISOString(),activeHouseholdId,households},'Census2027_All_Houses_Backup.json');
+            showToastNotice('सभी घरों का Combined JSON Backup डाउनलोड हुआ।');
+        }
+
+        function importJSONBackup(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(imported.format === 'DhurdaJangle-CensusManager-v1' && imported.households) {
+                        households = imported.households; activeHouseholdId = imported.activeHouseholdId || Object.keys(households)[0];
+                    } else if(imported.format === 'CensusManager-House-v1' && imported.household) {
+                        households[imported.household.id] = imported.household; activeHouseholdId = imported.household.id;
+                    } else {
+                        const id='HH-RESTORED'; households[id]={id,houseNo:id,headName:'Restored Family',members:imported.members||imported,peStatus:'pending',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}; activeHouseholdId=id;
+                    }
+                    loadActiveHousehold(); saveLocalState();
+                    if(censusDB) { for(const h of Object.values(households)) await dbRequest('readwrite','put',h); }
+                    refreshHouseholdUI(); renderFormQuestions(); renderMemberSelector();
+                    updateConditionalLocks(); updateMembersRemainingBadge();
+                    showToastNotice('डेटा सफलतापूर्वक रीस्टोर हो गया!');
+                } catch(err) {
+                    showToastNotice("अमान्य JSON बैकअप फ़ाइल!");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        
+        function toggleParentIsMember(keyP, isChecked) {
+            updateValue(keyP + '_is_member', isChecked ? 'हाँ' : 'नहीं');
+            if(isChecked) {
+                let memNum = getCurrentMemberData()[keyP + '_member_no'];
+                
+                // Smart auto-detection if member number is not already selected
+                if(!memNum) {
+                    const targetRel = keyP === 'q11' ? 'पिता' : 'माता';
+                    const targetGender = keyP === 'q11' ? 'पुरुष' : 'महिला';
+                    
+                    // Search in family members for a matching gender or relationship
+                    for(const mStr of Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b))) {
+                        if(mStr === currentActiveMember) continue;
+                        
+                        const mInfo = familyCensusData[mStr];
+                        if(mInfo && mInfo[1]) { // member has a name
+                            const genderMatch = mInfo[3] === targetGender;
+                            const relStr = mInfo[2] || '';
+                            const relMatch = relStr.includes(targetRel) || relStr.includes('मुखिया') || relStr.includes('पति/पत्नी');
+                            
+                            if(genderMatch || relMatch) {
+                                memNum = mStr;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Fallback to first available non-self member with a name
+                    if(!memNum) {
+                        for(const mStr of Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b))) {
+                            if(mStr !== currentActiveMember && familyCensusData[mStr] && familyCensusData[mStr][1]) {
+                                memNum = mStr;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if(memNum) {
+                    autoFillParentFromMember(keyP, memNum);
+                } else {
+                    renderFormQuestions();
+                    showToastNotice("कृपया परिवार के अन्य सदस्य का नाम/विवरण दर्ज करें या सदस्य क्रमांक चुनें।");
+                }
+            } else {
+                // Unticked: clear parent member data
+                updateValue(keyP + '_member_no', '');
+                updateValue(keyP + '_name', '');
+                updateValue(keyP + '_dob', '');
+                updateValue(keyP + '_place', 'भारत में');
+                updateValue(keyP + '_place_name', '');
+                updateValue(keyP + '_religion', '');
+                renderFormQuestions();
+            }
+        }
+
+        function autoFillParentFromMember(keyP, targetMemNum) {
+            updateValue(keyP + '_member_no', targetMemNum);
+            if(!targetMemNum) return;
+
+            const targetData = familyCensusData[String(targetMemNum)];
+            if(targetData) {
+                // 1. Name (Q1)
+                if(targetData[1]) {
+                    updateValue(keyP + '_name', targetData[1]);
+                }
+
+                // 2. DOB (Q4)
+                const dd = targetData['q4_dd'];
+                const mm = targetData['q4_mm'];
+                const yyyy = targetData['q4_yyyy'];
+                if(yyyy && mm && dd) {
+                    const formattedDd = String(dd).padStart(2, '0');
+                    const formattedMm = String(mm).padStart(2, '0');
+                    const isoDob = `${yyyy}-${formattedMm}-${formattedDd}`;
+                    updateValue(keyP + '_dob', isoDob);
+                }
+
+                // 3. Birthplace (Q26)
+                if(targetData['q26_type']) {
+                    updateValue(keyP + '_place', targetData['q26_type']);
+                }
+                if(targetData['q26_name']) {
+                    updateValue(keyP + '_place_name', targetData['q26_name']);
+                }
+
+                // 4. Religion (Q9)
+                if(targetData[9]) {
+                    updateValue(keyP + '_religion', targetData[9]);
+                }
+
+                renderFormQuestions();
+                showToastNotice(`सदस्य ${targetMemNum} की समस्त सूचनाएँ स्वचालित (Auto-fill) भर दी गई हैं!`);
+            } else {
+                showToastNotice(`सदस्य ${targetMemNum} का डेटा अभी दर्ज नहीं है।`);
+            }
+        }
+
+        
+        
+        function handleDobInputChange(key, val) {
+            updateValue(key, val);
+            const mData = getCurrentMemberData();
+            const d = parseInt(mData['q4_dd'], 10);
+            const m = parseInt(mData['q4_mm'], 10);
+            const y = parseInt(mData['q4_yyyy'], 10);
+
+            const ageInput = document.getElementById('q4_age_input');
+            const ageBadge = document.getElementById('q4_age_badge');
+            const ageContainer = document.getElementById('q4_age_container');
+
+            if(d > 0 && d <= 31 && m > 0 && m <= 12 && y >= 1900 && y <= 2027) {
+                // Uttar Pradesh PE reference date: 5 January 2027, 00:00 hours
+                const refYear = 2027;
+                const refMonth = 1;
+                const refDay = 5;
+
+                let calcAge = refYear - y;
+                if (m > refMonth || (m === refMonth && d > refDay)) {
+                    calcAge--;
+                }
+                if(calcAge < 0) calcAge = 0;
+                
+                updateValue('q4_age', String(calcAge));
+                
+                if(ageInput) {
+                    ageInput.value = calcAge;
+                    ageInput.readOnly = true;
+                    ageInput.style.backgroundColor = "#e9ecef";
+                }
+                if(ageBadge) {
+                    ageBadge.innerHTML = '<span class="badge bg-success ms-1"><i class="fas fa-calculator me-1"></i>स्वचालित गणना (5 जनवरी 2027)</span>';
+                }
+                if(ageContainer) ageContainer.classList.add('opacity-75');
+            } else {
+                // DOB is incomplete or cleared
+                if(!mData['q4_dd'] && !mData['q4_mm'] && !mData['q4_yyyy']) {
+                    // DOB completely empty
+                    if(ageInput && ageInput.readOnly) {
+                        updateValue('q4_age', '');
+                        ageInput.value = '';
+                        ageInput.readOnly = false;
+                        ageInput.style.backgroundColor = "";
+                    }
+                    if(ageBadge) ageBadge.innerHTML = '';
+                    if(ageContainer) ageContainer.classList.remove('opacity-75');
+                }
+            }
+            updateConditionalLocks();
+        }
+
+        function handleAgeInputChange(val) {
+            updateValue('q4_age', val);
+            
+            const ddInput = document.getElementById('q4_dd_input');
+            const mmInput = document.getElementById('q4_mm_input');
+            const yyyyInput = document.getElementById('q4_yyyy_input');
+            const dobBadge = document.getElementById('q4_dob_badge');
+            const dobContainer = document.getElementById('q4_dob_container');
+
+            if(val !== '') {
+                // Clear DOB data when age is entered directly
+                updateValue('q4_dd', '');
+                updateValue('q4_mm', '');
+                updateValue('q4_yyyy', '');
+
+                if(ddInput) { ddInput.value = ''; ddInput.disabled = true; }
+                if(mmInput) { mmInput.value = ''; mmInput.disabled = true; }
+                if(yyyyInput) { yyyyInput.value = ''; yyyyInput.disabled = true; }
+
+                if(dobBadge) dobBadge.innerHTML = '<span class="badge bg-danger ms-1"><i class="fas fa-lock me-1"></i>लॉक (आयु दर्ज है)</span>';
+                if(dobContainer) dobContainer.classList.add('opacity-50');
+            } else {
+                // Age cleared, enable DOB inputs
+                if(ddInput) ddInput.disabled = false;
+                if(mmInput) mmInput.disabled = false;
+                if(yyyyInput) yyyyInput.disabled = false;
+
+                if(dobBadge) dobBadge.innerHTML = '';
+                if(dobContainer) dobContainer.classList.remove('opacity-50');
+            }
+            updateConditionalLocks();
+        }
+
+        function handleLiteracyChange(val) {
+            updateValue('q15_lit', val);
+            if(val === 'निरक्षर') {
+                updateValue('q15_digital', '');
+                updateValue('q16_status', '');
+            }
+            renderFormQuestions();
+            updateConditionalLocks();
+        }
+
+        function resetFormConfirmation() {
+            if(confirm("क्या आप निश्चित रूप से पूरा भरा हुआ परिवार का डेटा रीसेट करना चाहते हैं?")) {
+                familyCensusData = { "1": {} }; currentActiveMember = "1";
+                saveLocalState();
+                renderFormQuestions(); renderMemberSelector();
+                updateConditionalLocks();
+                updateMembersRemainingBadge();
+                document.getElementById('summary-output-container').classList.add('d-none');
+                showToastNotice("डेटा रीसेट कर दिया गया है।");
+            }
+        }
+
+        
+        function downloadThisSoftware() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'DhurdaJangle_Offline_Census_Manager.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToastNotice("सॉफ्टवेयर HTML फ़ाइल सफलतापूर्वक डाउनलोड हो गई है!");
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Keep the repository's existing offline/PWA service worker active.
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.warn('PWA offline setup failed:', err)));
+        }
+    </script>
+
+
+<script async="" src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="2cabcaf4-79cc-4dc2-99ee-7a05c2737f3b" data-app-host="app.netlify.com" data-account-tier="free"></script>
+<iframe id="nl-badge-frame" title="Powered by Netlify" srcdoc="&lt;!doctype html&gt;&lt;html class=&quot;nl-narrow&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot;&gt;&lt;style&gt;
+    :root{--nl-vw:288px;--nl-vh:557px}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:transparent;overflow:hidden}
+    body{display:flex;align-items:flex-end;justify-content:flex-end;height:100vh;
+      padding:8px 18px 18px 8px;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#f4f9f9;-webkit-font-smoothing:antialiased}
+    .nl-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:10px;width:max-content;max-width:calc(var(--nl-vw,100vw) - 26px)}
+    button{font-family:inherit;cursor:pointer}
+    :focus-visible{outline:2px solid #32e6e2;outline-offset:2px;border-radius:6px}
+    .nl-icon-btn{position:relative;flex:none;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid transparent;background:transparent;color:#d5e3e6;transition:background .15s ease,color .15s ease}
+    .nl-icon-btn:hover{background:rgba(255,255,255,0.08);color:#f4f9f9}
+    .nl-tap::after{content:&quot;&quot;;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:max(100%,44px);height:max(100%,44px)}
+    @keyframes nl-rise{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+    @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
+  
+      .nl-card{position:relative;display:none;width:min(340px,calc(var(--nl-vw,100vw) - 26px));max-height:calc(var(--nl-vh,100vh) - 84px);overflow-y:auto;background:linear-gradient(180deg,#132832 0%,#0e1e25 100%);border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:18px;transform-origin:bottom right;animation:nl-rise .3s cubic-bezier(.34,1.4,.4,1) both}
+      .nl-card.open{display:block}
+      .nl-card-close{position:absolute;top:10px;right:10px}
+      .nl-card h2{margin:0;padding-right:30px;font-size:16px;font-weight:750;letter-spacing:-0.015em;line-height:1.35}
+      .nl-card h2 em{font-style:normal;background:linear-gradient(90deg,#32e6e2,#4d7cfe,#9a6bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+      .nl-card p{margin:8px 0 0;font-size:12.5px;color:#d5e3e6}
+      .nl-prompt{position:relative;margin-top:14px;background:#10222b;border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:10px 12px;transition:border-color .15s ease,box-shadow .15s ease}
+      .nl-prompt:focus-within{border-color:#05bdba;box-shadow:0 0 0 3px rgba(5,189,186,0.18)}
+      .nl-prompt textarea{display:block;width:100%;height:38px;resize:none;border:0;outline:none;background:transparent;color:#f4f9f9;font:inherit;font-size:13px;line-height:19px;padding:0 28px 0 0}
+      .nl-prompt textarea::placeholder{color:#a9bdc2}
+      .nl-send{position:absolute;right:9px;bottom:9px;width:24px;height:24px;flex:none;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:#05bdba;color:#02191b;transition:background .15s ease}
+      .nl-send:hover{background:#32e6e2}
+      @media (pointer: coarse){
+        .nl-prompt textarea{font-size:16px;line-height:21px;height:42px}
+      }
+      .nl-or{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:10.5px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#a9bdc2}
+      .nl-or::before,.nl-or::after{content:&quot;&quot;;flex:1;height:1px;background:rgba(255,255,255,0.09)}
+      .nl-drop{display:flex;align-items:center;justify-content:space-between;gap:6px;text-decoration:none;background:#1b3a45;border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;color:#cfe0e3;transition:background .15s ease,color .15s ease,border-color .15s ease}
+      .nl-drop:hover{background:#224753;color:#f4f9f9;border-color:rgba(50,230,226,0.3)}
+      .nl-drop .nl-arrow{transition:transform .18s cubic-bezier(.34,1.4,.4,1)}
+      .nl-drop:hover .nl-arrow{transform:translateX(3px)}
+      .nl-badge{display:flex;align-items:center;gap:9px;white-space:nowrap;border:1px solid rgba(255,255,255,0.09);background:linear-gradient(180deg,#142b34,#0e1e25);color:#f4f9f9;border-radius:999px;padding:9px 14px 9px 11px;font-size:13px;font-weight:600;letter-spacing:0.01em;transition:border-color .2s ease}
+      .nl-badge:hover{border-color:rgba(50,230,226,0.26)}
+      .nl-hide{display:block;width:100%;margin-top:10px;border:0;background:transparent;color:#a9bdc2;font-size:11.5px;font-weight:600;padding:4px;border-radius:8px;transition:color .15s ease}
+      .nl-hide:hover{color:#d5e3e6;text-decoration:underline}
+      .nl-badge-label{color:#d5e3e6;font-weight:500}
+      .nl-badge-brand{font-weight:750}
+    &lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+      &lt;div class=&quot;nl-wrap&quot;&gt;
+        &lt;section class=&quot;nl-card&quot; id=&quot;nl-card&quot; aria-label=&quot;Build your own site on Netlify&quot;&gt;
+          &lt;button type=&quot;button&quot; class=&quot;nl-icon-btn nl-tap nl-card-close&quot; id=&quot;nl-card-close&quot; aria-label=&quot;Close&quot;&gt;&lt;svg width=&quot;14&quot; height=&quot;14&quot; viewBox=&quot;0 0 16 16&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.9&quot; stroke-linecap=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;
+          &lt;h2&gt;&lt;em&gt;Build your own site with Netlify&lt;/em&gt;&lt;/h2&gt;
+          &lt;p&gt;Describe what you want, and an AI agent designs, builds and deploys it in minutes.&lt;/p&gt;
+          &lt;form class=&quot;nl-prompt&quot; action=&quot;https://app.netlify.com/start&quot; method=&quot;get&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
+            &lt;textarea name=&quot;prompt&quot; rows=&quot;2&quot; required maxlength=&quot;300&quot; autocomplete=&quot;off&quot;
+                      enterkeyhint=&quot;go&quot;
+                      placeholder=&quot;A shop for my handmade surfboards&amp;hellip;&quot;
+                      aria-label=&quot;Describe the site you want to build&quot;&gt;&lt;/textarea&gt;
+            &lt;button type=&quot;submit&quot; class=&quot;nl-send nl-tap&quot; aria-label=&quot;Build this site&quot;&gt;&lt;svg width=&quot;13&quot; height=&quot;13&quot; viewBox=&quot;0 0 16 16&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M8 12.75v-9.5M3.9 7.35 8 3.25l4.1 4.1&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;utm_source&quot; value=&quot;netlify_badge&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;utm_campaign&quot; value=&quot;loops&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;utm_medium&quot; value=&quot;owned&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;utm_content&quot; value=&quot;prompt&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;utm_id&quot; value=&quot;2cabcaf4-79cc-4dc2-99ee-7a05c2737f3b&quot;&gt;
+            
+          &lt;/form&gt;
+          &lt;div class=&quot;nl-or&quot;&gt;&lt;span&gt;or&lt;/span&gt;&lt;/div&gt;
+          &lt;a class=&quot;nl-drop&quot; href=&quot;https://app.netlify.com/drop?utm_source=netlify_badge&amp;utm_campaign=loops&amp;utm_medium=owned&amp;utm_content=drop&amp;utm_id=2cabcaf4-79cc-4dc2-99ee-7a05c2737f3b&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
+            &lt;span&gt;Drop a site you already have&lt;/span&gt;&lt;span class=&quot;nl-arrow&quot; aria-hidden=&quot;true&quot;&gt;&amp;rarr;&lt;/span&gt;
+          &lt;/a&gt;
+          
+        &lt;/section&gt;
+        &lt;button type=&quot;button&quot; class=&quot;nl-badge&quot; id=&quot;nl-badge&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;nl-card&quot;
+                aria-label=&quot;Powered by Netlify — build your own site&quot;&gt;
+          &lt;svg width=&quot;18&quot; height=&quot;18&quot; viewBox=&quot;0 0 32 32&quot; fill=&quot;none&quot; aria-hidden=&quot;true&quot;&gt;
+    &lt;path fill=&quot;#fff&quot; d=&quot;M17.9922 18.3225H14.005L13.6746 17.9921V14.005L14.005 13.6746H17.9922L18.3226 14.005V17.9921L17.9922 18.3225Z&quot;/&gt;
+    &lt;g fill=&quot;#05BDBA&quot;&gt;
+      &lt;path d=&quot;M9.6958 24.3311H9.35705L7.6661 22.6401V22.3041L10.2511 19.7164L12.042 19.7191L12.2808 19.9552V21.7461L9.6958 24.3311Z&quot;/&gt;
+      &lt;path d=&quot;M7.6661 9.69576V9.35701L9.35705 7.66606H9.6958L12.2808 10.2511V12.0392L12.042 12.2808H10.2511L7.6661 9.69576Z&quot;/&gt;
+      &lt;path d=&quot;M10.0457 17.4369H0.205466L0 17.2314V14.7658L0.205466 14.5603H10.0457L10.2511 14.7658V17.2314L10.0457 17.4369Z&quot;/&gt;
+      &lt;path d=&quot;M31.7945 17.4369H21.9544L21.7489 17.2314V14.7658L21.9544 14.5603H31.7945L32 14.7658V17.2314L31.7945 17.4369Z&quot;/&gt;
+      &lt;path d=&quot;M14.5631 10.0456V2.66547L14.7686 2.46001H17.2343L17.4396 2.66547V10.0456L17.2343 10.2511H14.7686L14.5631 10.0456Z&quot;/&gt;
+      &lt;path d=&quot;M14.5631 29.3316V21.9515L14.7686 21.746H17.2343L17.4396 21.9515V29.3316L17.2343 29.5371H14.7686L14.5631 29.3316Z&quot;/&gt;
+    &lt;/g&gt;&lt;/svg&gt;
+          &lt;span&gt;&lt;span class=&quot;nl-badge-label&quot;&gt;Powered by&lt;/span&gt; &lt;span class=&quot;nl-badge-brand&quot;&gt;Netlify&lt;/span&gt;&lt;/span&gt;
+        &lt;/button&gt;
+      &lt;/div&gt;
+      &lt;script&gt;
+        
+    function nlSend(){
+      var wrap=document.querySelector('.nl-wrap'),boxes=[];
+      for(var i=0;i&lt;wrap.children.length;i++){
+        var c=wrap.children[i];
+        if(!c.offsetWidth||!c.offsetHeight)continue;
+        boxes.push({x:c.offsetLeft-wrap.offsetLeft+8,
+                    y:c.offsetTop-wrap.offsetTop+8,
+                    w:c.offsetWidth,h:c.offsetHeight});
+      }
+      parent.postMessage({nlHud:'resize',
+        width:wrap.offsetWidth+26,
+        height:wrap.offsetHeight+26,
+        boxes:boxes},'*');
+    }
+    function nlSendSoon(){requestAnimationFrame(nlSend);}
+    window.addEventListener('load',nlSend);
+    window.addEventListener('message',function(e){
+      if(e.source!==parent||!e.data||e.data.nlHud!=='viewport')return;
+      var s=document.documentElement.style;
+      s.setProperty('--nl-vw',e.data.w+'px');
+      s.setProperty('--nl-vh',e.data.h+'px');
+      document.documentElement.classList.toggle('nl-narrow',e.data.w&lt;600);
+      nlSendSoon();
+    });
+    var nlCoarse=window.matchMedia('(pointer: coarse)').matches;
+    function nlSubmit(form){
+      if(form.requestSubmit)return form.requestSubmit();
+      if(form.checkValidity&amp;&amp;!form.checkValidity())
+        return form.reportValidity&amp;&amp;form.reportValidity();
+      form.submit();
+    }
+  
+        var badge=document.getElementById('nl-badge'),card=document.getElementById('nl-card'),
+            box=card.querySelector('textarea');
+        function setOpen(open){
+          card.classList.toggle('open',open);
+          badge.setAttribute('aria-expanded',open?'true':'false');
+          nlSendSoon();
+          if(open&amp;&amp;!nlCoarse)box.focus();
+        }
+        box.addEventListener('keydown',function(e){
+          if(e.key==='Enter'&amp;&amp;!e.shiftKey){e.preventDefault();nlSubmit(box.form);}
+        });
+        badge.addEventListener('click',function(){setOpen(!card.classList.contains('open'));});
+        document.getElementById('nl-card-close').addEventListener('click',function(){setOpen(false);badge.focus();});
+        document.addEventListener('keydown',function(e){
+          if(e.key==='Escape'&amp;&amp;card.classList.contains('open')){setOpen(false);badge.focus();}
+        });
+        card.addEventListener('click',function(e){
+          if(e.target.closest('#nl-hide'))parent.postMessage({nlHud:'state',value:'hidden'},'*');
+        });
+      &lt;/script&gt;
+    &lt;/body&gt;&lt;/html&gt;" style="position: fixed; bottom: 0px; right: 0px; border: 0px; margin: 0px; padding: 0px; background: transparent; color-scheme: dark; z-index: 2147483645; width: 192px; height: 64px; clip-path: path(&quot;M 3 3 H 179 V 51 H 3 Z&quot;);" data-nl-ready="1"></iframe></body></html>
