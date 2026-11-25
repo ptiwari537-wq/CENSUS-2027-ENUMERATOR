@@ -334,6 +334,7 @@
                 <button type="button" class="btn btn-outline-success btn-sm" onclick="editCurrentMember()"><i class="fas fa-user-edit me-1"></i> सदस्य Edit</button>
                 <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteCurrentMember()"><i class="fas fa-user-times me-1"></i> सदस्य Delete</button>
                 <button type="button" class="btn btn-outline-danger btn-sm" onclick="downloadCurrentMemberPDF()"><i class="fas fa-file-pdf me-1"></i> इस सदस्य का PDF</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="downloadCurrentHouseholdPDF()"><i class="fas fa-file-pdf me-1"></i> पूरे परिवार का PDF</button>
             </div>
             <div class="text-muted small fw-semibold">
                 <i class="fas fa-info-circle me-1 text-info"></i> सदस्यवार या प्रश्नवार तरीका चुनकर डेटा भरें
@@ -1945,6 +1946,33 @@
             if(!win){showToastNotice("PDF बनाने के लिए popup अनुमति दें।");return;}
             win.document.open(); win.document.write(doc); win.document.close();
             setTimeout(()=>{try{win.focus();win.print();}catch(e){}},500);
+        }
+
+        function downloadCurrentHouseholdPDF() {
+            const h = households[activeHouseholdId];
+            const members = Object.entries(familyCensusData || {}).sort((a,b) => Number(a[0])-Number(b[0]));
+            if (!h || !members.length) { showToastNotice("इस परिवार में सदस्य का डेटा उपलब्ध नहीं है।"); return; }
+            const win = window.open("", "_blank");
+            if (!win) { showToastNotice("PDF बनाने के लिए Popup अनुमति दें।"); return; }
+            const esc = v => String(v == null ? "" : v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+            const pages = members.map(([memberId,data], index) => {
+                const name = String((data && data[1]) || ("सदस्य " + memberId));
+                const valueFor = id => Object.keys(data || {}).filter(k => String(k)===String(id) || String(k).startsWith("q"+id+"_")).sort().map(k => {
+                    const v = data[k];
+                    if (v === "" || v === null || v === undefined || (Array.isArray(v) && !v.length)) return "";
+                    const label = k === String(id) ? "" : k.replace(/^q\\d+_?/,"").replace(/_/g," ");
+                    const value = Array.isArray(v) ? v.join(", ") : (typeof v === "object" ? Object.entries(v).map(([a,b]) => a+": "+b).join("; ") : String(v));
+                    return (label ? label+" — " : "")+value;
+                }).filter(Boolean).join(" ; ");
+                const rows = CENSUS_QUESTIONS.map(q => {
+                    const answer = valueFor(q.id);
+                    return '<tr><td class="num">प्र. '+esc(q.id)+'</td><td class="question">'+esc(q.title)+'</td><td class="answer">'+(answer.trim()?esc(answer):'<span class="blank">दर्ज नहीं</span>')+'</td></tr>';
+                }).join("");
+                return '<section class="sheet'+(index ? ' page-break' : '')+'"><div class="head"><h1>परिवार का सदस्य विवरण</h1><div class="meta"><span>मकान संख्या: <b>'+esc(h.houseNo || "—")+'</b></span><span>मुखिया: <b>'+esc(h.headName || "—")+'</b></span><span>सदस्य क्रमांक: <b>'+esc(memberId)+'</b></span><span>नाम: <b>'+esc(name)+'</b></span><span>कुल सदस्य: '+members.length+'</span></div></div><table><thead><tr><th class="num">प्रश्न</th><th class="question">प्रश्न का विवरण</th><th>दर्ज उत्तर</th></tr></thead><tbody>'+rows+'</tbody></table><p class="foot">यह निजी सहायक कार्यपत्रक है, आधिकारिक Census दस्तावेज नहीं। सभी उत्तरों की उत्तरदाता से पुष्टि करके ही आधिकारिक PE App में दर्ज करें।</p></section>';
+            }).join("");
+            const doc = '<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>घर '+esc(h.houseNo)+' — सभी सदस्यों का PDF</title><style> *{box-sizing:border-box}body{font-family:Arial,"Noto Sans Devanagari",sans-serif;color:#172033;margin:0;font-size:11px;line-height:1.4}.actions{text-align:center;padding:12px;background:#f4f6f8}.actions button{padding:9px 18px;font-size:14px}.sheet{padding:10mm}.head{border-bottom:2px solid #243f60;padding-bottom:9px;margin-bottom:12px}h1{font-size:18px;margin:0 0 7px}.meta{display:flex;flex-wrap:wrap;gap:5px 16px;color:#39485b}table{width:100%;border-collapse:collapse;table-layout:fixed}th{background:#eaf0f6;text-align:left}th,td{border:1px solid #cbd3dc;padding:6px;vertical-align:top;overflow-wrap:anywhere}th.num,td.num{width:10%;white-space:nowrap}th.question,td.question{width:37%}td.answer{width:53%}.blank,.foot{color:#687386}.foot{font-size:9px;margin-top:10px}.page-break{break-before:page;page-break-before:always}@media print{.actions{display:none}.sheet{padding:0}}@page{size:A4;margin:11mm}</style></head><body><div class="actions"><button onclick="window.print()">PDF सेव / Print करें</button></div>'+pages+'</body></html>';
+            win.document.open(); win.document.write(doc); win.document.close();
+            setTimeout(() => { try { win.focus(); win.print(); } catch(e) {} }, 500);
         }
 
         function exportCurrentHouseholdBackup() {
