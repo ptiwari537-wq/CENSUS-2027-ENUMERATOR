@@ -1,11 +1,16 @@
 <html lang="hi"><head>
     <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0a3d62"><meta name="description" content="Census 2027 Enumerator - offline household data manager">
-<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Census 2027">
-<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="icons/icon-192.png">
-    <title>Census 2027 – Enumerator</title>
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=2cabcaf4-79cc-4dc2-99ee-7a05c2737f3b
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a3d62">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <title>भारत की जनगणना 2027 - परिवार अनुसूची (प्रायोगिक अभ्यास सॉफ्टवेयर)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -285,7 +290,7 @@
                     <h5 class="mb-0 text-light opacity-90">परिवार अनुसूची - 40 प्रश्नों का ऑनलाइन अभ्यास सॉफ्टवेयर</h5>
                 </div>
                 <div class="text-end mt-2 mt-md-0">
-                    <span class="badge bg-warning text-dark fs-6"><i class="fas fa-flask me-1"></i> प्रायोगिक संस्करण 5.6</span>
+                    <span class="badge bg-warning text-dark fs-6"><i class="fas fa-flask me-1"></i> प्रायोगिक संस्करण 5.8 Fast Entry</span>
                 </div>
             </div>
 
@@ -305,7 +310,6 @@
         </div>
     </header>
 
-<div class="container mt-3"><div class="alert alert-warning small mb-0" role="alert"><strong>पहली बार PWA में आ रहे हैं?</strong> पुराने HTML में सेव डेटा यहाँ अपने-आप नहीं आएगा। पुराने HTML में Combined JSON Backup बनाकर यहाँ <b>रीस्टोर</b> करें। यह PWA HTTPS पर install होने के बाद offline चल सकता है।</div></div>
     <div class="container mt-4">
         <div class="card mb-3 border-primary shadow-sm">
             <div class="card-body">
@@ -326,18 +330,19 @@
                 <i class="fas fa-users text-primary fs-4"></i>
                 <label for="member-select" class="fw-bold text-dark mb-0 fs-6">सदस्य का क्रमांक:</label>
                 <select id="member-select" class="form-select form-select-sm fw-bold border-primary" style="width: auto; min-width: 130px;" onchange="changeActiveMember(this.value)"></select>
-                <button type="button" class="btn btn-primary btn-sm" onclick="openAddMemberModal()"><i class="fas fa-user-plus me-1"></i> सदस्य जोड़ें</button>
-                <button type="button" class="btn btn-outline-warning btn-sm" onclick="editActiveMemberName()" title="चुने गए सदस्य का नाम बदलें"><i class="fas fa-edit me-1"></i> नाम एडिट करें</button>
-                <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteActiveMember()" title="चुने गए सदस्य को हटाएँ"><i class="fas fa-user-times me-1"></i> सदस्य हटाएँ</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="addFamilyMember()"><i class="fas fa-user-plus me-1"></i> सदस्य जोड़ें</button>
             </div>
             <div class="text-muted small fw-semibold">
-                <i class="fas fa-info-circle me-1 text-info"></i> वर्तमान में चुने गए सदस्य का डेटा नीचे प्रदर्शित हो रहा है
+                <i class="fas fa-info-circle me-1 text-info"></i> सदस्यवार या प्रश्नवार तरीका चुनकर डेटा भरें
             </div>
         </div>
 
         <div class="control-bar">
             <div class="d-flex gap-2 align-items-center flex-wrap">
-                <span class="fw-bold text-dark me-2"><i class="fas fa-sliders-h me-1"></i> डिस्प्ले मोड:</span>
+                <span class="fw-bold text-dark me-2"><i class="fas fa-sliders-h me-1"></i> कार्य शैली:</span>
+                <button class="btn btn-outline-success btn-sm active" id="btn-workflow-member" onclick="switchWorkflowMode('member')">सदस्यवार</button>
+                <button class="btn btn-outline-success btn-sm" id="btn-workflow-question" onclick="switchWorkflowMode('question')">प्रश्नवार</button>
+                <span class="fw-bold text-dark ms-2 me-1">डिस्प्ले:</span>
                 <button class="btn btn-outline-primary btn-sm active" id="btn-view-all" onclick="switchView('all')">
                     <i class="fas fa-list-ol me-1"></i> सभी 40 प्रश्न (Full Form)
                 </button>
@@ -348,14 +353,11 @@
 
             <div class="d-flex gap-2 flex-wrap">
                 <button class="btn btn-warning btn-sm fw-bold text-dark" onclick="downloadThisSoftware()">
-                    <i class="fas fa-download me-1"></i> सॉफ्टवेयर डाउनलोड करें (v5.6)
+                    <i class="fas fa-download me-1"></i> सॉफ्टवेयर डाउनलोड करें (v5.8)
                 </button>
 
                 <button class="btn btn-share btn-sm" onclick="shareDataOnWhatsApp()">
                     <i class="fab fa-whatsapp me-1"></i> व्हाट्सएप पर शेयर करें
-                </button>
-                <button class="btn btn-success btn-sm fw-bold" onclick="backupAndOpenDrive()" title="JSON बैकअप बनाकर Android Share विकल्प खोलें">
-                    <i class="fab fa-google-drive me-1"></i> Backup + Drive खोलें
                 </button>
                 <button class="btn btn-outline-secondary btn-sm" onclick="exportJSONBackup()">
                     <i class="fas fa-download me-1"></i> JSON बैकअप
@@ -372,9 +374,9 @@
 
         <div id="single-nav-bar" class="card mb-3 p-3 bg-white d-none shadow-sm">
             <div class="d-flex justify-content-between align-items-center">
-                <button class="btn btn-secondary btn-sm" id="btn-prev-q" onclick="navigateQuestion(-1)"><i class="fas fa-arrow-left me-1"></i> पिछला प्रश्न</button>
+                <button class="btn btn-secondary btn-sm" id="btn-prev-q" onclick="workflowMode === 'question' ? advanceQuestionWise(-1) : navigateQuestion(-1)"><i class="fas fa-arrow-left me-1"></i> पिछला प्रश्न</button>
                 <span class="fw-bold text-primary" id="single-q-indicator">प्रश्न 1 / 40</span>
-                <button class="btn btn-primary btn-sm" id="btn-next-q" onclick="navigateQuestion(1)">अगला प्रश्न <i class="fas fa-arrow-right ms-1"></i></button>
+                <button class="btn btn-primary btn-sm" id="btn-next-q" onclick="workflowMode === 'question' ? advanceQuestionWise(1) : navigateQuestion(1)">अगला प्रश्न <i class="fas fa-arrow-right ms-1"></i></button>
             </div>
         </div>
 
@@ -438,13 +440,13 @@
                         </label>
                         <div class="row g-2">
                             <div class="col-4">
-                                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" id="q4_dd_input" min="1" max="31" class="form-control text-center" placeholder="DD" value="" oninput="handleDobSegmentInput('q4_dd', this)">
+                                <input type="number" id="q4_dd_input" min="1" max="31" class="form-control text-center" placeholder="DD" value="" oninput="handleDobInputChange('q4_dd', this.value)">
                             </div>
                             <div class="col-4">
-                                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" id="q4_mm_input" min="1" max="12" class="form-control text-center" placeholder="MM" value="" oninput="handleDobSegmentInput('q4_mm', this)">
+                                <input type="number" id="q4_mm_input" min="1" max="12" class="form-control text-center" placeholder="MM" value="" oninput="handleDobInputChange('q4_mm', this.value)">
                             </div>
                             <div class="col-4">
-                                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="q4_yyyy_input" min="1900" max="2027" class="form-control text-center" placeholder="YYYY" value="" oninput="handleDobSegmentInput('q4_yyyy', this)">
+                                <input type="number" id="q4_yyyy_input" min="1900" max="2027" class="form-control text-center" placeholder="YYYY" value="" oninput="handleDobInputChange('q4_yyyy', this.value)">
                             </div>
                         </div>
                     </div>
@@ -457,7 +459,7 @@
                     </div>
                     <div class="info-notice-banner">
                         <i class="fas fa-exclamation-circle text-warning fs-5"></i>
-                        <span>आयु की गणना 1 मार्च 2027 के अनुसार की गई है।</span>
+                        <span>उत्तर प्रदेश के लिए आयु की गणना 5 जनवरी 2027 की संदर्भ तारीख के अनुसार करें।</span>
                     </div>
                     </div>
                 </div><div class="q-card" id="q-card-5">
@@ -488,7 +490,7 @@
                 <button class="btn-save-member" onclick="saveCurrentMemberData()">
                     <i class="fas fa-save me-2"></i>सदस्य का विवरण सेव करें
                 </button>
-                <div class="member-remaining-badge" id="members-remaining-text">परिवार के सभी सदस्यों का विवरण जोड़ सकते हैं</div>
+                <div class="member-remaining-badge" id="members-remaining-text">जानकारी भरने के लिए 6 सदस्य बाकी हैं</div>
                 <button class="btn-next-member-q7" onclick="scrollToQuestion7()">
                     प्रश्न 7 से सदस्य की जानकारी डालें। <i class="fas fa-arrow-down ms-1"></i>
                 </button>
@@ -610,7 +612,8 @@
                             <label class="form-check-label" for="q10_other_1">जाति का नाम लिखें</label>
                         </div>
                         <div id="box-other-caste-text" class="d-none ms-4 my-2">
-                            <input type="text" class="form-control form-control-sm" placeholder="जाति का नाम दर्ज करें" value="" oninput="updateValue('q10_other_name', this.value)">
+                            <input type="text" class="form-control form-control-sm" list="other-caste-suggestions" placeholder="जाति का नाम दर्ज करें (जैसे राजभर)" value="" oninput="updateValue('q10_other_name', this.value)">
+                            <datalist id="other-caste-suggestions"><option value="राजभर"></option></datalist>
                         </div>
                         <div class="form-check mb-1">
                             <input class="form-check-input" type="radio" name="q10_other_opt" id="q10_other_2" value="जाति का नाम नहीं बताना चाहते" disabled="" onchange="handleCasteSelection('other', 'जाति का नाम नहीं बताना चाहते')">
@@ -1505,10 +1508,11 @@
                 <i class="fas fa-check-circle me-2"></i>फॉर्म सबमिशन एवं डेटा शेयरिंग रिपोर्ट
             </div>
             <div class="card-body">
-                <p class="text-muted">आप परिवार के सभी सदस्यों के भरे गए उत्तरों की समीक्षा कर सकते हैं तथा इसे शेयर कर सकते हैं।</p>
-                <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-primary fw-bold px-3" onclick="openFullDataReview()"><i class="fas fa-list-check me-2"></i>पूरा 40 प्रश्नों का विवरण देखें</button>
-                    <button class="btn btn-success fw-bold px-3" onclick="generateSummaryReport()"><i class="fas fa-file-alt me-2"></i>संक्षिप्त सारांश देखें</button>
+                <p class="text-muted">आप सभी 6 सदस्यों के भरे गए उत्तरों की समीक्षा कर सकते हैं तथा इसे शेयर कर सकते हैं।</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <button class="btn btn-success fw-bold px-4" onclick="generateSummaryReport()">
+                        <i class="fas fa-file-alt me-2"></i>सम्पूर्ण डेटा समीक्षा / रिपोर्ट देखें
+                    </button>
                 </div>
                 <div id="summary-output-container" class="mt-3 d-none">
                     <div class="p-3 bg-light border rounded">
@@ -1523,9 +1527,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="addMemberModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header bg-primary text-white"><h5 class="modal-title">नया परिवार सदस्य जोड़ें</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><label for="new-member-name" class="form-label fw-bold">सदस्य का पूरा नाम</label><input type="text" class="form-control form-control-lg" id="new-member-name" maxlength="120" placeholder="जैसे: राम कुमार"><div class="form-text">नाम भरने के बाद सदस्य बनेगा। बाकी प्रश्नों के उत्तर बाद में भरें।</div></div><div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">रद्द करें</button><button type="button" class="btn btn-primary" onclick="confirmAddFamilyMember()">नाम के साथ सदस्य जोड़ें</button></div></div></div></div>
-    <div class="modal fade" id="fullDataReviewModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content"><div class="modal-header bg-primary text-white"><div><h5 class="modal-title mb-1">परिवार का पूरा विवरण — 40 प्रश्न</h5><small id="review-house-label"></small></div><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="row g-2 align-items-end mb-3"><div class="col-md-7"><label class="form-label fw-bold" for="review-member-select">सदस्य चुनें</label><select class="form-select" id="review-member-select" onchange="renderFullDataReview()"></select></div><div class="col-md-5 d-flex gap-2"><button class="btn btn-outline-primary flex-fill" onclick="printFullDataReview()">प्रिंट / PDF</button><button class="btn btn-outline-secondary flex-fill" onclick="copyFullDataReview()">कॉपी</button></div></div><div id="full-review-person" class="alert alert-light border"></div><div class="row g-2" id="full-review-cards"></div><div class="small text-muted mt-3">यह इस offline manager में सेव उत्तरों का review view है। PE App में प्रविष्टि आधिकारिक निर्देशों के अनुसार स्वयं करें।</div></div><div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">बंद करें</button></div></div></div></div>
-<div class="security-watermark">
+    <div class="security-watermark">
         <i class="fas fa-lock me-1"></i> सुरक्षित सॉफ्टवेयर | सर्वाधिकार सुरक्षित: <strong>आदित्य कुमार द्विवेदी</strong>
     </div>
 
@@ -1548,6 +1550,7 @@
         let currentActiveMember = "1";
         let currentActiveQuestion = 1;
         let currentDisplayMode = 'all';
+        let workflowMode = 'member'; // member = one member at a time; question = same question across all members
         const DB_NAME = 'DhurdaJangleCensusDB';
         const DB_STORE = 'households';
         let censusDB = null;
@@ -1639,9 +1642,9 @@
         function loadActiveHousehold() {
             const h=households[activeHouseholdId];
             if (!h) return;
-            // An empty household is valid after its last member is deleted.
-            familyCensusData = h.members && typeof h.members === 'object' ? h.members : {'1':{}};
-            currentActiveMember = Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b))[0] || '';
+            familyCensusData = h.members || {'1':{}};
+            if (!Object.keys(familyCensusData).length) familyCensusData={'1':{}};
+            currentActiveMember = Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b))[0] || '1';
         }
         function saveLocalState() {
             const h=households[activeHouseholdId];
@@ -1661,9 +1664,7 @@
         function renderMemberSelector() {
             const sel=document.getElementById('member-select'); if(!sel) return;
             const ids=Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
-            sel.innerHTML=ids.length
-                ? ids.map(id=>`<option value="${escapeHTML(id)}" ${id===currentActiveMember?'selected':''}>सदस्य ${escapeHTML(id)}${familyCensusData[id]?.[1]?' — '+escapeHTML(familyCensusData[id][1]):''}</option>`).join('')
-                : '<option value="" selected>कोई सदस्य नहीं — सदस्य जोड़ें</option>';
+            sel.innerHTML=ids.map(id=>`<option value="${escapeHTML(id)}" ${id===currentActiveMember?'selected':''}>सदस्य ${escapeHTML(id)}${familyCensusData[id]?.[1]?' — '+escapeHTML(familyCensusData[id][1]):''}</option>`).join('');
         }
         async function addHousehold() {
             const next=String(Math.max(0,...Object.values(households).map(h=>Number(h.houseNo)||0))+1).padStart(3,'0');
@@ -1676,78 +1677,10 @@
             if(!households[id]) return; saveLocalState(); activeHouseholdId=id; loadActiveHousehold();
             renderFormQuestions(); renderMemberSelector(); refreshHouseholdUI(); updateConditionalLocks(); updateMembersRemainingBadge();
         }
-        function openAddMemberModal() {
-            const input=document.getElementById('new-member-name');
-            if(input) input.value='';
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('addMemberModal')).show();
-            setTimeout(()=>{if(input) input.focus();},250);
-        }
-        function confirmAddFamilyMember() {
-            const input=document.getElementById('new-member-name');
-            const name=(input?.value||'').trim();
-            if(!name){showToastNotice('कृपया सदस्य का नाम लिखें।');input?.focus();return;}
-            // Start at 1 for an empty household; otherwise append after the highest current number.
-            const existingIds=Object.keys(familyCensusData).map(Number).filter(Number.isFinite);
-            const next=String(existingIds.length ? Math.max(...existingIds)+1 : 1);
-            familyCensusData[next]={1:name}; currentActiveMember=next;
-            saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('addMemberModal')).hide();
-            showToastNotice('सदस्य '+next+' — '+name+' जोड़ा गया।');
-        }
-        function editActiveMemberName() {
-            const member=familyCensusData[currentActiveMember];
-            if(!member){showToastNotice('पहले सदस्य चुनें।');return;}
-            const oldName=String(member[1]||'');
-            const updated=prompt('सदस्य '+currentActiveMember+' का नया नाम लिखें:',oldName);
-            if(updated===null) return;
-            const name=updated.trim();
-            if(!name){showToastNotice('नाम खाली नहीं रख सकते।');return;}
-            member[1]=name;
-            saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateMembersRemainingBadge();
-            showToastNotice('सदस्य का नाम अपडेट हो गया।');
-        }
-        function deleteActiveMember() {
-            const ids=Object.keys(familyCensusData);
-            if(!ids.length){showToastNotice('इस परिवार में अभी कोई सदस्य नहीं है।');return;}
-            const member=familyCensusData[currentActiveMember];
-            if(!member){showToastNotice('पहले सदस्य चुनें।');return;}
-            const name=member[1]||'नाम दर्ज नहीं';
-            if(!confirm('क्या सदस्य '+currentActiveMember+' — '+name+' और उसका पूरा भरा हुआ विवरण हटाना चाहते हैं? यह वापस नहीं आएगा।')) return;
-            const deletedId=String(currentActiveMember);
-            const previouslyActive=String(currentActiveMember);
-            delete familyCensusData[deletedId];
-
-            // Re-number every remaining member continuously from 1 (1, 2, 3...).
-            // Keep parent/member references aligned with the new member numbers.
-            const oldIds=Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
-            const idMap={};
-            oldIds.forEach((oldId,index)=>{ idMap[String(oldId)]=String(index+1); });
-            const renumbered={};
-            oldIds.forEach(oldId=>{
-                const newId=idMap[String(oldId)];
-                renumbered[newId]=familyCensusData[oldId] || {};
-            });
-            Object.values(renumbered).forEach(m=>{
-                Object.keys(m||{}).forEach(k=>{
-                    if(k.endsWith('_member_no')) {
-                        const linked=String(m[k] ?? '');
-                        if(linked && idMap[linked]) {
-                            m[k]=idMap[linked];
-                        } else if(linked) {
-                            m[k]='';
-                            const flag=k.replace('_member_no','_is_member');
-                            if(Object.prototype.hasOwnProperty.call(m,flag)) m[flag]='नहीं';
-                        }
-                    }
-                });
-            });
-            familyCensusData=renumbered;
-            const remainingIds=Object.keys(renumbered).sort((a,b)=>Number(a)-Number(b));
-            currentActiveMember=idMap[previouslyActive] || remainingIds[0] || '';
-            saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
-            showToastNotice(remainingIds.length
-                ? 'सदस्य हटाया गया। बाकी सदस्यों के क्रमांक 1 से लगातार सेट कर दिए गए हैं।'
-                : 'परिवार का अंतिम सदस्य हटाया गया। अब कोई सदस्य नहीं है; अगला सदस्य क्रमांक 1 से जुड़ेगा।');
+        function addFamilyMember() {
+            const next=String(Math.max(0,...Object.keys(familyCensusData).map(Number))+1);
+            familyCensusData[next]={}; currentActiveMember=next; saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
+            showToastNotice('सदस्य '+next+' जोड़ा गया।');
         }
         function updatePEStatus(value) { const h=households[activeHouseholdId]; if(h){h.peStatus=value;saveLocalState();refreshHouseholdUI();} }
         function deleteCurrentHousehold() {
@@ -1764,26 +1697,22 @@
 
 
         function getCurrentMemberData() {
-            // Do not silently recreate a deleted member while rendering an empty household.
-            return currentActiveMember && familyCensusData[currentActiveMember]
-                ? familyCensusData[currentActiveMember]
-                : {};
+            if(!familyCensusData[currentActiveMember]) {
+                familyCensusData[currentActiveMember] = {};
+            }
+            return familyCensusData[currentActiveMember];
         }
 
         function updateValue(key, value) {
-            if(!currentActiveMember || !familyCensusData[currentActiveMember]) {
-                showToastNotice('पहले सदस्य जोड़ें, फिर उसका विवरण भरें।');
-                return;
-            }
             const mData = getCurrentMemberData();
             mData[key] = value;
+            if(String(key) === '5') mData.q5_auto_suggested = false;
             saveLocalState();
             updateConditionalLocks();
             updateMembersRemainingBadge();
         }
 
         function changeActiveMember(mNum) {
-            if(!mNum || !familyCensusData[String(mNum)]) return;
             currentActiveMember = String(mNum);
             renderFormQuestions(); renderMemberSelector();
             updateConditionalLocks();
@@ -1832,6 +1761,12 @@
 
             switch(q.type) {
                 case 'text':
+                    if (q.id === 7) {
+                        const spouseChoices = Object.entries(familyCensusData || {})
+                            .filter(([memberId, data]) => memberId !== String(currentActiveMember) && data && String(data[1] || '').trim())
+                            .map(([memberId, data]) => `<option value="${escapeAttr(String(data[1]).trim())}"></option>`).join('');
+                        return `<input type="text" class="form-control" list="spouse-name-options" placeholder="सूची से पति/पत्नी का नाम चुनें या लिखें" value="${escapeAttr(val)}" oninput="updateValue(7, this.value)"><datalist id="spouse-name-options">${spouseChoices}</datalist><div class="form-text">परिवार में दर्ज अन्य सदस्यों के नाम सुझाव में दिखेंगे। सही नाम की पुष्टि करें।</div>`;
+                    }
                     return `<input type="text" class="form-control" placeholder="${q.placeholder}" value="${escapeAttr(val)}" oninput="updateValue(${q.id}, this.value)">`;
 
                 case 'number':
@@ -1839,10 +1774,12 @@
 
                 case 'select':
                     let opts = `<option value="">-- स्थिति/संबंध चुनें --</option>`;
+                    const selectedValue = (q.id === 5 && !val && Number(mData['q4_age'] || 999) <= 14) ? 'अविवाहित - 1' : val;
                     q.options.forEach(opt => {
-                        opts += `<option value="${opt}" ${val === opt ? 'selected' : ''}>${opt}</option>`;
+                        opts += `<option value="${opt}" ${selectedValue === opt ? 'selected' : ''}>${opt}</option>`;
                     });
-                    return `<select class="form-select" onchange="updateValue(${q.id}, this.value)">${opts}</select>`;
+                    const suggestionNote = (q.id === 5 && mData.q5_auto_suggested) ? `<div class="small text-warning-emphasis mt-2">उम्र के आधार पर सुझाया गया विकल्प — वास्तविक वैवाहिक स्थिति की पुष्टि करें। जरूरत हो तो बदल दें।</div>` : '';
+                    return `<select class="form-select" onchange="updateValue(${q.id}, this.value)">${opts}</select>${suggestionNote}`;
 
                 case 'radio':
                     let rHtml = '';
@@ -1872,26 +1809,26 @@
                         </label>
                         <div class="row g-2">
                             <div class="col-4">
-                                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" id="q4_dd_input" min="1" max="31" class="form-control text-center" placeholder="DD" value="${escapeAttr(dd)}" ${hasAgeOnly ? 'disabled' : ''} oninput="handleDobSegmentInput('q4_dd', this)">
+                                <input type="number" id="q4_dd_input" min="1" max="31" class="form-control text-center" placeholder="DD" value="${escapeAttr(dd)}" ${hasAgeOnly ? 'disabled' : ''} oninput="handleDobInputChange('q4_dd', this.value)">
                             </div>
                             <div class="col-4">
-                                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" id="q4_mm_input" min="1" max="12" class="form-control text-center" placeholder="MM" value="${escapeAttr(mm)}" ${hasAgeOnly ? 'disabled' : ''} oninput="handleDobSegmentInput('q4_mm', this)">
+                                <input type="number" id="q4_mm_input" min="1" max="12" class="form-control text-center" placeholder="MM" value="${escapeAttr(mm)}" ${hasAgeOnly ? 'disabled' : ''} oninput="handleDobInputChange('q4_mm', this.value)">
                             </div>
                             <div class="col-4">
-                                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="q4_yyyy_input" min="1900" max="2027" class="form-control text-center" placeholder="YYYY" value="${escapeAttr(yyyy)}" ${hasAgeOnly ? 'disabled' : ''} oninput="handleDobSegmentInput('q4_yyyy', this)">
+                                <input type="number" id="q4_yyyy_input" min="1900" max="2027" class="form-control text-center" placeholder="YYYY" value="${escapeAttr(yyyy)}" ${hasAgeOnly ? 'disabled' : ''} oninput="handleDobInputChange('q4_yyyy', this.value)">
                             </div>
                         </div>
                     </div>
                     <div class="mb-2 ${hasDobFull ? 'opacity-75' : ''}" id="q4_age_container">
                         <label class="form-label fw-bold">
                             4(ख). आयु (पूर्ण वर्षों में)
-                            <span id="q4_age_badge">${hasDobFull ? '<span class="badge bg-success ms-1"><i class="fas fa-calculator me-1"></i>स्वचालित गणना (1 मार्च 2027)</span>' : ''}</span>
+                            <span id="q4_age_badge">${hasDobFull ? '<span class="badge bg-success ms-1"><i class="fas fa-calculator me-1"></i>स्वचालित गणना (5 जनवरी 2027)</span>' : ''}</span>
                         </label>
                         <input type="number" id="q4_age_input" min="0" max="120" class="form-control" placeholder="आयु दर्ज करें" value="${escapeAttr(age)}" ${hasDobFull ? 'readonly style="background-color: #e9ecef;"' : ''} oninput="handleAgeInputChange(this.value)">
                     </div>
                     <div class="info-notice-banner">
                         <i class="fas fa-exclamation-circle text-warning fs-5"></i>
-                        <span>आयु की गणना 1 मार्च 2027 के अनुसार की गई है।</span>
+                        <span>उत्तर प्रदेश के लिए आयु की गणना 5 जनवरी 2027 की संदर्भ तारीख के अनुसार करें।</span>
                     </div>`;
 
                 case 'caste_block':
@@ -2353,9 +2290,39 @@
         function updateConditionalLocks() {
             const mData = getCurrentMemberData();
 
+            // Convenience suggestion only (not an official age-based census rule):
+            // for age 0-14, preselect 'अविवाहित' if marital status is still blank.
+            // Enumerator/respondent can change it; a manual choice is never overwritten.
+            const ageRaw = mData['q4_age'];
+            const ageNow = (ageRaw === '' || ageRaw === null || ageRaw === undefined) ? NaN : Number(ageRaw);
+            if(Number.isFinite(ageNow) && ageNow >= 0 && ageNow <= 14 && !mData[5]) {
+                mData[5] = 'अविवाहित - 1';
+                mData.q5_auto_suggested = true;
+                saveLocalState();
+                const maritalSelect = document.querySelector('#q-card-5 select');
+                if(maritalSelect) maritalSelect.value = 'अविवाहित - 1';
+                const maritalBody = document.getElementById('q-body-5');
+                if(maritalBody && !maritalBody.querySelector('.age-suggestion-note')) {
+                    const note = document.createElement('div');
+                    note.className = 'small text-warning-emphasis mt-2 age-suggestion-note';
+                    note.textContent = 'उम्र के आधार पर सुझाया गया विकल्प — वास्तविक वैवाहिक स्थिति की पुष्टि करें। जरूरत हो तो बदल दें।';
+                    maritalBody.appendChild(note);
+                }
+            }
             const isUnmarried = (mData[5] || '').includes('अविवाहित');
             applyCardLock(6, isUnmarried, "अविवाहित व्यक्ति के लिए लागू नहीं");
             applyCardLock(7, isUnmarried, "अविवाहित व्यक्ति के लिए लागू नहीं");
+
+            // Official questionnaire wording: Q31-32 are for ever-married women;
+            // Q33 is for currently married women. Do not infer from age alone.
+            const sex = mData[3] || '';
+            const marital = mData[5] || '';
+            const isFemale = sex === 'महिला';
+            const everMarried = isFemale && !marital.includes('अविवाहित') && !!marital;
+            const currentlyMarried = isFemale && marital.includes('वर्तमान में विवाहित');
+            applyCardLock(31, !everMarried && (sex !== '' || marital !== ''), "केवल पहले कभी विवाहित महिलाओं के लिए");
+            applyCardLock(32, !everMarried && (sex !== '' || marital !== ''), "केवल पहले कभी विवाहित महिलाओं के लिए");
+            applyCardLock(33, !currentlyMarried && (sex !== '' || marital !== ''), "केवल वर्तमान में विवाहित महिलाओं के लिए");
 
             const isIlliterate = mData['q15_lit'] === 'निरक्षर';
             const noEdu = isIlliterate || mData['q16_status'] === 'कभी शिक्षा ग्रहण नहीं की है';
@@ -2423,6 +2390,38 @@
             }
         }
 
+        function switchWorkflowMode(mode) {
+            workflowMode = mode;
+            document.getElementById('btn-workflow-member').classList.toggle('active', mode === 'member');
+            document.getElementById('btn-workflow-question').classList.toggle('active', mode === 'question');
+            if (mode === 'question') {
+                currentActiveQuestion = 1;
+                currentActiveMember = Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b))[0] || '1';
+                renderFormQuestions(); renderMemberSelector(); switchView('single');
+                showToastNotice('प्रश्नवार मोड: एक ही प्रश्न सभी सदस्यों के लिए भरें। अगला बटन सदस्य बदलता है; अंतिम सदस्य के बाद अगला प्रश्न खुलेगा।');
+            } else {
+                renderFormQuestions(); renderMemberSelector(); switchView('all');
+                showToastNotice('सदस्यवार मोड: एक सदस्य के सभी प्रश्न भरें, फिर अगला सदस्य चुनें।');
+            }
+        }
+
+        function advanceQuestionWise(direction) {
+            const ids = Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
+            if (!ids.length) return;
+            let idx = ids.indexOf(String(currentActiveMember)); if (idx < 0) idx = 0;
+            if (direction > 0) {
+                if (idx < ids.length - 1) { currentActiveMember = ids[idx + 1]; }
+                else { currentActiveMember = ids[0]; currentActiveQuestion = Math.min(40, currentActiveQuestion + 1); }
+            } else {
+                if (idx > 0) { currentActiveMember = ids[idx - 1]; }
+                else { currentActiveMember = ids[ids.length - 1]; currentActiveQuestion = Math.max(1, currentActiveQuestion - 1); }
+            }
+            renderFormQuestions(); renderMemberSelector(); updateConditionalLocks();
+            const q = document.getElementById('q-card-' + currentActiveQuestion);
+            if (q) q.scrollIntoView({behavior:'smooth',block:'start'});
+            updateSingleNavIndicator();
+        }
+
         function switchView(mode) {
             currentDisplayMode = mode;
             document.getElementById('btn-view-all').classList.toggle('active', mode === 'all');
@@ -2449,9 +2448,13 @@
         }
 
         function updateSingleNavIndicator() {
-            document.getElementById('single-q-indicator').innerText = `प्रश्न ${currentActiveQuestion} / 40`;
-            document.getElementById('btn-prev-q').disabled = currentActiveQuestion === 1;
-            document.getElementById('btn-next-q').disabled = currentActiveQuestion === 40;
+            document.getElementById('single-q-indicator').innerText = `प्रश्न ${currentActiveQuestion} / 40${workflowMode === 'question' ? ' | सदस्य ' + currentActiveMember + '/' + Object.keys(familyCensusData).length : ''}`;
+            const ids = Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
+            const idx = ids.indexOf(String(currentActiveMember));
+            document.getElementById('btn-prev-q').disabled = workflowMode === 'question' ? (currentActiveQuestion === 1 && idx <= 0) : currentActiveQuestion === 1;
+            document.getElementById('btn-next-q').disabled = workflowMode === 'question' ? (currentActiveQuestion === 40 && idx === ids.length - 1) : currentActiveQuestion === 40;
+            document.getElementById('btn-next-q').innerHTML = workflowMode === 'question' ? 'अगला सदस्य / प्रश्न <i class="fas fa-arrow-right ms-1"></i>' : 'अगला प्रश्न <i class="fas fa-arrow-right ms-1"></i>';
+            document.getElementById('btn-prev-q').innerHTML = workflowMode === 'question' ? '<i class="fas fa-arrow-left me-1"></i> पिछला सदस्य / प्रश्न' : '<i class="fas fa-arrow-left me-1"></i> पिछला प्रश्न';
         }
 
         function setupSecurityWatchdog() {
@@ -2515,22 +2518,6 @@
             return String(str || '').replace(/"/g, '&quot;');
         }
 
-        const REVIEW_FIELD_LABELS={q4_dd:'जन्म दिन',q4_mm:'जन्म महीना',q4_yyyy:'जन्म वर्ष',q4_age:'आयु (वर्ष)',q10_sc:'अनुसूचित जाति',q10_sc_name:'अनुसूचित जाति का नाम',q10_st:'अनुसूचित जनजाति',q10_st_name:'अनुसूचित जनजाति का नाम',q10_other_opt:'अन्य जाति विकल्प',q10_other_name:'जाति का नाम',q11_name:'पिता का नाम',q11_dob:'पिता की जन्म तिथि',q11_place:'पिता का जन्म स्थान प्रकार',q11_place_name:'पिता का जन्म स्थान',q11_religion:'पिता का धर्म',q12_name:'माता का नाम',q12_dob:'माता की जन्म तिथि',q12_place:'माता का जन्म स्थान प्रकार',q12_place_name:'माता का जन्म स्थान',q12_religion:'माता का धर्म',q13_has:'दिव्यांगता है?',q13_types:'दिव्यांगता का प्रकार',q14_mother_tongue:'मातृभाषा',q14_lang1:'दूसरी भाषा',q14_lang2:'तीसरी भाषा',q15_lit:'साक्षरता',q15_digital:'डिजिटल साक्षरता',q16_status:'शिक्षा की वर्तमान स्थिति',q18_work:'कामकाज',q25_mode:'यात्रा का साधन',q26_type:'जन्म स्थान प्रकार',q26_name:'जन्म स्थान',q27_loc_type:'पूर्व निवास स्थान प्रकार',q27_loc_name:'पूर्व निवास स्थान',q27_area:'पूर्व निवास क्षेत्र',q30_type:'स्थायी पता विकल्प',q30_state:'राज्य',q30_district:'जिला',q30_town:'गाँव/नगर',q30_house:'मकान संख्या/मोहल्ला',q31_sons:'जीवित पुत्र',q31_daughters:'जीवित पुत्रियाँ',q32_sons:'कभी जन्मे जीवित पुत्र',q32_daughters:'कभी जन्मी जीवित पुत्रियाँ',q33_sons:'पिछले वर्ष जन्मे पुत्र',q33_daughters:'पिछले वर्ष जन्मी पुत्रियाँ',q34_vaccinated:'टीकाकरण कराया?',q34_loc:'टीकाकरण स्थान',q36_has:'मोबाइल उपलब्ध?',q36_val:'मोबाइल नंबर',q37_has:'आधार उपलब्ध?',q37_val:'आधार नंबर',q38_has:'वोटर ID उपलब्ध?',q38_val:'वोटर ID नंबर',q39_has:'पासपोर्ट उपलब्ध?',q39_val:'पासपोर्ट नंबर',q40_has:'ड्राइविंग लाइसेंस उपलब्ध?',q40_val:'ड्राइविंग लाइसेंस नंबर'};
-        let lastFullReviewText='';
-        function openFullDataReview(){
-            const ids=Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
-            if(!ids.length){showToastNotice('इस परिवार में कोई सदस्य नहीं है। पहले सदस्य जोड़ें।');return;}
-            saveLocalState();
-            const sel=document.getElementById('review-member-select');
-            sel.innerHTML=ids.map(id=>`<option value="${escapeHTML(id)}">सदस्य ${escapeHTML(id)} — ${escapeHTML(familyCensusData[id]?.[1]||'नाम दर्ज नहीं')}</option>`).join('');
-            sel.value=currentActiveMember || ids[0];renderFullDataReview();
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('fullDataReviewModal')).show();
-        }
-        function reviewValueText(v){if(Array.isArray(v))return v.length?v.join(', '):'दर्ज नहीं';if(v&&typeof v==='object')return Object.entries(v).map(([k,x])=>`${k}: ${x}`).join(' | ')||'दर्ज नहीं';return v===undefined||v===null||String(v).trim()===''?'दर्ज नहीं':String(v);}
-        function renderFullDataReview(){const memberId=document.getElementById('review-member-select').value;const data=familyCensusData[memberId]||{};const h=households[activeHouseholdId]||{};document.getElementById('review-house-label').textContent=`मकान संख्या: ${h.houseNo||'—'} | ${h.headName||'मुखिया का नाम दर्ज नहीं'}`;document.getElementById('full-review-person').innerHTML=`<strong>सदस्य ${escapeHTML(memberId)}:</strong> ${escapeHTML(data[1]||'नाम दर्ज नहीं')} &nbsp; | &nbsp; <strong>रिश्ता:</strong> ${escapeHTML(data[2]||'दर्ज नहीं')} &nbsp; | &nbsp; <strong>PE App:</strong> ${h.peStatus==='completed'?'पूरा':'बाकी'}`;let cards='';let plain=`मकान संख्या: ${h.houseNo||''}\nसदस्य ${memberId}: ${data[1]||'नाम दर्ज नहीं'}\n`;CENSUS_QUESTIONS.forEach(q=>{let entries=[];if(q.id===4){const dob=[data.q4_dd,data.q4_mm,data.q4_yyyy].filter(x=>x!==undefined&&String(x).trim()!=='').join('-');entries=[['जन्म तिथि',dob||'दर्ज नहीं'],['आयु (वर्ष)',reviewValueText(data.q4_age)]];}else{const keys=Object.keys(data).filter(k=>k===String(q.id)||k.startsWith(`q${q.id}_`)).sort();entries=keys.length?keys.map(k=>[REVIEW_FIELD_LABELS[k]||(k===String(q.id)?'उत्तर':k.replace(/^q\d+_/,'').replaceAll('_',' ')),reviewValueText(data[k])]):[['उत्तर','दर्ज नहीं']];}const rows=entries.map(([label,value])=>`<div class="d-flex justify-content-between gap-2 border-top py-2"><span class="text-muted">${escapeHTML(label)}</span><strong class="text-end">${escapeHTML(value)}</strong></div>`).join('');cards+=`<div class="col-12 col-md-6"><div class="card h-100 shadow-sm"><div class="card-header bg-light fw-bold"><span class="badge bg-primary me-2">${q.id}</span>${escapeHTML(q.title)}</div><div class="card-body py-2">${rows}</div></div></div>`;plain+=`\nप्र. ${q.id}. ${q.title}\n`+entries.map(([l,v])=>`  ${l}: ${v}`).join('\n')+'\n';});document.getElementById('full-review-cards').innerHTML=cards;lastFullReviewText=plain;}
-        function copyFullDataReview(){if(!lastFullReviewText)return;navigator.clipboard?.writeText(lastFullReviewText).then(()=>showToastNotice('पूरा विवरण कॉपी हो गया।')).catch(()=>showToastNotice('कॉपी नहीं हुआ; प्रिंट विकल्प इस्तेमाल करें।'));}
-        function printFullDataReview(){if(!lastFullReviewText)return;const win=window.open('','_blank');if(!win){showToastNotice('Pop-up block है। ब्राउज़र में pop-up अनुमति दें।');return;}win.document.write(`<html><head><meta charset="utf-8"><title>परिवार विवरण</title><style>body{font-family:Arial,sans-serif;padding:20px}pre{white-space:pre-wrap;font:14px/1.6 Arial}</style></head><body><h2>परिवार का पूरा विवरण — 40 प्रश्न</h2><pre>${escapeHTML(lastFullReviewText)}</pre><script>window.onload=()=>window.print()<\/script></body></html>`);win.document.close();}
-
         function generateSummaryReport() {
             let report = `📋 *भारत की जनगणना 2027 - परिवार अनुसूची प्रविष्टि*
 `;
@@ -2588,58 +2575,10 @@
             });
         }
 
-        function buildCombinedBackupData() {
-            saveLocalState();
-            return {format:'DhurdaJangle-CensusManager-v1',exportedAt:new Date().toISOString(),activeHouseholdId,households};
-        }
-
         function exportJSONBackup() {
-            const data = buildCombinedBackupData();
-            downloadJSON(data,'Census2027_All_Houses_Backup.json');
+            saveLocalState();
+            downloadJSON({format:'DhurdaJangle-CensusManager-v1',exportedAt:new Date().toISOString(),activeHouseholdId,households},'Census2027_All_Houses_Backup.json');
             showToastNotice('सभी घरों का Combined JSON Backup डाउनलोड हुआ।');
-        }
-
-        // Creates a dated JSON file and opens Android's native share sheet.
-        // On Android, the user can choose Google Drive and then select the target folder.
-        // If file sharing is unavailable, fall back to a normal JSON download.
-        async function backupAndOpenDrive() {
-            try {
-                const data = buildCombinedBackupData();
-                const now = new Date();
-                const dd = String(now.getDate()).padStart(2,'0');
-                const mm = String(now.getMonth()+1).padStart(2,'0');
-                const yyyy = now.getFullYear();
-                const hh = String(now.getHours()).padStart(2,'0');
-                const min = String(now.getMinutes()).padStart(2,'0');
-                const fileName = `Census_Backup_${dd}-${mm}-${yyyy}_${hh}-${min}.json`;
-                const jsonText = JSON.stringify(data, null, 2);
-                const file = new File([jsonText], fileName, {type:'application/json'});
-
-                if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
-                    try {
-                        await navigator.share({
-                            files:[file],
-                            title:'Census 2027 JSON Backup',
-                            text:'इस JSON बैकअप को Google Drive के CENSUS 2027 BACKUP फोल्डर में सेव करें।'
-                        });
-                        showToastNotice('Share विकल्प खुल गया। Google Drive चुनें और अपना Backup Folder चुनकर Save करें।');
-                    } catch (shareErr) {
-                        if (shareErr && shareErr.name === 'AbortError') {
-                            showToastNotice('Sharing रद्द किया गया। आपका डेटा सुरक्षित है; जरूरत हो तो फिर से Backup करें।');
-                            return;
-                        }
-                        console.warn('Native file sharing failed; falling back to download:', shareErr);
-                        downloadJSON(data,fileName);
-                        showToastNotice('Share विकल्प उपलब्ध नहीं हुआ। JSON Downloads में सेव हुई है; वहाँ से Drive में Upload करें।');
-                    }
-                } else {
-                    downloadJSON(data,fileName);
-                    showToastNotice('इस Chrome में File Share उपलब्ध नहीं है। JSON Downloads में सेव हुई है; वहाँ से Drive में Upload करें।');
-                }
-            } catch (err) {
-                console.error('Backup/share failed:', err);
-                showToastNotice('Backup नहीं बन पाया। कृपया JSON बैकअप बटन से दोबारा कोशिश करें।');
-            }
         }
 
         function importJSONBackup(event) {
@@ -2770,23 +2709,6 @@
 
         
         
-        // DD -> MM -> YYYY auto-advance for the member's date of birth.
-        function handleDobSegmentInput(key, input) {
-            const limits = { q4_dd: 2, q4_mm: 2, q4_yyyy: 4 };
-            const nextIds = { q4_dd: 'q4_mm_input', q4_mm: 'q4_yyyy_input' };
-            const max = limits[key] || 2;
-            const cleaned = String(input.value || '').replace(/\D/g, '').slice(0, max);
-            if (input.value !== cleaned) input.value = cleaned;
-            handleDobInputChange(key, cleaned);
-            if (cleaned.length === max && nextIds[key]) {
-                const next = document.getElementById(nextIds[key]);
-                if (next && !next.disabled) {
-                    next.focus();
-                    next.select();
-                }
-            }
-        }
-
         function handleDobInputChange(key, val) {
             updateValue(key, val);
             const mData = getCurrentMemberData();
@@ -2799,10 +2721,10 @@
             const ageContainer = document.getElementById('q4_age_container');
 
             if(d > 0 && d <= 31 && m > 0 && m <= 12 && y >= 1900 && y <= 2027) {
-                // Reference Date: 1 March 2027
+                // Uttar Pradesh PE reference date: 5 January 2027, 00:00 hours
                 const refYear = 2027;
-                const refMonth = 3;
-                const refDay = 1;
+                const refMonth = 1;
+                const refDay = 5;
 
                 let calcAge = refYear - y;
                 if (m > refMonth || (m === refMonth && d > refDay)) {
@@ -2818,7 +2740,7 @@
                     ageInput.style.backgroundColor = "#e9ecef";
                 }
                 if(ageBadge) {
-                    ageBadge.innerHTML = '<span class="badge bg-success ms-1"><i class="fas fa-calculator me-1"></i>स्वचालित गणना (1 मार्च 2027)</span>';
+                    ageBadge.innerHTML = '<span class="badge bg-success ms-1"><i class="fas fa-calculator me-1"></i>स्वचालित गणना (5 जनवरी 2027)</span>';
                 }
                 if(ageContainer) ageContainer.classList.add('opacity-75');
             } else {
@@ -2908,13 +2830,151 @@
         }
 
         document.addEventListener('DOMContentLoaded', initApp);
+
+        // Keep the repository's existing offline/PWA service worker active.
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.warn('PWA offline setup failed:', err)));
+        }
     </script>
 
 
-
-<script>// PWA service worker registration; HTTPS or localhost is required.
-if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.warn('PWA offline setup failed:', err)));
-}
-</script>
-</body></html>
+<script async="" src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="2cabcaf4-79cc-4dc2-99ee-7a05c2737f3b" data-app-host="app.netlify.com" data-account-tier="free"></script>
+<iframe id="nl-badge-frame" title="Powered by Netlify" srcdoc="&lt;!doctype html&gt;&lt;html class=&quot;nl-narrow&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot;&gt;&lt;style&gt;
+    :root{--nl-vw:288px;--nl-vh:557px}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:transparent;overflow:hidden}
+    body{display:flex;align-items:flex-end;justify-content:flex-end;height:100vh;
+      padding:8px 18px 18px 8px;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#f4f9f9;-webkit-font-smoothing:antialiased}
+    .nl-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:10px;width:max-content;max-width:calc(var(--nl-vw,100vw) - 26px)}
+    button{font-family:inherit;cursor:pointer}
+    :focus-visible{outline:2px solid #32e6e2;outline-offset:2px;border-radius:6px}
+    .nl-icon-btn{position:relative;flex:none;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid transparent;background:transparent;color:#d5e3e6;transition:background .15s ease,color .15s ease}
+    .nl-icon-btn:hover{background:rgba(255,255,255,0.08);color:#f4f9f9}
+    .nl-tap::after{content:&quot;&quot;;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:max(100%,44px);height:max(100%,44px)}
+    @keyframes nl-rise{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+    @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
+  
+      .nl-card{position:relative;display:none;width:min(340px,calc(var(--nl-vw,100vw) - 26px));max-height:calc(var(--nl-vh,100vh) - 84px);overflow-y:auto;background:linear-gradient(180deg,#132832 0%,#0e1e25 100%);border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:18px;transform-origin:bottom right;animation:nl-rise .3s cubic-bezier(.34,1.4,.4,1) both}
+      .nl-card.open{display:block}
+      .nl-card-close{position:absolute;top:10px;right:10px}
+      .nl-card h2{margin:0;padding-right:30px;font-size:16px;font-weight:750;letter-spacing:-0.015em;line-height:1.35}
+      .nl-card h2 em{font-style:normal;background:linear-gradient(90deg,#32e6e2,#4d7cfe,#9a6bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+      .nl-card p{margin:8px 0 0;font-size:12.5px;color:#d5e3e6}
+      .nl-prompt{position:relative;margin-top:14px;background:#10222b;border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:10px 12px;transition:border-color .15s ease,box-shadow .15s ease}
+      .nl-prompt:focus-within{border-color:#05bdba;box-shadow:0 0 0 3px rgba(5,189,186,0.18)}
+      .nl-prompt textarea{display:block;width:100%;height:38px;resize:none;border:0;outline:none;background:transparent;color:#f4f9f9;font:inherit;font-size:13px;line-height:19px;padding:0 28px 0 0}
+      .nl-prompt textarea::placeholder{color:#a9bdc2}
+      .nl-send{position:absolute;right:9px;bottom:9px;width:24px;height:24px;flex:none;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:#05bdba;color:#02191b;transition:background .15s ease}
+      .nl-send:hover{background:#32e6e2}
+      @media (pointer: coarse){
+        .nl-prompt textarea{font-size:16px;line-height:21px;height:42px}
+      }
+      .nl-or{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:10.5px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#a9bdc2}
+      .nl-or::before,.nl-or::after{content:&quot;&quot;;flex:1;height:1px;background:rgba(255,255,255,0.09)}
+      .nl-drop{display:flex;align-items:center;justify-content:space-between;gap:6px;text-decoration:none;background:#1b3a45;border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;color:#cfe0e3;transition:background .15s ease,color .15s ease,border-color .15s ease}
+      .nl-drop:hover{background:#224753;color:#f4f9f9;border-color:rgba(50,230,226,0.3)}
+      .nl-drop .nl-arrow{transition:transform .18s cubic-bezier(.34,1.4,.4,1)}
+      .nl-drop:hover .nl-arrow{transform:translateX(3px)}
+      .nl-badge{display:flex;align-items:center;gap:9px;white-space:nowrap;border:1px solid rgba(255,255,255,0.09);background:linear-gradient(180deg,#142b34,#0e1e25);color:#f4f9f9;border-radius:999px;padding:9px 14px 9px 11px;font-size:13px;font-weight:600;letter-spacing:0.01em;transition:border-color .2s ease}
+      .nl-badge:hover{border-color:rgba(50,230,226,0.26)}
+      .nl-hide{display:block;width:100%;margin-top:10px;border:0;background:transparent;color:#a9bdc2;font-size:11.5px;font-weight:600;padding:4px;border-radius:8px;transition:color .15s ease}
+      .nl-hide:hover{color:#d5e3e6;text-decoration:underline}
+      .nl-badge-label{color:#d5e3e6;font-weight:500}
+      .nl-badge-brand{font-weight:750}
+    &lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+      &lt;div class=&quot;nl-wrap&quot;&gt;
+        &lt;section class=&quot;nl-card&quot; id=&quot;nl-card&quot; aria-label=&quot;Build your own site on Netlify&quot;&gt;
+          &lt;button type=&quot;button&quot; class=&quot;nl-icon-btn nl-tap nl-card-close&quot; id=&quot;nl-card-close&quot; aria-label=&quot;Close&quot;&gt;&lt;svg width=&quot;14&quot; height=&quot;14&quot; viewBox=&quot;0 0 16 16&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.9&quot; stroke-linecap=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;
+          &lt;h2&gt;&lt;em&gt;Build your own site with Netlify&lt;/em&gt;&lt;/h2&gt;
+          &lt;p&gt;Describe what you want, and an AI agent designs, builds and deploys it in minutes.&lt;/p&gt;
+          &lt;form class=&quot;nl-prompt&quot; action=&quot;https://app.netlify.com/start&quot; method=&quot;get&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
+            &lt;textarea name=&quot;prompt&quot; rows=&quot;2&quot; required maxlength=&quot;300&quot; autocomplete=&quot;off&quot;
+                      enterkeyhint=&quot;go&quot;
+                      placeholder=&quot;A shop for my handmade surfboards&amp;hellip;&quot;
+                      aria-label=&quot;Describe the site you want to build&quot;&gt;&lt;/textarea&gt;
+            &lt;button type=&quot;submit&quot; class=&quot;nl-send nl-tap&quot; aria-label=&quot;Build this site&quot;&gt;&lt;svg width=&quot;13&quot; height=&quot;13&quot; viewBox=&quot;0 0 16 16&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M8 12.75v-9.5M3.9 7.35 8 3.25l4.1 4.1&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;utm_source&quot; value=&quot;netlify_badge&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;utm_campaign&quot; value=&quot;loops&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;utm_medium&quot; value=&quot;owned&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;utm_content&quot; value=&quot;prompt&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;utm_id&quot; value=&quot;2cabcaf4-79cc-4dc2-99ee-7a05c2737f3b&quot;&gt;
+            
+          &lt;/form&gt;
+          &lt;div class=&quot;nl-or&quot;&gt;&lt;span&gt;or&lt;/span&gt;&lt;/div&gt;
+          &lt;a class=&quot;nl-drop&quot; href=&quot;https://app.netlify.com/drop?utm_source=netlify_badge&amp;utm_campaign=loops&amp;utm_medium=owned&amp;utm_content=drop&amp;utm_id=2cabcaf4-79cc-4dc2-99ee-7a05c2737f3b&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
+            &lt;span&gt;Drop a site you already have&lt;/span&gt;&lt;span class=&quot;nl-arrow&quot; aria-hidden=&quot;true&quot;&gt;&amp;rarr;&lt;/span&gt;
+          &lt;/a&gt;
+          
+        &lt;/section&gt;
+        &lt;button type=&quot;button&quot; class=&quot;nl-badge&quot; id=&quot;nl-badge&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;nl-card&quot;
+                aria-label=&quot;Powered by Netlify — build your own site&quot;&gt;
+          &lt;svg width=&quot;18&quot; height=&quot;18&quot; viewBox=&quot;0 0 32 32&quot; fill=&quot;none&quot; aria-hidden=&quot;true&quot;&gt;
+    &lt;path fill=&quot;#fff&quot; d=&quot;M17.9922 18.3225H14.005L13.6746 17.9921V14.005L14.005 13.6746H17.9922L18.3226 14.005V17.9921L17.9922 18.3225Z&quot;/&gt;
+    &lt;g fill=&quot;#05BDBA&quot;&gt;
+      &lt;path d=&quot;M9.6958 24.3311H9.35705L7.6661 22.6401V22.3041L10.2511 19.7164L12.042 19.7191L12.2808 19.9552V21.7461L9.6958 24.3311Z&quot;/&gt;
+      &lt;path d=&quot;M7.6661 9.69576V9.35701L9.35705 7.66606H9.6958L12.2808 10.2511V12.0392L12.042 12.2808H10.2511L7.6661 9.69576Z&quot;/&gt;
+      &lt;path d=&quot;M10.0457 17.4369H0.205466L0 17.2314V14.7658L0.205466 14.5603H10.0457L10.2511 14.7658V17.2314L10.0457 17.4369Z&quot;/&gt;
+      &lt;path d=&quot;M31.7945 17.4369H21.9544L21.7489 17.2314V14.7658L21.9544 14.5603H31.7945L32 14.7658V17.2314L31.7945 17.4369Z&quot;/&gt;
+      &lt;path d=&quot;M14.5631 10.0456V2.66547L14.7686 2.46001H17.2343L17.4396 2.66547V10.0456L17.2343 10.2511H14.7686L14.5631 10.0456Z&quot;/&gt;
+      &lt;path d=&quot;M14.5631 29.3316V21.9515L14.7686 21.746H17.2343L17.4396 21.9515V29.3316L17.2343 29.5371H14.7686L14.5631 29.3316Z&quot;/&gt;
+    &lt;/g&gt;&lt;/svg&gt;
+          &lt;span&gt;&lt;span class=&quot;nl-badge-label&quot;&gt;Powered by&lt;/span&gt; &lt;span class=&quot;nl-badge-brand&quot;&gt;Netlify&lt;/span&gt;&lt;/span&gt;
+        &lt;/button&gt;
+      &lt;/div&gt;
+      &lt;script&gt;
+        
+    function nlSend(){
+      var wrap=document.querySelector('.nl-wrap'),boxes=[];
+      for(var i=0;i&lt;wrap.children.length;i++){
+        var c=wrap.children[i];
+        if(!c.offsetWidth||!c.offsetHeight)continue;
+        boxes.push({x:c.offsetLeft-wrap.offsetLeft+8,
+                    y:c.offsetTop-wrap.offsetTop+8,
+                    w:c.offsetWidth,h:c.offsetHeight});
+      }
+      parent.postMessage({nlHud:'resize',
+        width:wrap.offsetWidth+26,
+        height:wrap.offsetHeight+26,
+        boxes:boxes},'*');
+    }
+    function nlSendSoon(){requestAnimationFrame(nlSend);}
+    window.addEventListener('load',nlSend);
+    window.addEventListener('message',function(e){
+      if(e.source!==parent||!e.data||e.data.nlHud!=='viewport')return;
+      var s=document.documentElement.style;
+      s.setProperty('--nl-vw',e.data.w+'px');
+      s.setProperty('--nl-vh',e.data.h+'px');
+      document.documentElement.classList.toggle('nl-narrow',e.data.w&lt;600);
+      nlSendSoon();
+    });
+    var nlCoarse=window.matchMedia('(pointer: coarse)').matches;
+    function nlSubmit(form){
+      if(form.requestSubmit)return form.requestSubmit();
+      if(form.checkValidity&amp;&amp;!form.checkValidity())
+        return form.reportValidity&amp;&amp;form.reportValidity();
+      form.submit();
+    }
+  
+        var badge=document.getElementById('nl-badge'),card=document.getElementById('nl-card'),
+            box=card.querySelector('textarea');
+        function setOpen(open){
+          card.classList.toggle('open',open);
+          badge.setAttribute('aria-expanded',open?'true':'false');
+          nlSendSoon();
+          if(open&amp;&amp;!nlCoarse)box.focus();
+        }
+        box.addEventListener('keydown',function(e){
+          if(e.key==='Enter'&amp;&amp;!e.shiftKey){e.preventDefault();nlSubmit(box.form);}
+        });
+        badge.addEventListener('click',function(){setOpen(!card.classList.contains('open'));});
+        document.getElementById('nl-card-close').addEventListener('click',function(){setOpen(false);badge.focus();});
+        document.addEventListener('keydown',function(e){
+          if(e.key==='Escape'&amp;&amp;card.classList.contains('open')){setOpen(false);badge.focus();}
+        });
+        card.addEventListener('click',function(e){
+          if(e.target.closest('#nl-hide'))parent.postMessage({nlHud:'state',value:'hidden'},'*');
+        });
+      &lt;/script&gt;
+    &lt;/body&gt;&lt;/html&gt;" style="position: fixed; bottom: 0px; right: 0px; border: 0px; margin: 0px; padding: 0px; background: transparent; color-scheme: dark; z-index: 2147483645; width: 192px; height: 64px; clip-path: path(&quot;M 3 3 H 179 V 51 H 3 Z&quot;);" data-nl-ready="1"></iframe></body></html>
