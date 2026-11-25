@@ -2291,6 +2291,27 @@
         function updateConditionalLocks() {
             const mData = getCurrentMemberData();
 
+            // Convenience prefill for this user's local workflow only; confirm each person's actual response.
+            // Apply once per member, only when both SC and ST are explicitly marked 'नहीं'.
+            if(mData['q10_sc'] === 'नहीं' && mData['q10_st'] === 'नहीं' && !mData.q10_other_auto_suggested) {
+                if(!mData['q10_other_opt']) mData['q10_other_opt'] = 'जाति का नाम लिखें';
+                if(mData['q10_other_opt'] === 'जाति का नाम लिखें' && !mData['q10_other_name']) {
+                    mData['q10_other_name'] = 'राजभर';
+                    mData.q10_other_auto_suggested = true;
+                    saveLocalState();
+                } else if(mData['q10_other_opt'] !== 'जाति का नाम लिखें') {
+                    // Respect an already selected response such as refusal or no caste.
+                    mData.q10_other_auto_suggested = true;
+                    saveLocalState();
+                }
+                const otherRadio = document.getElementById('q10_other_1');
+                if(otherRadio && mData['q10_other_opt'] === 'जाति का नाम लिखें') otherRadio.checked = true;
+                const otherBox = document.getElementById('box-other-caste-text');
+                if(otherBox && mData['q10_other_opt'] === 'जाति का नाम लिखें') otherBox.classList.remove('d-none');
+                const casteInput = document.querySelector('#box-other-caste-text input');
+                if(casteInput && mData['q10_other_opt'] === 'जाति का नाम लिखें') casteInput.value = mData['q10_other_name'] || '';
+            }
+
             // Convenience suggestion only (not an official age-based census rule):
             // for age 0-14, preselect 'अविवाहित' if marital status is still blank.
             // Enumerator/respondent can change it; a manual choice is never overwritten.
