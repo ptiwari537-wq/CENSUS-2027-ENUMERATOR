@@ -2877,32 +2877,72 @@
         }
 
         function importJSONBackup(event) {
-            const file = event.target.files[0];
-            if(!file) return;
+            const input = event && event.target;
+            const file = input && input.files && input.files[0];
+            if (!file) { showToastNotice('पहले JSON बैकअप फ़ाइल चुनें।'); return; }
+            if (input) input.value = '';
 
+            showToastNotice('JSON बैकअप पढ़ा जा रहा है...');
             const reader = new FileReader();
+
             reader.onload = async function(e) {
                 try {
-                    const imported = JSON.parse(e.target.result);
-                    if(imported.format === 'DhurdaJangle-CensusManager-v1' && imported.households) {
-                        households = imported.households; activeHouseholdId = imported.activeHouseholdId || Object.keys(households)[0];
-                    } else if(imported.format === 'CensusManager-House-v1' && imported.household) {
-                        households[imported.household.id] = imported.household; activeHouseholdId = imported.household.id;
+                    const imported = JSON.parse(String(e.target.result || ''));
+                    let incoming = {};
+                    let preferredActiveId = '';
+
+                    if (imported && imported.format === 'DhurdaJangle-CensusManager-v1' && imported.households && typeof imported.households === 'object') {
+                        incoming = imported.households;
+                        preferredActiveId = imported.activeHouseholdId || '';
+                    } else if (imported && imported.format === 'CensusManager-House-v1' && imported.household) {
+                        incoming[imported.household.id || 'HH-RESTORED'] = imported.household;
+                        preferredActiveId = imported.household.id || 'HH-RESTORED';
+                    } else if (imported && imported.members && typeof imported.members === 'object') {
+                        incoming['HH-RESTORED'] = { id:'HH-RESTORED', houseNo:'RESTORED', headName:'Restored Family', members:imported.members, peStatus:'pending', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString() };
+                        preferredActiveId = 'HH-RESTORED';
                     } else {
-                        const id='HH-RESTORED'; households[id]={id,houseNo:id,headName:'Restored Family',members:imported.members||imported,peStatus:'pending',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}; activeHouseholdId=id;
+                        throw new Error('इस JSON में पहचाने जाने योग्य घरों का डेटा नहीं मिला।');
                     }
-                    loadActiveHousehold(); saveLocalState();
-                    if(censusDB) { for(const h of Object.values(households)) await dbRequest('readwrite','put',h); }
-                    refreshHouseholdUI(); renderFormQuestions(); renderMemberSelector();
-                    updateConditionalLocks(); updateMembersRemainingBadge();
-                    showToastNotice('डेटा सफलतापूर्वक रीस्टोर हो गया!');
+
+                    const validEntries = Object.entries(incoming).filter(([id, h]) => h && typeof h === 'object' && (h.members || typeof h === 'object'));
+                    if (!validEntries.length) throw new Error('JSON में कोई परिवार नहीं मिला।');
+
+                    const normalized = {};
+                    validEntries.forEach(([key, h], index) => {
+                        const id = String(h.id || key || ('HH-' + (index + 1)));
+                        normalized[id] = {
+                            ...h,
+                            id,
+                            houseNo: h.houseNo || String(index + 1).padStart(3, '0'),
+                            members: (h.members && typeof h.members === 'object') ? h.members : {'1':{}}
+                        };
+                    });
+
+                    if (!censusDB) await openCensusDB();
+                    households = { ...households, ...normalized };
+                    activeHouseholdId = (preferredActiveId && households[preferredActiveId]) ? preferredActiveId : Object.keys(normalized)[0];
+                    loadActiveHousehold();
+
+                    for (const h of Object.values(normalized)) await dbRequest('readwrite', 'put', h);
+                    saveLocalState();
+                    refreshHouseholdUI();
+                    renderFormQuestions();
+                    renderMemberSelector();
+                    updateConditionalLocks();
+                    updateMembersRemainingBadge();
+
+                    const total = Object.keys(normalized).length;
+                    showToastNotice('रीस्टोर सफल: ' + total + ' परिवार लोड हुए। घरों की सूची जाँचें।');
                 } catch(err) {
-                    showToastNotice("अमान्य JSON बैकअप फ़ाइल!");
+                    console.error('JSON restore failed:', err);
+                    showToastNotice('रीस्टोर नहीं हुआ: ' + (err && err.message ? err.message : 'JSON फ़ाइल पढ़ने में समस्या'));
                 }
+            };
+            reader.onerror = function() {
+                showToastNotice('JSON फ़ाइल पढ़ी नहीं जा सकी। Downloads से फ़ाइल दोबारा चुनें।');
             };
             reader.readAsText(file);
         }
-
         
         function toggleParentIsMember(keyP, isChecked) {
             updateValue(keyP + '_is_member', isChecked ? 'हाँ' : 'नहीं');
