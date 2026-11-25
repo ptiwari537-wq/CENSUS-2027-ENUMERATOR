@@ -14,11 +14,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        #praveen-splash{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;background:radial-gradient(circle at 50% 35%,#244d9d 0%,#071a46 72%);transition:opacity .55s ease,visibility .55s ease}
-        #praveen-splash.hide{opacity:0;visibility:hidden;pointer-events:none}
-        #praveen-splash img{width:min(76vw,440px);height:auto;max-height:66vh;object-fit:contain;filter:drop-shadow(0 14px 28px #0008)}
-        #praveen-splash .splash-caption{color:#ffe19a;font-weight:700;letter-spacing:.4px;text-align:center;font-size:clamp(15px,3.5vw,21px)}
-        #praveen-splash button{border:1px solid #f6c64b;background:#f6c64b;color:#09245c;border-radius:30px;padding:9px 24px;font-weight:800}
         :root {
             --primary-gov: #0a3d62;
             --secondary-gov: #1e3799;
@@ -285,12 +280,6 @@
     </style>
 </head>
 <body class="no-select" oncontextmenu="return showLockNotice(event);">
-    <div id="praveen-splash" role="dialog" aria-label="स्वागत">
-        <img src="./praveen-logo.svg" alt="प्रवीण तिवारी, सहायक अध्यापक, प्राथमिक विद्यालय धुरदा जंगल का लोगो">
-        <div class="splash-caption">Census Manager में आपका स्वागत है</div>
-        <button type="button" onclick="closePraveenSplash()">आगे बढ़ें</button>
-    </div>
-
     <header class="gov-header" id="immutable-header">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
@@ -1556,9 +1545,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        function closePraveenSplash(){const el=document.getElementById('praveen-splash');if(el)el.classList.add('hide');}
-        window.addEventListener('load',function(){window.setTimeout(closePraveenSplash,3200);},{once:true});
-
         const IMMUTABLE_AUTHOR = "प्रवीण तिवारी";
         const IMMUTABLE_COLLEGE = "सहायक अध्यापक, प्राथमिक विद्यालय धुरदा जंगल, वि०क्षे०-परसरामपुर, जनपद-बस्ती";
 
