@@ -289,7 +289,7 @@
                     <h5 class="mb-0 text-light opacity-90">परिवार अनुसूची - 40 प्रश्नों का ऑनलाइन अभ्यास सॉफ्टवेयर</h5>
                 </div>
                 <div class="text-end mt-2 mt-md-0">
-                    <span class="badge bg-warning text-dark fs-6"><i class="fas fa-flask me-1"></i> प्रायोगिक संस्करण 5.8 Fast Entry</span>
+                    <span class="badge bg-warning text-dark fs-6"><i class="fas fa-flask me-1"></i> प्रायोगिक संस्करण 5.9 Smart Suggestions</span>
                 </div>
             </div>
 
@@ -354,7 +354,7 @@
 
             <div class="d-flex gap-2 flex-wrap">
                 <button class="btn btn-warning btn-sm fw-bold text-dark" onclick="downloadThisSoftware()">
-                    <i class="fas fa-download me-1"></i> सॉफ्टवेयर डाउनलोड करें (v5.8)
+                    <i class="fas fa-download me-1"></i> सॉफ्टवेयर डाउनलोड करें (v5.9)
                 </button>
 
                 <button class="btn btn-share btn-sm" onclick="shareDataOnWhatsApp()">
@@ -2337,6 +2337,7 @@
             const ageRaw = mData['q4_age'];
             const ageNow = (ageRaw === '' || ageRaw === null || ageRaw === undefined) ? NaN : Number(ageRaw);
             if(Number.isFinite(ageNow) && ageNow >= 0 && ageNow <= 14 && !mData[5]) {
+                // Convenience default only: this is a suggestion, not an official age rule.
                 mData[5] = 'अविवाहित - 1';
                 mData.q5_auto_suggested = true;
                 saveLocalState();
@@ -2346,9 +2347,16 @@
                 if(maritalBody && !maritalBody.querySelector('.age-suggestion-note')) {
                     const note = document.createElement('div');
                     note.className = 'small text-warning-emphasis mt-2 age-suggestion-note';
-                    note.textContent = 'उम्र के आधार पर सुझाया गया विकल्प — वास्तविक वैवाहिक स्थिति की पुष्टि करें। जरूरत हो तो बदल दें।';
+                    note.textContent = 'उम्र के आधार पर सुझाया गया — उत्तरदाता से पुष्टि करें; जरूरत हो तो बदलें।';
                     maritalBody.appendChild(note);
                 }
+            } else if(Number.isFinite(ageNow) && ageNow > 14 && mData.q5_auto_suggested === true) {
+                // Remove only our own untouched suggestion when age changes; preserve manual answers.
+                mData[5] = '';
+                mData.q5_auto_suggested = false;
+                saveLocalState();
+                const maritalSelect = document.querySelector('#q-card-5 select');
+                if(maritalSelect) maritalSelect.value = '';
             }
             const isUnmarried = (mData[5] || '').includes('अविवाहित');
             applyCardLock(6, isUnmarried, "अविवाहित व्यक्ति के लिए लागू नहीं");
