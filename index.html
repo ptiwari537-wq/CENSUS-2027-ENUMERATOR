@@ -10,7 +10,7 @@
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" href="./icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="./icon-192.png">
-    <title>भारत की जनगणना 2027 - 6.2 Smart Family Fast Entry</title>
+    <title>भारत की जनगणना 2027 - 6.3 Simple Entry</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -338,23 +338,6 @@
             </div>
         </div>
 
-        <div class="card mb-3 border-success shadow-sm" id="family-suggestions-panel">
-            <div class="card-body">
-                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-                    <div><h6 class="mb-1 fw-bold text-success"><i class="fas fa-bolt me-2"></i>परिवार की सामान्य जानकारी — Smart Suggestions</h6>
-                    <small class="text-muted">एक सदस्य से सुझाव सेव करें, फिर दूसरे सदस्यों के खाली उत्तरों में लगाएं। कोई उत्तर अपने-आप अंतिम नहीं माना जाएगा।</small></div>
-                    <span class="badge bg-success-subtle text-success-emphasis" id="family-suggestions-status">अभी सुझाव सेव नहीं हैं</span>
-                </div>
-                <div class="row g-2">
-                    <div class="col-12 col-md-6"><button class="btn btn-outline-success w-100" type="button" onclick="saveFamilySuggestionsFromCurrentMember()"><i class="fas fa-save me-1"></i> वर्तमान सदस्य से सुझाव सेव करें</button></div>
-                    <div class="col-12 col-md-6"><button class="btn btn-success w-100" type="button" onclick="applyFamilySuggestionsToCurrentMember()"><i class="fas fa-magic me-1"></i> इस सदस्य के खाली उत्तरों में सुझाव लगाएं</button></div>
-                </div>
-                <div class="d-grid mt-2"><button class="btn btn-outline-warning" id="review-suggestions-btn" type="button" onclick="reviewNextFamilySuggestion()" disabled><i class="fas fa-clipboard-check me-1"></i> पुष्टि बाकी देखें (0)</button></div>
-                <div class="small text-muted mt-2">सुझाव वाले प्रश्न: 8 राष्ट्रीयता और 14 मातृभाषा/अन्य भाषाएं। हर व्यक्ति से पुष्टि करें। धर्म, जाति और अन्य व्यक्तिगत उत्तर स्वतः नहीं भरे जाएंगे।</div>
-            </div>
-        </div>
-
-
         <div class="card mb-3 border-primary shadow-sm" id="smart-family-fast-entry">
             <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <span><i class="fas fa-bolt me-2"></i>6.2 Smart Family Fast Entry</span>
@@ -369,38 +352,6 @@
                     <div class="col-12 col-md-2"><button class="btn btn-success w-100" onclick="fastAddFamilyMember()"><i class="fas fa-user-plus me-1"></i> जोड़ें</button></div>
                 </div>
                 <hr>
-                <div class="row g-3">
-                    <div class="col-12 col-lg-6">
-                        <h6 class="fw-bold">Family Master Profile (केवल नोट्स)</h6>
-                        <small class="text-muted d-block mb-2">यह परिवार की सामान्य जानकारी रखने के लिए है। इससे कोई Census उत्तर अपने-आप नहीं भरेगा।</small>
-                        <label class="form-label">परिवार संबंधी नोट्स</label>
-                        <textarea id="family-profile-notes" class="form-control" rows="3" maxlength="1000" placeholder="उदाहरण: संयुक्त परिवार / दादा-दादी साथ रहते हैं / वास्तविक सदस्य क्रम अलग-अलग हो सकता है"></textarea>
-                        <button class="btn btn-outline-primary btn-sm mt-2" onclick="saveFamilyMasterProfile()">प्रोफाइल नोट्स सेव करें</button>
-                    </div>
-                    <div class="col-12 col-lg-6">
-                        <h6 class="fw-bold">Selective Smart Copy</h6>
-                        <small class="text-muted d-block mb-2">सिर्फ चुने हुए खाली उत्तरों में सुझाव लगेंगे। हर सुझाव व्यक्ति से पुष्टि के बाद ही सही मानें।</small>
-                        <label class="form-check"><input class="form-check-input" type="checkbox" id="copy-q8" checked> प्रश्न 8 – राष्ट्रीयता</label>
-                        <label class="form-check"><input class="form-check-input" type="checkbox" id="copy-q14"> प्रश्न 14 – मातृभाषा / अन्य भाषा</label>
-                        <button class="btn btn-outline-success btn-sm mt-2" onclick="copySelectedFamilySuggestions()">चुने हुए सुझाव लगाएं</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card mb-3 border-info shadow-sm" id="family-dashboard">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <h6 class="fw-bold mb-0"><i class="fas fa-chart-pie text-info me-2"></i>Family Dashboard & Missing Answer Alerts</h6>
-                    <button class="btn btn-outline-info btn-sm" onclick="refreshSmartFamilyDashboard()">अपडेट करें</button>
-                </div>
-                <div id="smart-family-dashboard-content" class="mt-3 small">डैशबोर्ड तैयार हो रहा है…</div>
-                <div class="d-flex flex-wrap gap-2 mt-3">
-                    <button class="btn btn-success btn-sm" onclick="oneTapFamilySummary()"><i class="fas fa-file-alt me-1"></i> एक क्लिक में परिवार सारांश</button>
-                    <button class="btn btn-outline-primary btn-sm" onclick="showMissingAnswerAlerts()"><i class="fas fa-clipboard-check me-1"></i> अधूरे उत्तर देखें</button>
-                </div>
-                <div id="smart-missing-alerts" class="mt-3"></div>
-            </div>
-        </div>
         <div class="control-bar">
             <div class="d-flex gap-2 align-items-center flex-wrap">
                 <span class="fw-bold text-dark me-2"><i class="fas fa-sliders-h me-1"></i> कार्य शैली:</span>
@@ -504,13 +455,13 @@
                         </label>
                         <div class="row g-2">
                             <div class="col-4">
-                                <input type="number" id="q4_dd_input" min="1" max="31" class="form-control text-center" placeholder="DD" value="" oninput="handleDobInputChange('q4_dd', this.value)">
+                                <input type="number" id="q4_dd_input" inputmode="numeric" maxlength="2" class="form-control text-center" placeholder="DD" value="" oninput="handleDobInputChange('q4_dd', this.value)">
                             </div>
                             <div class="col-4">
-                                <input type="number" id="q4_mm_input" min="1" max="12" class="form-control text-center" placeholder="MM" value="" oninput="handleDobInputChange('q4_mm', this.value)">
+                                <input type="number" id="q4_mm_input" inputmode="numeric" maxlength="2" class="form-control text-center" placeholder="MM" value="" oninput="handleDobInputChange('q4_mm', this.value)">
                             </div>
                             <div class="col-4">
-                                <input type="number" id="q4_yyyy_input" min="1900" max="2027" class="form-control text-center" placeholder="YYYY" value="" oninput="handleDobInputChange('q4_yyyy', this.value)">
+                                <input type="number" id="q4_yyyy_input" inputmode="numeric" maxlength="4" class="form-control text-center" placeholder="YYYY" value="" oninput="handleDobInputChange('q4_yyyy', this.value)">
                             </div>
                         </div>
                     </div>
@@ -1683,11 +1634,17 @@
             });
         }
 
+        function guessIndianNameGender(name){
+            const n=String(name||'').trim().toLocaleLowerCase('hi-IN'); const last=n.split(/\\s+/).pop();
+            const female=['सीता','गीता','रीता','सुनीता','कविता','पूजा','राधा','लक्ष्मी','सरिता','अनीता','ममता','नेहा','प्रियंका','संगीता','शांति','कमला','पूनम','वंदना','रीना','शिवानी','अंजली','आरती','मनीषा','खुशबू','सोनम'];
+            const male=['राम','श्याम','मोहन','सोहन','राजेश','रमेश','सुरेश','प्रवीण','अमित','सुमित','रोहित','मनीष','दीपक','विकास','आकाश','अंकित','अजय','विजय','संजय','राहुल','अरविंद','दिनेश','महेश','गणेश','कृष्ण','शिवम','अभिषेक','आशीष','अनिल','सुनील'];
+            if(female.includes(last)||/(ा|ी|या)$/.test(last))return 'महिला'; if(male.includes(last)||/(ेश|ंंत|ीप|कुमार|पाल|नाथ|वीर|राज)$/.test(last))return 'पुरुष'; return '';
+        }
         function fastAddFamilyMember() {
             const name=(document.getElementById('fast-member-name')?.value||'').trim();
             const relation=document.getElementById('fast-member-relation')?.value||'';
-            const gender=document.getElementById('fast-member-gender')?.value||'';
-            if(!name || !relation || !gender) { showToastNotice('नाम, संबंध और लिंग तीनों भरें।'); return; }
+            const gender=document.getElementById('fast-member-gender')?.value||guessIndianNameGender(name)||'';
+            if(!name || !relation) { showToastNotice('नाम और संबंध भरें। लिंग का अनुमान नाम से होगा; जरूरत पर बदलें।'); return; }
             const next=String(Math.max(0,...Object.keys(familyCensusData).map(Number))+1);
             familyCensusData[next]={1:name,2:relation,3:gender};
             currentActiveMember=next;
@@ -1952,7 +1909,9 @@
             const memberName=familyCensusData[deleting]?.[1] || ('सदस्य '+deleting);
             if(!confirm('क्या '+memberName+' का पूरा डेटा हटाना चाहते हैं? यह कार्रवाई वापस नहीं होगी।')) return;
             delete familyCensusData[deleting];
-            currentActiveMember=ids.filter(id=>id!==deleting).sort((a,b)=>Number(a)-Number(b))[0];
+            const remaining=ids.filter(id=>id!==deleting).map(id=>familyCensusData[id]);
+            familyCensusData={}; remaining.forEach((m,i)=>familyCensusData[String(i+1)]=m);
+            currentActiveMember='1';
             saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
             showToastNotice('सदस्य '+deleting+' का डेटा हटा दिया गया।');
         }
@@ -1980,6 +1939,7 @@
         function updateValue(key, value) {
             const mData = getCurrentMemberData();
             mData[key] = value;
+            if(String(key)==='1' && !String(mData['3']||'').trim()){const g=guessIndianNameGender(value);if(g)mData['3']=g;}
             if(String(key) === '5') mData.q5_auto_suggested = false;
             const suggestionFlags = {
                 '8':'q8_family_suggested', '9':'q9_family_suggested',
@@ -2037,7 +1997,9 @@
 
         function renderQuestionBody(q) {
             const mData = getCurrentMemberData();
-            const val = mData[q.id] || '';
+            let val = mData[q.id] || '';
+            if(q.id===8 && !val){val='भारतीय';mData[8]=val;}
+            if(q.id===10 && (mData.q10_other_name===undefined || mData.q10_other_name===''))mData.q10_other_name='राजभर';
 
             switch(q.type) {
                 case 'text':
@@ -2679,13 +2641,7 @@
             showToastNotice(`सदस्य ${currentActiveMember} का विवरण सफलतापूर्वक सेव किया गया!`);
         }
 
-        function updateMembersRemainingBadge() {
-            const total=Object.keys(familyCensusData).length;
-            const filled=Object.values(familyCensusData).filter(m=>m && m[1]).length;
-            document.getElementById('members-remaining-text').innerText = `कुल ${total} सदस्य | नाम दर्ज: ${filled} | जरूरत के अनुसार सदस्य जोड़ें`;
-            renderMemberSelector();
-            refreshSmartFamilyDashboard();
-        }
+        function updateMembersRemainingBadge() { renderMemberSelector(); }
 
         function scrollToQuestion7() {
             const q7Card = document.getElementById('q-card-7');
@@ -3014,7 +2970,10 @@
         
         
         function handleDobInputChange(key, val) {
+            val=String(val||'').replace(/\\D/g,'').slice(0,key==='q4_yyyy'?4:2);
+            const input=document.getElementById(key==='q4_dd'?'q4_dd_input':key==='q4_mm'?'q4_mm_input':'q4_yyyy_input'); if(input)input.value=val;
             updateValue(key, val);
+            if(val.length===(key==='q4_yyyy'?4:2)){const next=document.getElementById(key==='q4_dd'?'q4_mm_input':key==='q4_mm'?'q4_yyyy_input':'q4_age_input');if(next&&!next.disabled&&!next.readOnly)next.focus();}
             const mData = getCurrentMemberData();
             const d = parseInt(mData['q4_dd'], 10);
             const m = parseInt(mData['q4_mm'], 10);
