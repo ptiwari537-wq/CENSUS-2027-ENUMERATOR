@@ -1,4 +1,4 @@
-const CACHE_NAME = 'census-2027-enumerator-v14';
+const CACHE_NAME = 'census-2027-enumerator-v15';
 const APP_SHELL = [
   './',
   './index.html',
