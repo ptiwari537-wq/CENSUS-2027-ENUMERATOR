@@ -348,7 +348,7 @@
                     <div class="col-12"><h6 class="fw-bold mb-1">एक साथ सदस्य जोड़ें (केवल प्रश्न 1–3)</h6><small class="text-muted">नाम, संबंध और लिंग भरें। बाकी प्रश्न प्रत्येक व्यक्ति से पूछकर अलग-अलग भरें।</small></div>
                     <div class="col-12 col-md-4"><label class="form-label">सदस्य का नाम</label><input id="fast-member-name" class="form-control" maxlength="100" placeholder="पूरा नाम" oninput="autoSelectFastGender(this.value)"></div>
                     <div class="col-6 col-md-4"><label class="form-label">मुखिया से संबंध</label><select id="fast-member-relation" class="form-select"><option value="">चुनें</option><option>मुखिया - 01</option><option>पति/पत्नी - 02</option><option>पुत्र/पुत्री - 03</option><option>पुत्रवधू/दामाद - 04</option><option>पोता/पोती - 05</option><option>माता/पिता - 06</option><option>भाई/बहन - 07</option><option>अन्य रिश्तेदार - 08</option><option>गैर-रिश्तेदार - 09</option></select></div>
-                    <div class="col-6 col-md-2"><label class="form-label">लिंग</label><select id="fast-member-gender" class="form-select"><option value="">चुनें</option><option>पुरुष</option><option>महिला</option><option>ट्रांसजेंडर व्यक्ति</option></select></div>
+                    <div class="col-6 col-md-2"><label class="form-label">लिंग</label><select id="fast-member-gender" class="form-select"><option value="">चुनें</option><option>पुरुष</option><option>महिला</option></select></div>
                     <div class="col-12 col-md-2"><button class="btn btn-success w-100" onclick="fastAddFamilyMember()"><i class="fas fa-user-plus me-1"></i> जोड़ें</button></div>
                 </div>
                 <hr>
@@ -1577,7 +1577,7 @@
         const CENSUS_QUESTIONS = [
             { id: 1, title: "व्यक्ति का नाम", type: "text", placeholder: "परिवार के सदस्य का नाम लिखें (परिवार के मुखिया से प्रारंभ करें)" },
             { id: 2, title: "मुखिया से संबंध", type: "select", options: ["मुखिया - 01", "पति/पत्नी - 02", "पुत्र/पुत्री - 03", "पुत्रवधू/दामाद - 04", "पोता/पोती - 05", "माता/पिता - 06", "भाई/बहन - 07", "अन्य रिश्तेदार - 08", "गैर-रिश्तेदार - 09"] },
-            { id: 3, title: "लिंग", type: "radio", options: ["पुरुष", "महिला", "ट्रांसजेंडर व्यक्ति"] },
+            { id: 3, title: "लिंग", type: "radio", options: ["पुरुष", "महिला"] },
             { id: 4, title: "जन्म तिथि और आयु", type: "composite_4" },
             { id: 5, title: "वर्तमान वैवाहिक स्थिति", type: "select", options: ["अविवाहित - 1", "वर्तमान में विवाहित - 2", "विधवा/विधुर - 3", "संबंध विच्छेदित - 4", "तलाकशुदा - 5"] },
             { id: 6, title: "विवाह के समय आयु", type: "number", placeholder: "आयु दर्ज करें" },
