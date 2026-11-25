@@ -1898,7 +1898,8 @@
                             <label class="form-check-label" for="q10_other_1">जाति का नाम लिखें</label>
                         </div>
                         <div id="box-other-caste-text" class="${other_caste_opt === 'जाति का नाम लिखें' && !otherLocked ? '' : 'd-none'} ms-4 my-2">
-                            <input type="text" class="form-control form-control-sm" placeholder="जाति का नाम दर्ज करें" value="${escapeAttr(other_caste_name)}" oninput="updateValue('q10_other_name', this.value)">
+                            <input type="text" class="form-control form-control-sm" list="other-caste-suggestions" placeholder="जाति का नाम दर्ज करें (जैसे राजभर)" value="${escapeAttr(other_caste_name)}" oninput="updateValue('q10_other_name', this.value)">
+                            <datalist id="other-caste-suggestions"><option value="राजभर"></option></datalist>
                         </div>
                         <div class="form-check mb-1">
                             <input class="form-check-input" type="radio" name="q10_other_opt" id="q10_other_2" value="जाति का नाम नहीं बताना चाहते" ${other_caste_opt === 'जाति का नाम नहीं बताना चाहते' ? 'checked' : ''} ${otherLocked ? 'disabled' : ''} onchange="handleCasteSelection('other', 'जाति का नाम नहीं बताना चाहते')">
