@@ -319,7 +319,7 @@
                 <div class="row g-2 align-items-end">
                     <div class="col-12 col-md-5"><label class="form-label fw-bold">सक्रिय घर / मकान संख्या</label><select id="household-select" class="form-select" onchange="switchHousehold(this.value)"></select></div>
                     <div class="col-6 col-md-3"><label class="form-label fw-bold">PE App स्थिति</label><select id="pe-status" class="form-select" onchange="updatePEStatus(this.value)"><option value="pending">Pending</option><option value="completed">Completed</option></select></div>
-                    <div class="col-6 col-md-4"><div class="d-flex gap-2"><button class="btn btn-outline-primary flex-fill" type="button" onclick="exportCurrentHouseholdBackup()">इस घर का Backup</button><button class="btn btn-outline-success flex-fill" type="button" onclick="downloadFamilyDetailsPDF()"><i class="fas fa-file-pdf me-1"></i> परिवार का 40 प्रश्न PDF</button><button class="btn btn-outline-danger" type="button" onclick="deleteCurrentHousehold()" title="घर हटाएँ"><i class="fas fa-trash"></i></button></div></div>
+                    <div class="col-6 col-md-4"><div class="d-flex gap-2"><button class="btn btn-outline-primary flex-fill" type="button" onclick="exportCurrentHouseholdBackup()">इस घर का Backup</button><button class="btn btn-outline-danger" type="button" onclick="deleteCurrentHousehold()" title="घर हटाएँ"><i class="fas fa-trash"></i></button></div></div>
                 </div>
                 <div class="mt-3 d-flex flex-wrap gap-3 small"><span id="household-count">कुल घर: 1</span><span id="db-status" class="text-success">Offline Database तैयार</span><span id="pe-progress">PE App Entry: Pending</span></div>
             </div>
@@ -332,6 +332,7 @@
                 <button type="button" class="btn btn-primary btn-sm" onclick="addFamilyMember()"><i class="fas fa-user-plus me-1"></i> सदस्य जोड़ें</button>
                 <button type="button" class="btn btn-outline-success btn-sm" onclick="editCurrentMember()"><i class="fas fa-user-edit me-1"></i> सदस्य Edit</button>
                 <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteCurrentMember()"><i class="fas fa-user-times me-1"></i> सदस्य Delete</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="downloadCurrentMemberPDF()"><i class="fas fa-file-pdf me-1"></i> इस सदस्य का PDF</button>
             </div>
             <div class="text-muted small fw-semibold">
                 <i class="fas fa-info-circle me-1 text-info"></i> सदस्यवार या प्रश्नवार तरीका चुनकर डेटा भरें
@@ -1920,56 +1921,39 @@
             const old=activeHouseholdId; delete households[old]; if(censusDB) dbRequest('readwrite','delete',old);
             activeHouseholdId=Object.keys(households)[0];loadActiveHousehold();saveLocalState();refreshHouseholdUI();renderFormQuestions();renderMemberSelector();updateConditionalLocks();updateMembersRemainingBadge();
         }
-        function downloadFamilyDetailsPDF() {
+        function downloadCurrentMemberPDF() {
             const h = households[activeHouseholdId];
-            if (!h) { showToastNotice("पहले परिवार चुनें।"); return; }
-            const members = Object.entries(h.members || {}).sort((a,b)=>Number(a[0])-Number(b[0]));
-            if (!members.length) { showToastNotice("इस परिवार में सदस्य दर्ज नहीं हैं।"); return; }
-
+            const data = familyCensusData[currentActiveMember];
+            if (!h || !data) { showToastNotice("पहले सदस्य चुनें।"); return; }
             const esc = v => String(v == null ? "" : v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-            const memberName = ([id,d]) => String((d && d[1]) || ("सदस्य "+id));
-            const keysFor = (data,id) => Object.keys(data || {}).filter(k => String(k)===String(id) || String(k).startsWith("q"+id+"_")).sort();
-            const valueFor = (data,id) => keysFor(data,id).map(k => {
+            const name = String(data[1] || ("सदस्य " + currentActiveMember));
+            const keysFor = (obj,id) => Object.keys(obj || {}).filter(k => String(k)===String(id) || String(k).startsWith("q"+id+"_")).sort();
+            const valueFor = id => keysFor(data,id).map(k => {
                 const v=data[k];
                 if(v==="" || v===null || v===undefined || (Array.isArray(v)&&!v.length)) return "";
                 const label = k===String(id) ? "" : k.replace(/^q\d+_?/,"").replace(/_/g," ");
                 const value = Array.isArray(v) ? v.join(", ") : (typeof v==="object" ? Object.entries(v).map(([a,b])=>a+": "+b).join("; ") : String(v));
                 return (label ? label+" — " : "")+value;
             }).filter(Boolean).join(" ; ");
-
-            const common = [];
-            const individualByMember = members.map(([id,data])=>({id,data,name:memberName([id,data]),items:[]}));
-            CENSUS_QUESTIONS.forEach(q=>{
-                const vals=members.map(([,d])=>valueFor(d,q.id));
-                const allSame=vals.length>1 && vals.every(v=>v.trim()!=="") && vals.every(v=>v===vals[0]);
-                if(allSame) common.push({q,value:vals[0]});
-                else members.forEach(([,d],i)=>individualByMember[i].items.push({q,value:valueFor(d,q.id)}));
-            });
-
-            const commonHtml = common.length ? common.map(x=>'<div class="common-item"><b>प्रश्न '+x.q.id+'. '+esc(x.q.title)+'</b><div>'+esc(x.value)+'</div></div>').join("") : '<p class="muted">कोई ऐसा प्रश्न नहीं मिला जिसका उत्तर सभी सदस्यों में समान और भरा हुआ हो।</p>';
-            const memberPages = individualByMember.map(m=>{
-                const rows=m.items.map(x=>'<div class="answer-row"><div class="question"><b>प्र. '+x.q.id+'</b> '+esc(x.q.title)+'</div><div class="answer">'+(x.value.trim()?esc(x.value):'<span class="blank">____________________________</span>')+'</div></div>').join("");
-                return '<section class="member-page"><div class="member-head"><span>सदस्य '+esc(m.id)+'</span><h2>'+esc(m.name)+'</h2></div><p class="hint">नीचे केवल वे प्रश्न हैं जिनका उत्तर परिवार के सभी सदस्यों में समान नहीं मिला। खाली स्थान पर उत्तरदाता से जानकारी लेकर भरें।</p>'+rows+'</section>';
+            const rows = CENSUS_QUESTIONS.map(q => {
+                const answer = valueFor(q.id);
+                return '<tr><td class="num">प्र. '+esc(q.id)+'</td><td class="question">'+esc(q.title)+'</td><td class="answer">'+(answer.trim()?esc(answer):'<span class="blank">________________________________</span>')+'</td></tr>';
             }).join("");
-
-            const html='<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>परिवार जनगणना कार्यपत्रक</title><style>
-            *{box-sizing:border-box}body{font-family:Arial,"Noto Sans Devanagari",sans-serif;color:#172033;margin:0;font-size:12px;line-height:1.5}
-            .page{padding:12mm}.top{border-bottom:2px solid #243f60;padding-bottom:10px;margin-bottom:14px}h1{font-size:20px;margin:0 0 7px}h2{font-size:17px;margin:0}.meta{display:flex;flex-wrap:wrap;gap:8px 22px;color:#39485b}.note{margin:12px 0;padding:9px 11px;background:#f3f6f9;border-left:3px solid #58738f}
-            h3{font-size:14px;margin:0 0 8px}.common-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.common-item{border:1px solid #cbd3dc;border-radius:5px;padding:7px 9px;break-inside:avoid}.common-item div{margin-top:3px}
-            .member-page{padding:10mm 12mm;break-before:page}.member-head{display:flex;align-items:center;gap:14px;border-bottom:2px solid #243f60;padding-bottom:8px;margin-bottom:8px}.member-head span{background:#eaf0f6;padding:5px 9px;border-radius:4px;font-weight:bold}.hint,.muted{color:#657184;font-size:11px;margin:5px 0 12px}
-            .answer-row{display:grid;grid-template-columns:40% 60%;border-bottom:1px solid #d9dfe6;padding:7px 4px;break-inside:avoid;min-height:35px}.question{padding-right:8px}.question b{color:#234b70}.answer{overflow-wrap:anywhere}.blank{color:#777}
-            .actions{padding:12px;text-align:center;background:#f4f6f8}.actions button{padding:9px 18px;font-size:14px}.foot{font-size:10px;color:#687386;margin-top:14px}
-            @media print{.actions{display:none}.page{padding:0}.member-page{padding:0;break-before:page}body{font-size:11px}}
-            @page{size:A4;margin:12mm}</style></head><body>
+            const doc = '<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>सदस्य '+esc(currentActiveMember)+' — 40 प्रश्न</title><style>
+            *{box-sizing:border-box}body{font-family:Arial,"Noto Sans Devanagari",sans-serif;color:#172033;margin:0;font-size:12px;line-height:1.45}
+            .sheet{padding:10mm}.head{border-bottom:2px solid #243f60;padding-bottom:9px;margin-bottom:12px}h1{font-size:19px;margin:0 0 7px}.meta{display:flex;flex-wrap:wrap;gap:6px 20px;color:#39485b}.note{background:#f3f6f9;border-left:3px solid #58738f;padding:7px 10px;margin:10px 0 12px}
+            table{width:100%;border-collapse:collapse;table-layout:fixed}th{background:#eaf0f6;text-align:left}th,td{border:1px solid #cbd3dc;padding:7px 6px;vertical-align:top}th.num,td.num{width:11%;white-space:nowrap}th.question,td.question{width:39%}td.answer{width:50%;overflow-wrap:anywhere}.blank{color:#777}.foot{font-size:10px;color:#687386;margin-top:12px}
+            .actions{text-align:center;padding:12px;background:#f4f6f8}.actions button{padding:9px 18px;font-size:14px}
+            @media print{.actions{display:none}.sheet{padding:0}body{font-size:11px}}
+            @page{size:A4;margin:11mm}</style></head><body>
             <div class="actions"><button onclick="window.print()">PDF सेव / Print करें</button></div>
-            <main class="page"><div class="top"><h1>परिवार का जनगणना कार्यपत्रक</h1><div class="meta"><span>मकान संख्या: <b>'+esc(h.houseNo||"—")+'</b></span><span>मुखिया: <b>'+esc(h.headName||memberName(members[0]))+'</b></span><span>कुल सदस्य: <b>'+members.length+'</b></span><span>दिनांक: '+esc(new Date().toLocaleDateString("hi-IN"))+'</span></div></div>
-            <div class="note">इस पृष्ठ पर केवल सभी सदस्यों के बिल्कुल समान और भरे हुए उत्तर दिए गए हैं। इन्हें हर सदस्य के लिए अलग-अलग दोहराने की जरूरत नहीं—फिर भी मूल उत्तरदाता से पुष्टि करें।</div>
-            <h3>भाग A — सभी सदस्यों के समान उत्तर</h3><div class="common-grid">'+commonHtml+'</div>
-            <p class="foot">यह निजी सहायक कार्यपत्रक है, आधिकारिक Census दस्तावेज नहीं। आधिकारिक PE App में वही जानकारी दर्ज करें जिसकी उत्तरदाता से पुष्टि हुई हो।</p></main>
-            <div class="actions"><button onclick="window.print()">PDF सेव / Print करें</button></div>'+memberPages+'</body></html>';
+            <main class="sheet"><div class="head"><h1>व्यक्तिगत सदस्य — 40 प्रश्न कार्यपत्रक</h1><div class="meta"><span>मकान संख्या: <b>'+esc(h.houseNo||"—")+'</b></span><span>सदस्य क्रमांक: <b>'+esc(currentActiveMember)+'</b></span><span>नाम: <b>'+esc(name)+'</b></span><span>दिनांक: '+esc(new Date().toLocaleDateString("hi-IN"))+'</span></div></div>
+            <div class="note">इस PDF में केवल चुने गए सदस्य की जानकारी है। खाली स्थानों को उत्तरदाता से पूछकर नोट करें।</div>
+            <table><thead><tr><th class="num">प्रश्न</th><th class="question">प्रश्न का विवरण</th><th>दर्ज उत्तर</th></tr></thead><tbody>'+rows+'</tbody></table>
+            <p class="foot">यह निजी सहायक कार्यपत्रक है, आधिकारिक Census दस्तावेज नहीं। सभी उत्तरों की उत्तरदाता से पुष्टि करके ही आधिकारिक PE App में दर्ज करें।</p></main></body></html>';
             const win=window.open("","_blank");
             if(!win){showToastNotice("PDF बनाने के लिए popup अनुमति दें।");return;}
-            win.document.open(); win.document.write(html); win.document.close();
+            win.document.open(); win.document.write(doc); win.document.close();
             setTimeout(()=>{try{win.focus();win.print();}catch(e){}},500);
         }
 
