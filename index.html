@@ -10,7 +10,7 @@
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" href="./icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="./icon-192.png">
-    <title>भारत की जनगणना 2027 - परिवार अनुसूची (प्रायोगिक अभ्यास सॉफ्टवेयर)</title>
+    <title>भारत की जनगणना 2027 - 6.2 Smart Family Fast Entry</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -289,7 +289,7 @@
                     <h5 class="mb-0 text-light opacity-90">परिवार अनुसूची - 40 प्रश्नों का ऑनलाइन अभ्यास सॉफ्टवेयर</h5>
                 </div>
                 <div class="text-end mt-2 mt-md-0">
-                    <span class="badge bg-warning text-dark fs-6"><i class="fas fa-flask me-1"></i> प्रायोगिक संस्करण 6.1 Smart Review & Safe Entry</span>
+                    <span class="badge bg-warning text-dark fs-6"><i class="fas fa-flask me-1"></i> प्रायोगिक संस्करण 6.2 Smart Family Fast Entry</span>
                 </div>
             </div>
 
@@ -350,10 +350,57 @@
                     <div class="col-12 col-md-6"><button class="btn btn-success w-100" type="button" onclick="applyFamilySuggestionsToCurrentMember()"><i class="fas fa-magic me-1"></i> इस सदस्य के खाली उत्तरों में सुझाव लगाएं</button></div>
                 </div>
                 <div class="d-grid mt-2"><button class="btn btn-outline-warning" id="review-suggestions-btn" type="button" onclick="reviewNextFamilySuggestion()" disabled><i class="fas fa-clipboard-check me-1"></i> पुष्टि बाकी देखें (0)</button></div>
-                <div class="small text-muted mt-2">सुझाव वाले प्रश्न: 8 राष्ट्रीयता, 9 धर्म, 14 मातृभाषा/अन्य भाषाएं। हर व्यक्ति से पुष्टि करें। अलग उत्तर होने पर PE App में सही उत्तर ही भरें। प्रश्न 10 जाति/समुदाय स्वतः नहीं भरा जाएगा।</div>
+                <div class="small text-muted mt-2">सुझाव वाले प्रश्न: 8 राष्ट्रीयता और 14 मातृभाषा/अन्य भाषाएं। हर व्यक्ति से पुष्टि करें। धर्म, जाति और अन्य व्यक्तिगत उत्तर स्वतः नहीं भरे जाएंगे।</div>
             </div>
         </div>
 
+
+        <div class="card mb-3 border-primary shadow-sm" id="smart-family-fast-entry">
+            <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span><i class="fas fa-bolt me-2"></i>6.2 Smart Family Fast Entry</span>
+                <span class="badge bg-light text-primary">Offline • परिवारवार</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 align-items-end">
+                    <div class="col-12"><h6 class="fw-bold mb-1">एक साथ सदस्य जोड़ें (केवल प्रश्न 1–3)</h6><small class="text-muted">नाम, संबंध और लिंग भरें। बाकी प्रश्न प्रत्येक व्यक्ति से पूछकर अलग-अलग भरें।</small></div>
+                    <div class="col-12 col-md-4"><label class="form-label">सदस्य का नाम</label><input id="fast-member-name" class="form-control" maxlength="100" placeholder="पूरा नाम"></div>
+                    <div class="col-6 col-md-4"><label class="form-label">मुखिया से संबंध</label><select id="fast-member-relation" class="form-select"><option value="">चुनें</option><option>मुखिया - 01</option><option>पति/पत्नी - 02</option><option>पुत्र/पुत्री - 03</option><option>पुत्रवधू/दामाद - 04</option><option>पोता/पोती - 05</option><option>माता/पिता - 06</option><option>भाई/बहन - 07</option><option>अन्य रिश्तेदार - 08</option><option>गैर-रिश्तेदार - 09</option></select></div>
+                    <div class="col-6 col-md-2"><label class="form-label">लिंग</label><select id="fast-member-gender" class="form-select"><option value="">चुनें</option><option>पुरुष</option><option>महिला</option><option>ट्रांसजेंडर व्यक्ति</option></select></div>
+                    <div class="col-12 col-md-2"><button class="btn btn-success w-100" onclick="fastAddFamilyMember()"><i class="fas fa-user-plus me-1"></i> जोड़ें</button></div>
+                </div>
+                <hr>
+                <div class="row g-3">
+                    <div class="col-12 col-lg-6">
+                        <h6 class="fw-bold">Family Master Profile (केवल नोट्स)</h6>
+                        <small class="text-muted d-block mb-2">यह परिवार की सामान्य जानकारी रखने के लिए है। इससे कोई Census उत्तर अपने-आप नहीं भरेगा।</small>
+                        <label class="form-label">परिवार संबंधी नोट्स</label>
+                        <textarea id="family-profile-notes" class="form-control" rows="3" maxlength="1000" placeholder="उदाहरण: संयुक्त परिवार / दादा-दादी साथ रहते हैं / वास्तविक सदस्य क्रम अलग-अलग हो सकता है"></textarea>
+                        <button class="btn btn-outline-primary btn-sm mt-2" onclick="saveFamilyMasterProfile()">प्रोफाइल नोट्स सेव करें</button>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <h6 class="fw-bold">Selective Smart Copy</h6>
+                        <small class="text-muted d-block mb-2">सिर्फ चुने हुए खाली उत्तरों में सुझाव लगेंगे। हर सुझाव व्यक्ति से पुष्टि के बाद ही सही मानें।</small>
+                        <label class="form-check"><input class="form-check-input" type="checkbox" id="copy-q8" checked> प्रश्न 8 – राष्ट्रीयता</label>
+                        <label class="form-check"><input class="form-check-input" type="checkbox" id="copy-q14"> प्रश्न 14 – मातृभाषा / अन्य भाषा</label>
+                        <button class="btn btn-outline-success btn-sm mt-2" onclick="copySelectedFamilySuggestions()">चुने हुए सुझाव लगाएं</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-3 border-info shadow-sm" id="family-dashboard">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h6 class="fw-bold mb-0"><i class="fas fa-chart-pie text-info me-2"></i>Family Dashboard & Missing Answer Alerts</h6>
+                    <button class="btn btn-outline-info btn-sm" onclick="refreshSmartFamilyDashboard()">अपडेट करें</button>
+                </div>
+                <div id="smart-family-dashboard-content" class="mt-3 small">डैशबोर्ड तैयार हो रहा है…</div>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <button class="btn btn-success btn-sm" onclick="oneTapFamilySummary()"><i class="fas fa-file-alt me-1"></i> एक क्लिक में परिवार सारांश</button>
+                    <button class="btn btn-outline-primary btn-sm" onclick="showMissingAnswerAlerts()"><i class="fas fa-clipboard-check me-1"></i> अधूरे उत्तर देखें</button>
+                </div>
+                <div id="smart-missing-alerts" class="mt-3"></div>
+            </div>
+        </div>
         <div class="control-bar">
             <div class="d-flex gap-2 align-items-center flex-wrap">
                 <span class="fw-bold text-dark me-2"><i class="fas fa-sliders-h me-1"></i> कार्य शैली:</span>
@@ -370,7 +417,7 @@
 
             <div class="d-flex gap-2 flex-wrap">
                 <button class="btn btn-warning btn-sm fw-bold text-dark" onclick="downloadThisSoftware()">
-                    <i class="fas fa-download me-1"></i> सॉफ्टवेयर डाउनलोड करें (v6.1)
+                    <i class="fas fa-download me-1"></i> सॉफ्टवेयर डाउनलोड करें (v6.2)
                 </button>
 
                 <button class="btn btn-share btn-sm" onclick="shareDataOnWhatsApp()">
@@ -1635,6 +1682,93 @@
                 req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error);
             });
         }
+
+        function fastAddFamilyMember() {
+            const name=(document.getElementById('fast-member-name')?.value||'').trim();
+            const relation=document.getElementById('fast-member-relation')?.value||'';
+            const gender=document.getElementById('fast-member-gender')?.value||'';
+            if(!name || !relation || !gender) { showToastNotice('नाम, संबंध और लिंग तीनों भरें।'); return; }
+            const next=String(Math.max(0,...Object.keys(familyCensusData).map(Number))+1);
+            familyCensusData[next]={1:name,2:relation,3:gender};
+            currentActiveMember=next;
+            saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
+            ['fast-member-name','fast-member-relation','fast-member-gender'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+            refreshSmartFamilyDashboard();
+            showToastNotice('सदस्य '+next+' जोड़ा गया। अब बाकी प्रश्नों की व्यक्तिगत पुष्टि करें।');
+        }
+        function saveFamilyMasterProfile() {
+            const h=households[activeHouseholdId]; if(!h)return;
+            h.familyProfileNotes=(document.getElementById('family-profile-notes')?.value||'').trim();
+            saveLocalState(); showToastNotice('Family Master Profile के नोट्स सेव हो गए। कोई Census उत्तर स्वतः नहीं भरा गया।');
+        }
+        function copySelectedFamilySuggestions() {
+            const h=households[activeHouseholdId], p=h&&h.familySuggestions;
+            if(!p) { showToastNotice('पहले परिवार सुझाव सेव करें।'); return; }
+            const m=getCurrentMemberData(); let count=0;
+            const apply=(enabled,key,value,flag)=>{
+                if(enabled && value && (m[key]===undefined || String(m[key]).trim()==='')) {m[key]=value;m[flag]=true;count++;}
+            };
+            apply(document.getElementById('copy-q8')?.checked,'8',p.nationality,'q8_family_suggested');
+            const use14=!!document.getElementById('copy-q14')?.checked;
+            apply(use14,'q14_mother_tongue',p.motherTongue,'q14_mother_tongue_family_suggested');
+            apply(use14,'q14_lang1',p.lang1,'q14_lang1_family_suggested');
+            apply(use14,'q14_lang2',p.lang2,'q14_lang2_family_suggested');
+            saveLocalState();renderFormQuestions();updateConditionalLocks();refreshSmartFamilyDashboard();
+            showToastNotice(count+' सुझाव लगाए गए (या कोई खाली चयनित उत्तर नहीं मिला)। इन्हें व्यक्ति से सत्यापित करें।');
+        }
+        function questionHasValue(m,qid) {
+            if(!m)return false;
+            const keys=Object.keys(m).filter(k=>k===String(qid)||k.startsWith('q'+qid+'_'));
+            return keys.some(k=>m[k]!==null && m[k]!==undefined && String(m[k]).trim()!=='');
+        }
+        function refreshSmartFamilyDashboard() {
+            const out=document.getElementById('smart-family-dashboard-content'); if(!out)return;
+            const ids=Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
+            const total=ids.length;
+            const named=ids.filter(id=>String(familyCensusData[id]?.[1]||'').trim()).length;
+            const rows=ids.map(id=>{
+                const m=familyCensusData[id]||{};
+                const answered=CENSUS_QUESTIONS.filter(q=>questionHasValue(m,q.id)).length;
+                const missing=CENSUS_QUESTIONS.filter(q=>!questionHasValue(m,q.id)).map(q=>q.id);
+                return {id,name:m[1]||'नाम दर्ज नहीं',answered,missing};
+            });
+            const totalAnswered=rows.reduce((n,r)=>n+r.answered,0);
+            const totalPossible=total*40;
+            out.innerHTML=`
+                <div class="row g-2 mb-3">
+                    <div class="col-4"><div class="p-2 bg-light rounded text-center"><strong class="d-block fs-5">${total}</strong>कुल सदस्य</div></div>
+                    <div class="col-4"><div class="p-2 bg-light rounded text-center"><strong class="d-block fs-5">${named}</strong>नाम दर्ज</div></div>
+                    <div class="col-4"><div class="p-2 bg-light rounded text-center"><strong class="d-block fs-5">${totalPossible?Math.round(totalAnswered/totalPossible*100):0}%</strong>उत्तर प्रगति*</div></div>
+                </div>
+                <div class="progress mb-2" role="progressbar" aria-label="उत्तर प्रगति" aria-valuenow="${totalPossible?Math.round(totalAnswered/totalPossible*100):0}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar" style="width:${totalPossible?Math.round(totalAnswered/totalPossible*100):0}%"></div></div>
+                <div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead><tr><th>सदस्य</th><th>भरे प्रश्न*</th><th>अधूरे</th><th></th></tr></thead><tbody>
+                ${rows.map(r=>`<tr><td>${escapeHTML(r.id+'. '+r.name)}</td><td>${r.answered}/40</td><td>${r.missing.length}</td><td><button class="btn btn-outline-primary btn-sm" onclick="openMemberFromDashboard('${r.id}')">खोलें</button></td></tr>`).join('')}
+                </tbody></table></div>
+                <small class="text-muted">*यह तकनीकी प्रगति संकेतक है। लागू न होने वाले प्रश्न भी अधूरे दिख सकते हैं; अंतिम निर्णय आधिकारिक प्रश्नावली और व्यक्ति के उत्तर से करें।</small>`;
+            const notes=document.getElementById('family-profile-notes'); if(notes && document.activeElement!==notes)notes.value=households[activeHouseholdId]?.familyProfileNotes||'';
+        }
+        function openMemberFromDashboard(id) {
+            changeActiveMember(String(id));
+            document.getElementById('smart-family-fast-entry')?.scrollIntoView({behavior:'smooth',block:'start'});
+        }
+        function showMissingAnswerAlerts() {
+            const box=document.getElementById('smart-missing-alerts'); if(!box)return;
+            const ids=Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
+            box.innerHTML=ids.map(id=>{
+                const m=familyCensusData[id]||{};
+                const missing=CENSUS_QUESTIONS.filter(q=>!questionHasValue(m,q.id));
+                return `<div class="border rounded p-2 mb-2"><strong>सदस्य ${escapeHTML(id)} – ${escapeHTML(m[1]||'नाम दर्ज नहीं')}</strong><div class="text-muted">जिन प्रश्नों में अभी कोई उत्तर दर्ज नहीं: ${missing.map(q=>q.id).join(', ')||'कोई नहीं'}</div></div>`;
+            }).join('');
+            box.scrollIntoView({behavior:'smooth',block:'nearest'});
+        }
+        function oneTapFamilySummary() {
+            const report=generateSummaryReport();
+            const box=document.getElementById('summary-output-container');
+            if(box){box.classList.remove('d-none');box.scrollIntoView({behavior:'smooth',block:'start'});}
+            const textEl=document.getElementById('summary-text');
+            if(textEl) textEl.innerText=report+'\\n\\nडैशबोर्ड: '+Object.keys(familyCensusData).length+' सदस्य। यह समीक्षा हेतु है; आधिकारिक PE App में प्रविष्टि अलग से करें।';
+        }
+
         async function initApp() {
             try {
                 await openCensusDB();
@@ -1654,7 +1788,8 @@
             }
             activeHouseholdId = Object.keys(households)[0];
             loadActiveHousehold(); refreshHouseholdUI(); renderFormQuestions(); renderMemberSelector();
-            setupSecurityWatchdog(); updateConditionalLocks(); updateMembersRemainingBadge(); renderFamilySuggestionsStatus();
+            setupSecurityWatchdog(); updateConditionalLocks(); updateMembersRemainingBadge(); renderFamilySuggestionsStatus(); refreshSmartFamilyDashboard();
+            refreshSmartFamilyDashboard();
         }
         function loadActiveHousehold() {
             const h=households[activeHouseholdId];
@@ -1672,6 +1807,7 @@
             if (censusDB) dbRequest('readwrite','put',h).then(()=>{ const el=document.getElementById('db-status'); if(el) el.textContent='डेटा IndexedDB में सेव हो गया'; }).catch(()=>{});
             refreshHouseholdUI();
             renderFamilySuggestionsStatus();
+            refreshSmartFamilyDashboard();
         }
         function refreshHouseholdUI() {
             const sel=document.getElementById('household-select'); if(!sel) return;
@@ -1689,13 +1825,12 @@
             const m = getCurrentMemberData();
             const profile = {
                 nationality: String(m['8'] || '').trim(),
-                religion: String(m['9'] || '').trim(),
                 motherTongue: String(m['q14_mother_tongue'] || '').trim(),
                 lang1: String(m['q14_lang1'] || '').trim(),
                 lang2: String(m['q14_lang2'] || '').trim()
             };
             if (!Object.values(profile).some(Boolean)) {
-                showToastNotice('पहले वर्तमान सदस्य में प्रश्न 8, 9 या 14 की जानकारी भरें।');
+                showToastNotice('पहले वर्तमान सदस्य में प्रश्न 8 या 14 की जानकारी भरें।');
                 return;
             }
             const h = households[activeHouseholdId];
@@ -1723,7 +1858,6 @@
                 }
             };
             apply('8', p.nationality, 'q8_family_suggested');
-            apply('9', p.religion, 'q9_family_suggested');
             apply('q14_mother_tongue', p.motherTongue, 'q14_mother_tongue_family_suggested');
             apply('q14_lang1', p.lang1, 'q14_lang1_family_suggested');
             apply('q14_lang2', p.lang2, 'q14_lang2_family_suggested');
@@ -1732,14 +1866,13 @@
             renderMemberSelector();
             updateConditionalLocks();
             updateMembersRemainingBadge();
-            showToastNotice(count ? count + ' खाली उत्तरों में सुझाव लगाए गए। प्रश्न 8, 9 और 14 की व्यक्ति से पुष्टि करें।' : 'इस सदस्य के संबंधित उत्तर पहले से भरे हैं; कोई बदलाव नहीं किया गया।');
+            showToastNotice(count ? count + ' खाली उत्तरों में सुझाव लगाए गए। प्रश्न 8 और 14 की व्यक्ति से पुष्टि करें।' : 'इस सदस्य के संबंधित उत्तर पहले से भरे हैं; कोई बदलाव नहीं किया गया।');
         }
 
         function getPendingFamilySuggestionItems() {
             const fields = [
                 { key:'8', flag:'q8_family_suggested', question:8, label:'राष्ट्रीयता' },
-                { key:'9', flag:'q9_family_suggested', question:9, label:'धर्म' },
-                { key:'q14_mother_tongue', flag:'q14_mother_tongue_family_suggested', question:14, label:'मातृभाषा' },
+                                { key:'q14_mother_tongue', flag:'q14_mother_tongue_family_suggested', question:14, label:'मातृभाषा' },
                 { key:'q14_lang1', flag:'q14_lang1_family_suggested', question:14, label:'अन्य भाषा 1' },
                 { key:'q14_lang2', flag:'q14_lang2_family_suggested', question:14, label:'अन्य भाषा 2' }
             ];
@@ -2551,6 +2684,7 @@
             const filled=Object.values(familyCensusData).filter(m=>m && m[1]).length;
             document.getElementById('members-remaining-text').innerText = `कुल ${total} सदस्य | नाम दर्ज: ${filled} | जरूरत के अनुसार सदस्य जोड़ें`;
             renderMemberSelector();
+            refreshSmartFamilyDashboard();
         }
 
         function scrollToQuestion7() {
