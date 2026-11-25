@@ -1677,6 +1677,7 @@
             sel.innerHTML=Object.values(households).sort((a,b)=>Number(a.houseNo)-Number(b.houseNo)).map(h=>`<option value="${escapeHTML(h.id)}" ${h.id===activeHouseholdId?'selected':''}>घर ${escapeHTML(h.houseNo)} — ${escapeHTML(h.headName||'मुखिया का नाम नहीं')}</option>`).join('');
             document.getElementById('household-count').textContent='कुल घर: '+Object.keys(households).length;
             const h=households[activeHouseholdId]; if(h){document.getElementById('pe-status').value=h.peStatus||'pending';document.getElementById('pe-progress').textContent='PE App Entry: '+((h.peStatus==='completed')?'Completed':'Pending');}
+            renderFamilySuggestionsStatus();
         }
         function renderMemberSelector() {
             const sel=document.getElementById('member-select'); if(!sel) return;
