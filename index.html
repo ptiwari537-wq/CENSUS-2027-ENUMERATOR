@@ -331,6 +331,8 @@
                 <label for="member-select" class="fw-bold text-dark mb-0 fs-6">सदस्य का क्रमांक:</label>
                 <select id="member-select" class="form-select form-select-sm fw-bold border-primary" style="width: auto; min-width: 130px;" onchange="changeActiveMember(this.value)"></select>
                 <button type="button" class="btn btn-primary btn-sm" onclick="addFamilyMember()"><i class="fas fa-user-plus me-1"></i> सदस्य जोड़ें</button>
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="editCurrentMember()"><i class="fas fa-user-edit me-1"></i> सदस्य Edit</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteCurrentMember()"><i class="fas fa-user-times me-1"></i> सदस्य Delete</button>
             </div>
             <div class="text-muted small fw-semibold">
                 <i class="fas fa-info-circle me-1 text-info"></i> सदस्यवार या प्रश्नवार तरीका चुनकर डेटा भरें
@@ -1681,6 +1683,24 @@
             const next=String(Math.max(0,...Object.keys(familyCensusData).map(Number))+1);
             familyCensusData[next]={}; currentActiveMember=next; saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
             showToastNotice('सदस्य '+next+' जोड़ा गया।');
+        }
+        function editCurrentMember() {
+            if(!familyCensusData[currentActiveMember]) { showToastNotice('पहले सदस्य चुनें।'); return; }
+            renderFormQuestions(); renderMemberSelector(); updateConditionalLocks();
+            const firstQuestion=document.getElementById('q-card-1');
+            if(firstQuestion) firstQuestion.scrollIntoView({behavior:'smooth',block:'start'});
+            showToastNotice('सदस्य '+currentActiveMember+' का डेटा Edit करें।');
+        }
+        function deleteCurrentMember() {
+            const ids=Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b));
+            if(ids.length<=1) { showToastNotice('कम से कम एक सदस्य रखना जरूरी है।'); return; }
+            const deleting=currentActiveMember;
+            const memberName=familyCensusData[deleting]?.[1] || ('सदस्य '+deleting);
+            if(!confirm('क्या '+memberName+' का पूरा डेटा हटाना चाहते हैं? यह कार्रवाई वापस नहीं होगी।')) return;
+            delete familyCensusData[deleting];
+            currentActiveMember=ids.filter(id=>id!==deleting).sort((a,b)=>Number(a)-Number(b))[0];
+            saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
+            showToastNotice('सदस्य '+deleting+' का डेटा हटा दिया गया।');
         }
         function updatePEStatus(value) { const h=households[activeHouseholdId]; if(h){h.peStatus=value;saveLocalState();refreshHouseholdUI();} }
         function deleteCurrentHousehold() {
