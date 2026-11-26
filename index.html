@@ -1917,11 +1917,22 @@
             showToastNotice('सदस्य '+deleting+' का डेटा हटा दिया गया।');
         }
         function updatePEStatus(value) { const h=households[activeHouseholdId]; if(h){h.peStatus=value;saveLocalState();refreshHouseholdUI();} }
-        function deleteCurrentHousehold() {
+        async function deleteCurrentHousehold() {
             if(Object.keys(households).length<=1){showToastNotice('कम से कम एक घर रखना जरूरी है।');return;}
             if(!confirm('क्या इस घर और इसके सभी सदस्यों का डेटा हटाना चाहते हैं?')) return;
-            const old=activeHouseholdId; delete households[old]; if(censusDB) dbRequest('readwrite','delete',old);
-            activeHouseholdId=Object.keys(households)[0];loadActiveHousehold();saveLocalState();refreshHouseholdUI();renderFormQuestions();renderMemberSelector();updateConditionalLocks();updateMembersRemainingBadge();
+            const old=activeHouseholdId;
+            delete households[old];
+            if(censusDB) await dbRequest('readwrite','delete',old).catch(()=>{});
+            // मकान की दिखाई देने वाली संख्या 001 से लगातार रखें; स्थायी ID न बदलें,
+            // ताकि IndexedDB और परिवार के रिकॉर्ड आपस में जुड़े रहें।
+            const ordered=Object.values(households).sort((a,b)=>(Number(a.houseNo)||0)-(Number(b.houseNo)||0));
+            ordered.forEach((h,i)=>{ h.houseNo=String(i+1).padStart(3,'0'); h.updatedAt=new Date().toISOString(); });
+            activeHouseholdId=ordered[0].id;
+            loadActiveHousehold();
+            try { localStorage.setItem('census_manager_fallback', JSON.stringify({activeHouseholdId,households})); } catch(e) {}
+            if(censusDB) await Promise.all(ordered.map(h=>dbRequest('readwrite','put',h).catch(()=>null)));
+            refreshHouseholdUI();renderFormQuestions();renderMemberSelector();updateConditionalLocks();updateMembersRemainingBadge();
+            showToastNotice('घर हटाया गया। बाकी घरों का क्रम 001 से सही कर दिया गया।');
         }
         function downloadCurrentMemberPDF() {
             const h = households[activeHouseholdId];
