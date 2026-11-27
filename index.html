@@ -264,6 +264,12 @@
             min-width: 300px;
         }
 
+        .household-progress-wrap { margin-top:14px; padding:12px; background:#f8fafc; border:1px solid #dbe4ee; border-radius:10px; }
+        .household-progress-track { height:12px; background:#e5e7eb; border-radius:20px; overflow:hidden; }
+        .household-progress-fill { height:100%; width:0%; background:#16a34a; border-radius:20px; transition:width .25s ease; }
+        .household-progress-meta { display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-size:.88rem; font-weight:600; }
+        .household-state-done { color:#15803d; font-weight:700; }
+        .household-state-pending { color:#b45309; font-weight:700; }
         .info-notice-banner {
             background-color: #fff3cd;
             border: 1px solid #ffeeba;
@@ -322,6 +328,14 @@
                     <div class="col-6 col-md-4"><div class="d-flex gap-2"><button class="btn btn-outline-primary flex-fill" type="button" onclick="exportCurrentHouseholdBackup()">इस घर का Backup</button><button class="btn btn-outline-danger" type="button" onclick="deleteCurrentHousehold()" title="घर हटाएँ"><i class="fas fa-trash"></i></button></div></div>
                 </div>
                 <div class="mt-3 d-flex flex-wrap gap-3 small"><span id="household-count">कुल घर: 1</span><span id="db-status" class="text-success">Offline Database तैयार</span><span id="pe-progress">PE App Entry: Pending</span></div>
+                <div class="household-progress-wrap">
+                    <div class="household-progress-meta mb-2"><span id="household-work-summary">परिवार का काम: 0 / 0 पूरा</span><span id="household-work-percent">0%</span></div>
+                    <div class="household-progress-track"><div id="household-work-bar" class="household-progress-fill"></div></div>
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-2">
+                        <small id="active-household-work-status" class="household-state-pending">⏳ इस परिवार का काम बाकी है</small>
+                        <button id="toggle-household-work-btn" type="button" class="btn btn-sm btn-success" onclick="toggleCurrentHouseholdWork()">✓ इस परिवार का काम पूरा करें</button>
+                    </div>
+                </div>
                 <div id="restore-status" class="small mt-2 text-primary fw-semibold" role="status" aria-live="polite">Backup स्थिति: अभी जाँच नहीं हुई</div>
             </div>
         </div>
@@ -1769,10 +1783,31 @@
         }
         function refreshHouseholdUI() {
             const sel=document.getElementById('household-select'); if(!sel) return;
-            sel.innerHTML=Object.values(households).sort((a,b)=>Number(a.houseNo)-Number(b.houseNo)).map(h=>`<option value="${escapeHTML(h.id)}" ${h.id===activeHouseholdId?'selected':''}>घर ${escapeHTML(h.houseNo)} — ${escapeHTML(h.headName||'मुखिया का नाम नहीं')}</option>`).join('');
+            const ordered=Object.values(households).sort((a,b)=>Number(a.houseNo)-Number(b.houseNo));
+            sel.innerHTML=ordered.map(h=>{const done=h.workCompleted===true;return `<option value="${escapeHTML(h.id)}" ${h.id===activeHouseholdId?'selected':''}>${done?'✓ पूरा':'⏳ बाकी'} | घर ${escapeHTML(h.houseNo)} — ${escapeHTML(h.headName||'मुखिया का नाम नहीं')}</option>`;}).join('');
             document.getElementById('household-count').textContent='कुल घर: '+Object.keys(households).length;
-            const h=households[activeHouseholdId]; if(h){document.getElementById('pe-status').value=h.peStatus||'pending';document.getElementById('pe-progress').textContent='PE App Entry: '+((h.peStatus==='completed')?'Completed':'Pending');}
+            const h=households[activeHouseholdId];
+            if(h){
+                document.getElementById('pe-status').value=h.peStatus||'pending';
+                document.getElementById('pe-progress').textContent='PE App Entry: '+((h.peStatus==='completed')?'Completed':'Pending');
+                const done=h.workCompleted===true, status=document.getElementById('active-household-work-status'), btn=document.getElementById('toggle-household-work-btn');
+                if(status){status.textContent=done?'✓ इस परिवार का काम पूरा है':'⏳ इस परिवार का काम बाकी है';status.className=done?'household-state-done':'household-state-pending';}
+                if(btn){btn.textContent=done?'↩ काम Pending करें':'✓ इस परिवार का काम पूरा करें';btn.className=done?'btn btn-sm btn-outline-warning':'btn btn-sm btn-success';}
+            }
+            const total=ordered.length, completed=ordered.filter(x=>x.workCompleted===true).length, percent=total?Math.round(completed*100/total):0;
+            const summary=document.getElementById('household-work-summary'), pct=document.getElementById('household-work-percent'), bar=document.getElementById('household-work-bar');
+            if(summary) summary.textContent='परिवार का काम: '+completed+' / '+total+' पूरा';
+            if(pct) pct.textContent=percent+'%';
+            if(bar) bar.style.width=percent+'%';
             renderFamilySuggestionsStatus();
+        }
+
+        function toggleCurrentHouseholdWork() {
+            const h=households[activeHouseholdId]; if(!h) return;
+            if(h.workCompleted===true){h.workCompleted=false;saveLocalState();showToastNotice('इस परिवार का काम फिर से Pending कर दिया गया।');return;}
+            const total=Object.keys(familyCensusData||{}).length;
+            if(!confirm('क्या आपने इस परिवार के सभी सदस्यों का विवरण जाँचकर पूरा कर लिया है? कुल सदस्य: '+total+'।')) return;
+            h.workCompleted=true;saveLocalState();showToastNotice('इस परिवार को पूरा चिह्नित कर दिया गया।');
         }
         function renderMemberSelector() {
             const sel=document.getElementById('member-select'); if(!sel) return;
@@ -1893,7 +1928,7 @@
         }
         function addFamilyMember() {
             const next=String(Math.max(0,...Object.keys(familyCensusData).map(Number))+1);
-            familyCensusData[next]={}; currentActiveMember=next; saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
+            familyCensusData[next]={}; if(households[activeHouseholdId]) households[activeHouseholdId].workCompleted=false; currentActiveMember=next; saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
             showToastNotice('सदस्य '+next+' जोड़ा गया।');
         }
         function editCurrentMember() {
@@ -1909,7 +1944,7 @@
             const deleting=currentActiveMember;
             const memberName=familyCensusData[deleting]?.[1] || ('सदस्य '+deleting);
             if(!confirm('क्या '+memberName+' का पूरा डेटा हटाना चाहते हैं? यह कार्रवाई वापस नहीं होगी।')) return;
-            delete familyCensusData[deleting];
+            delete familyCensusData[deleting]; if(households[activeHouseholdId]) households[activeHouseholdId].workCompleted=false;
             const remaining=ids.filter(id=>id!==deleting).map(id=>familyCensusData[id]);
             familyCensusData={}; remaining.forEach((m,i)=>familyCensusData[String(i+1)]=m);
             currentActiveMember='1';
@@ -2002,6 +2037,8 @@
 
         function updateValue(key, value) {
             const mData = getCurrentMemberData();
+            const activeHouse=households[activeHouseholdId];
+            if(activeHouse && activeHouse.workCompleted===true) activeHouse.workCompleted=false;
             mData[key] = value;
             if(String(key)==='1' && !String(mData['3']||'').trim()){const g=guessIndianNameGender(value);if(g)mData['3']=g;}
             if(String(key) === '5') mData.q5_auto_suggested = false;
