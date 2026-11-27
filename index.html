@@ -2051,6 +2051,10 @@
             saveLocalState();
             updateConditionalLocks();
             updateMembersRemainingBadge();
+            if(String(key) === '19' && mData[18] === 'दीर्घकालिक कर्मी (यदि 6 माह या उससे ज्यादा काम किया हो)' && value === 'काश्तकार') {
+                document.getElementById('q-card-26')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                showToastNotice('प्रश्न 20–25 इस चयन के लिए लॉक हैं। सीधे प्रश्न 26 पर जाएँ।');
+            }
         }
 
         function changeActiveMember(mNum) {
@@ -2735,14 +2739,17 @@
             const q18Val = mData[18] || '';
             const isNonWorker = q18Val === 'गैर कर्मी (यदि कोई काम नहीं किया)';
             const isWorker = q18Val.includes('कर्मी') && !isNonWorker;
+            // User-requested shortcut: दीर्घकालिक कर्मी + काश्तकार होने पर Q20-Q25 छोड़कर Q26 पर जाएँ।
+            const skipWorkDetails = q18Val === 'दीर्घकालिक कर्मी (यदि 6 माह या उससे ज्यादा काम किया हो)' && mData[19] === 'काश्तकार';
+            const skipReason = "दीर्घकालिक कर्मी + काश्तकार चयन होने पर इस ऐप में प्रश्न 20–25 छोड़े गए हैं";
 
             applyCardLock(19, isNonWorker, "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
-            applyCardLock(20, isNonWorker, "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
-            applyCardLock(21, isNonWorker, "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
-            applyCardLock(22, isNonWorker, "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
-            applyCardLock(25, isNonWorker, "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
-
-            applyCardLock(23, isWorker, "केवल गैर-कर्मियों के लिए लागू (कर्मियों हेतु बंद)");
+            applyCardLock(20, isNonWorker || skipWorkDetails, skipWorkDetails ? skipReason : "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
+            applyCardLock(21, isNonWorker || skipWorkDetails, skipWorkDetails ? skipReason : "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
+            applyCardLock(22, isNonWorker || skipWorkDetails, skipWorkDetails ? skipReason : "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
+            applyCardLock(23, isWorker || skipWorkDetails, skipWorkDetails ? skipReason : "केवल गैर-कर्मियों के लिए लागू (कर्मियों हेतु बंद)");
+            applyCardLock(24, skipWorkDetails, skipReason);
+            applyCardLock(25, isNonWorker || skipWorkDetails, skipWorkDetails ? skipReason : "केवल कर्मियों के लिए लागू (गैर-कर्मी हेतु बंद)");
 
             document.getElementById('q13-types-box')?.classList.toggle('d-none', mData['q13_has'] !== 'हाँ');
             document.getElementById('q34-loc-box')?.classList.toggle('d-none', mData['q34_vaccinated'] !== 'हाँ');
