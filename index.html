@@ -2045,11 +2045,39 @@
             return member;
         }
 
+        function estimateQ25TravelTime(distanceKm, travelMode) {
+            const distance = Number(distanceKm);
+            if (!Number.isFinite(distance) || distance <= 0) return '';
+            const speeds = {
+                'पैदल': 4,
+                'साइकिल': 12,
+                'मोपेड/स्कूटर/मोटर साइकिल': 25,
+                'कार/जीप/वैन': 30,
+                'टेम्पो/ऑटोरिक्शा/टैक्सी': 20,
+                'बस': 20,
+                'ट्रेन/मेट्रो रेल': 40,
+                'जल परिवहन': 15,
+                'अन्य साधन': 20
+            };
+            // If no mode is selected yet, use walking speed as a temporary estimate.
+            const speed = travelMode === 'यात्रा नहीं' ? 0 : (speeds[travelMode] || 4);
+            if (speed === 0) return '0 घंटे 0 मिनट';
+            const totalMinutes = Math.max(1, Math.round((distance / speed) * 60));
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+            return hours + ' घंटे ' + minutes + ' मिनट';
+        }
+
         function updateValue(key, value) {
             const mData = getCurrentMemberData();
             const activeHouse=households[activeHouseholdId];
             if(activeHouse && activeHouse.workCompleted===true) activeHouse.workCompleted=false;
             mData[key] = value;
+            if(String(key) === 'q25_dist' || String(key) === 'q25_mode') {
+                mData['q25_time'] = estimateQ25TravelTime(mData['q25_dist'], mData['q25_mode']);
+                const timeInput = document.querySelector('#q-card-25 input[placeholder="उदा. 0 घंटे 45 मिनट"]');
+                if(timeInput) timeInput.value = mData['q25_time'];
+            }
             if(String(key)==='1' && !String(mData['3']||'').trim()){const g=guessIndianNameGender(value);if(g)mData['3']=g;}
             if(String(key) === '5') mData.q5_auto_suggested = false;
             const suggestionFlags = {
@@ -2460,6 +2488,7 @@
                         <div class="col-md-6">
                             <label class="form-label fw-bold">25 (क) (ii) यात्रा समय (घंटे एवं मिनट)</label>
                             <input type="text" class="form-control" placeholder="उदा. 0 घंटे 45 मिनट" value="${escapeAttr(mData['q25_time'] || '')}" oninput="updateValue('q25_time', this.value)">
+                            <div class="form-text">दूरी और यात्रा के साधन के आधार पर अनुमानित समय अपने-आप भरेगा। उत्तरदाता से पुष्टि करें; जरूरत हो तो समय बदल सकते हैं। साधन चुनने से पहले पैदल गति के आधार पर अस्थायी अनुमान आएगा।</div>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-bold">25 (ख) यात्रा का साधन</label>
