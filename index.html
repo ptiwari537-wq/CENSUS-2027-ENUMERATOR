@@ -2219,6 +2219,12 @@
                             <input class="form-check-input" type="radio" name="q10_other_opt" id="q10_other_3" value="कोई जाति नहीं" ${other_caste_opt === 'कोई जाति नहीं' ? 'checked' : ''} ${otherLocked ? 'disabled' : ''} onchange="handleCasteSelection('other', 'कोई जाति नहीं')">
                             <label class="form-check-label" for="q10_other_3">कोई जाति नहीं</label>
                         </div>
+                    </div>
+                    <div class="mt-3 p-3 border border-success rounded bg-light">
+                        <div class="small text-muted mb-2">यदि परिवार के अन्य सदस्यों की जाति भी यही है, तो पुष्टि करके नीचे दिए बटन से कॉपी करें। हर सदस्य की जानकारी अलग से सत्यापित करें।</div>
+                        <button type="button" class="btn btn-success w-100" onclick="copyCasteToAllMembers()">
+                            <i class="fas fa-copy me-1"></i> इस जाति को परिवार के सभी सदस्यों में कॉपी करें
+                        </button>
                     </div>`;
 
                 case 'parent_block':
@@ -2581,6 +2587,37 @@
 
             renderFormQuestions();
             updateConditionalLocks();
+        }
+
+        function copyCasteToAllMembers() {
+            const source = getCurrentMemberData();
+            const caste = {
+                q10_sc: source.q10_sc || '',
+                q10_sc_name: source.q10_sc === 'हाँ' ? (source.q10_sc_name || '') : '',
+                q10_st: source.q10_st || '',
+                q10_st_name: source.q10_st === 'हाँ' ? (source.q10_st_name || '') : '',
+                q10_other_opt: source.q10_other_opt || '',
+                q10_other_name: source.q10_other_opt === 'जाति का नाम लिखें' ? (source.q10_other_name || '') : ''
+            };
+            if (!caste.q10_sc && !caste.q10_st && !caste.q10_other_opt) {
+                showToastNotice('पहले वर्तमान सदस्य का प्रश्न 10 पूरा करें।');
+                return;
+            }
+            const total = Object.keys(familyCensusData || {}).length;
+            if (total < 2) {
+                showToastNotice('इस परिवार में अभी केवल एक सदस्य है।');
+                return;
+            }
+            if (!confirm('क्या प्रश्न 10 की वर्तमान जाति जानकारी परिवार के सभी ' + total + ' सदस्यों पर लागू करनी है? अलग जाति वाले सदस्य की जानकारी बाद में अलग से बदलें।')) return;
+            Object.keys(familyCensusData).forEach(id => {
+                const member = familyCensusData[id] || (familyCensusData[id] = {});
+                Object.keys(caste).forEach(key => { member[key] = caste[key]; });
+            });
+            saveLocalState();
+            renderFormQuestions();
+            updateConditionalLocks();
+            updateMembersRemainingBadge();
+            showToastNotice('प्रश्न 10 की जानकारी ' + total + ' सदस्यों में कॉपी कर दी गई।');
         }
 
         function toggleDisabilityOption(dOpt) {
