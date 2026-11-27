@@ -1146,7 +1146,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">25 (क) (ii) यात्रा समय (घंटे एवं मिनट)</label>
-                            <input type="text" class="form-control" placeholder="उदा. 0 घंटे 45 मिनट" value="" oninput="updateValue('q25_time', this.value)">
+                            <input type="text" class="form-control q25-time-input" placeholder="उदा. 0 घंटे 45 मिनट" value="" oninput="updateValue('q25_time', this.value)">
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-bold">25 (ख) यात्रा का साधन</label>
@@ -2075,8 +2075,7 @@
             mData[key] = value;
             if(String(key) === 'q25_dist' || String(key) === 'q25_mode') {
                 mData['q25_time'] = estimateQ25TravelTime(mData['q25_dist'], mData['q25_mode']);
-                const timeInput = document.querySelector('#q-card-25 input[placeholder="उदा. 0 घंटे 45 मिनट"]');
-                if(timeInput) timeInput.value = mData['q25_time'];
+                document.querySelectorAll('.q25-time-input').forEach(timeInput => { timeInput.value = mData['q25_time']; });
             }
             if(String(key)==='1' && !String(mData['3']||'').trim()){const g=guessIndianNameGender(value);if(g)mData['3']=g;}
             if(String(key) === '5') mData.q5_auto_suggested = false;
@@ -2487,7 +2486,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">25 (क) (ii) यात्रा समय (घंटे एवं मिनट)</label>
-                            <input type="text" class="form-control" placeholder="उदा. 0 घंटे 45 मिनट" value="${escapeAttr(mData['q25_time'] || '')}" oninput="updateValue('q25_time', this.value)">
+                            <input type="text" class="form-control q25-time-input" placeholder="उदा. 0 घंटे 45 मिनट" value="${escapeAttr(mData['q25_time'] || '')}" oninput="updateValue('q25_time', this.value)">
                             <div class="form-text">दूरी और यात्रा के साधन के आधार पर अनुमानित समय अपने-आप भरेगा। उत्तरदाता से पुष्टि करें; जरूरत हो तो समय बदल सकते हैं। साधन चुनने से पहले पैदल गति के आधार पर अस्थायी अनुमान आएगा।</div>
                         </div>
                         <div class="col-12">
