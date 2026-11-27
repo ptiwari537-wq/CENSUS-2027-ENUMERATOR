@@ -2032,7 +2032,17 @@
             if(!familyCensusData[currentActiveMember]) {
                 familyCensusData[currentActiveMember] = {};
             }
-            return familyCensusData[currentActiveMember];
+            const member = familyCensusData[currentActiveMember];
+
+            // Enumerator convenience defaults for every member. These are editable suggestions,
+            // not verified census facts; preserve any answer already entered by the enumerator.
+            if(member['q34_vaccinated'] === undefined || member['q34_vaccinated'] === '') member['q34_vaccinated'] = 'हाँ';
+            if(member['q34_loc'] === undefined || member['q34_loc'] === '') member['q34_loc'] = 'भारत में';
+            if(member[35] === undefined || member[35] === '') member[35] = '1';
+            if(member['q39_has'] === undefined || member['q39_has'] === '') member['q39_has'] = 'नहीं';
+            if(member['q40_has'] === undefined || member['q40_has'] === '') member['q40_has'] = 'नहीं';
+
+            return member;
         }
 
         function updateValue(key, value) {
