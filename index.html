@@ -2393,10 +2393,10 @@
                     </div>
                     <div class="row g-3">
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">सदस्य क्रमांक</label>
+                            <label class="form-label fw-bold">परिवार का सदस्य चुनें</label>
                             <select class="form-select border-primary fw-bold" onchange="autoFillParentFromMember('${keyP}', this.value)" ${isMem === 'हाँ' ? '' : 'disabled'}>
-                                <option value="">-- क्रमांक चुनें --</option>
-                                ${Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b)).map(n => `<option value="${n}" ${String(memNum) === String(n) ? 'selected' : ''}>सदस्य ${n}</option>`).join('')}
+                                <option value="">-- नाम चुनें --</option>
+                                ${Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b)).map(n => { const member=familyCensusData[n]||{}; const memberName=String(member[1]||'नाम दर्ज नहीं').trim(); const memberRelation=String(member[2]||'').trim(); return `<option value="${n}" ${String(memNum) === String(n) ? 'selected' : ''}>${escapeHTML(memberName)} — सदस्य ${n}${memberRelation ? ' ('+escapeHTML(memberRelation)+')' : ''}</option>`; }).join('') }
                             </select>
                         </div>
                         <div class="col-md-5">
