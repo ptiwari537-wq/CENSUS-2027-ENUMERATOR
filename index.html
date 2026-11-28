@@ -1774,10 +1774,14 @@
                 if (!Object.keys(households).length) households['HH-001']={id:'HH-001',houseNo:'001',headName:'',members:{'1':{}},peStatus:'pending',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
             }
             // Restore the last actively selected household instead of always opening the first one.
+            // Restore last active household from both dedicated key and the local fallback snapshot.
             let lastActiveHouseholdId = '';
             try { lastActiveHouseholdId = localStorage.getItem('census_manager_last_active_household') || ''; } catch(e) {}
-            activeHouseholdId = (lastActiveHouseholdId && households[lastActiveHouseholdId]) ? lastActiveHouseholdId : (Object.keys(households)[0] || 'HH-001');
-            try { localStorage.setItem('census_manager_last_active_household', activeHouseholdId); } catch(e) {}
+            if(!lastActiveHouseholdId) {
+                try { const fallback=JSON.parse(localStorage.getItem('census_manager_fallback')||'{}'); lastActiveHouseholdId=fallback.activeHouseholdId||''; } catch(e) {}
+            }
+            activeHouseholdId = (lastActiveHouseholdId && households[lastActiveHouseholdId]) ? lastActiveHouseholdId : (Object.keys(households).sort((a,b)=>Number(households[a].houseNo)-Number(households[b].houseNo))[0] || 'HH-001');
+            persistActiveHouseholdId();
             // Convenience default only: fill blank Q14 mother-tongue fields with Hindi; never overwrite an existing answer.
             let q14DefaultsChanged = false;
             Object.values(households).forEach(h => {
@@ -1805,12 +1809,23 @@
             if (!Object.keys(familyCensusData).length) familyCensusData={'1':{}};
             currentActiveMember = Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b))[0] || '1';
         }
+        function persistActiveHouseholdId() {
+            if(!activeHouseholdId || !households[activeHouseholdId]) return;
+            try { localStorage.setItem('census_manager_last_active_household', activeHouseholdId); } catch(e) {}
+            try {
+                const raw=JSON.parse(localStorage.getItem('census_manager_fallback')||'{}');
+                raw.activeHouseholdId=activeHouseholdId;
+                raw.households=households;
+                localStorage.setItem('census_manager_fallback', JSON.stringify(raw));
+            } catch(e) {}
+        }
         function saveLocalState() {
             const h=households[activeHouseholdId];
             if (!h) return;
             h.members=familyCensusData; h.updatedAt=new Date().toISOString();
             const head=familyCensusData['1'] || {}; h.headName=head[1] || h.headName || '';
             try { localStorage.setItem('census_manager_fallback', JSON.stringify({activeHouseholdId,households})); } catch(e) {}
+            try { localStorage.setItem('census_manager_last_active_household', activeHouseholdId); } catch(e) {}
             if (censusDB) dbRequest('readwrite','put',h).then(()=>{ const el=document.getElementById('db-status'); if(el) el.textContent='डेटा IndexedDB में सेव हो गया'; }).catch(()=>{});
             refreshHouseholdUI();
             renderFamilySuggestionsStatus();
@@ -1954,16 +1969,18 @@
             const next=String(Math.max(0,...Object.values(households).map(h=>Number(h.houseNo)||0))+1).padStart(3,'0');
             const id='HH-'+next;
             households[id]={id,houseNo:next,headName:'',members:{'1':{}},peStatus:'pending',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
-            activeHouseholdId=id; try { localStorage.setItem('census_manager_last_active_household', id); } catch(e) {} loadActiveHousehold(); saveLocalState(); refreshHouseholdUI(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
+            activeHouseholdId=id; persistActiveHouseholdId(); loadActiveHousehold(); saveLocalState(); refreshHouseholdUI(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
             showToastNotice('नया घर '+next+' बनाया गया।');
         }
         function switchHousehold(id) {
             if(!households[id]) return;
             saveLocalState();
             activeHouseholdId=id;
-            try { localStorage.setItem('census_manager_last_active_household', id); } catch(e) {}
+            persistActiveHouseholdId();
             loadActiveHousehold();
             renderFormQuestions(); renderMemberSelector(); refreshHouseholdUI(); updateConditionalLocks(); updateMembersRemainingBadge();
+            const selector=document.getElementById('household-select');
+            if(selector) selector.value=activeHouseholdId;
         }
         function addFamilyMember() {
             const next=String(Math.max(0,...Object.keys(familyCensusData).map(Number))+1);
