@@ -1476,26 +1476,6 @@
                             <input type="text" class="form-control" placeholder="मतदाता पहचान पत्र संख्या (EPIC) दर्ज करें" value="" oninput="updateValue('q38_val', this.value)">
                         </div>
                     </div>
-                    <div id="q38-extra-panel" class="mt-3 p-3 border rounded bg-light d-none">
-                        <div class="alert alert-warning py-2 small mb-3">यह निजी सहायक रिकॉर्ड है, Census का आधिकारिक दस्तावेज नहीं। फोटो लेने से पहले व्यक्ति की स्पष्ट सहमति लें। केवल Masked Aadhaar (आधार संख्या के पहले 8 अंक छिपे हों) की फोटो लें।</div>
-                        <label class="form-label fw-semibold" for="q38-mobile">मोबाइल नंबर (यदि उपलब्ध हो)</label>
-                        <input id="q38-mobile" type="tel" inputmode="numeric" maxlength="10" class="form-control mb-3" placeholder="10 अंकों का मोबाइल नंबर" oninput="updateQ38Mobile(this.value)">
-                        <div class="row g-3">
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Masked Aadhaar की फोटो</label>
-                                <input id="q38-aadhaar-file" class="form-control" type="file" accept="image/*" capture="environment" onchange="saveQ38Photo('aadhaar',this)">
-                                <div id="q38-aadhaar-preview" class="mt-2 small text-muted">फोटो अभी सेव नहीं है।</div>
-                                <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="deleteQ38Photo('aadhaar')">आधार फोटो हटाएँ</button>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">व्यक्ति की फोटो</label>
-                                <input id="q38-person-file" class="form-control" type="file" accept="image/*" capture="user" onchange="saveQ38Photo('person',this)">
-                                <div id="q38-person-preview" class="mt-2 small text-muted">फोटो अभी सेव नहीं है।</div>
-                                <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="deleteQ38Photo('person')">व्यक्ति की फोटो हटाएँ</button>
-                            </div>
-                        </div>
-                        <div class="small text-danger mt-3">सुरक्षा: फोटो इसी डिवाइस के IndexedDB में बिना Password/Encryption सेव होंगी। फोन का Screen Lock रखें। JSON Backup में फोटो शामिल नहीं होंगी; ऐप का डेटा/फोन हटाने पर फोटो खो सकती हैं।</div>
-                    </div>
                     </div>
                 </div><div class="q-card" id="q-card-39">
                     <div class="q-header">
@@ -1602,7 +1582,6 @@
         let workflowMode = 'member'; // member = one member at a time; question = same question across all members
         const DB_NAME = 'DhurdaJangleCensusDB';
         const DB_STORE = 'households';
-        const MEDIA_STORE = 'privateMedia';
         let censusDB = null;
         let households = {};
         let activeHouseholdId = 'HH-001';
@@ -1656,7 +1635,7 @@
             return new Promise((resolve, reject) => {
                 if (!('indexedDB' in window)) return reject(new Error('IndexedDB उपलब्ध नहीं है'));
                 const req = indexedDB.open(DB_NAME, 2);
-                req.onupgradeneeded = () => { const db = req.result; if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE, { keyPath: 'id' }); if (!db.objectStoreNames.contains(MEDIA_STORE)) db.createObjectStore(MEDIA_STORE, { keyPath: 'id' }); };
+                req.onupgradeneeded = () => { const db = req.result; if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE, { keyPath: 'id' }); if (!db.objectStoreNames.contains('privateMedia')) db.createObjectStore('privateMedia', { keyPath: 'id' }); };
                 req.onsuccess = () => { censusDB = req.result; resolve(censusDB); };
                 req.onerror = () => reject(req.error);
             });
@@ -2357,7 +2336,7 @@
                             <label class="form-label fw-bold">सदस्य क्रमांक</label>
                             <select class="form-select border-primary fw-bold" onchange="autoFillParentFromMember('${keyP}', this.value)" ${isMem === 'हाँ' ? '' : 'disabled'}>
                                 <option value="">-- क्रमांक चुनें --</option>
-                                ${Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b)).map(n => { const p=familyCensusData[n]||{}; const nm=String(p[1]||'नाम दर्ज नहीं').trim(); const rel=String(p[2]||'').trim(); return `<option value="${n}" ${String(memNum) === String(n) ? 'selected' : ''}>सदस्य ${n} — ${escapeHTML(nm)}${rel ? ' ('+escapeHTML(rel)+')' : ''}</option>`; }).join('')}
+                                ${Object.keys(familyCensusData).sort((a,b)=>Number(a)-Number(b)).map(n => `<option value="${n}" ${String(memNum) === String(n) ? 'selected' : ''}>सदस्य ${n}</option>`).join('')}
                             </select>
                         </div>
                         <div class="col-md-5">
@@ -2650,27 +2629,6 @@
                 case 'yes_no_input':
                     const hasId = mData['q' + q.id + '_has'] || '';
                     const idVal = mData['q' + q.id + '_val'] || '';
-                    const q38Extra = q.id === 38 ? `
-                        <div id="q38-extra-panel" class="mt-3 p-3 border rounded bg-light ${hasId === 'नहीं' ? '' : 'd-none'}">
-                            <div class="alert alert-warning py-2 small mb-3">यह निजी सहायक रिकॉर्ड है, Census का आधिकारिक दस्तावेज नहीं। फोटो लेने से पहले व्यक्ति की स्पष्ट सहमति लें। केवल Masked Aadhaar (आधार संख्या के पहले 8 अंक छिपे हों) की फोटो लें।</div>
-                            <label class="form-label fw-semibold" for="q38-mobile">मोबाइल नंबर (यदि उपलब्ध हो)</label>
-                            <input id="q38-mobile" type="tel" inputmode="numeric" maxlength="10" class="form-control mb-3" placeholder="10 अंकों का मोबाइल नंबर" value="${escapeAttr(mData.q38_mobile || '')}" oninput="updateQ38Mobile(this.value)">
-                            <div class="row g-3">
-                                <div class="col-12 col-md-6">
-                                    <label class="form-label fw-semibold">Masked Aadhaar की फोटो</label>
-                                    <input id="q38-aadhaar-file" class="form-control" type="file" accept="image/*" capture="environment" onchange="saveQ38Photo('aadhaar',this)">
-                                    <div id="q38-aadhaar-preview" class="mt-2 small text-muted">फोटो अभी सेव नहीं है।</div>
-                                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="deleteQ38Photo('aadhaar')">आधार फोटो हटाएँ</button>
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    <label class="form-label fw-semibold">व्यक्ति की फोटो</label>
-                                    <input id="q38-person-file" class="form-control" type="file" accept="image/*" capture="user" onchange="saveQ38Photo('person',this)">
-                                    <div id="q38-person-preview" class="mt-2 small text-muted">फोटो अभी सेव नहीं है।</div>
-                                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="deleteQ38Photo('person')">व्यक्ति की फोटो हटाएँ</button>
-                                </div>
-                            </div>
-                            <div class="small text-danger mt-3">फोटो इसी डिवाइस के IndexedDB में बिना Password/Encryption सेव होंगी। फोन का Screen Lock रखें। JSON Backup में फोटो शामिल नहीं हैं।</div>
-                        </div>` : '';
                     return `
                     <div class="row g-3 align-items-center">
                         <div class="col-md-4">
@@ -2686,8 +2644,7 @@
                         <div class="col-md-8 ${hasId === 'हाँ' ? '' : 'd-none'}" id="box-id-${q.id}">
                             <input type="text" class="form-control" placeholder="${q.placeholder}" value="${escapeAttr(idVal)}" oninput="updateValue('q${q.id}_val', this.value)">
                         </div>
-                    </div>
-                    ${q38Extra}`;
+                    </div>`;
 
                 default:
                     return '';
@@ -2848,10 +2805,6 @@
             [36, 37, 38, 39, 40].forEach(id => {
                 document.getElementById('box-id-' + id)?.classList.toggle('d-none', mData['q' + id + '_has'] !== 'हाँ');
             });
-            document.getElementById('q38-extra-panel')?.classList.toggle('d-none', mData['q38_has'] !== 'नहीं');
-            const q38Mobile = document.getElementById('q38-mobile');
-            if(q38Mobile && q38Mobile.value !== String(mData.q38_mobile || '')) q38Mobile.value = mData.q38_mobile || '';
-            renderQ38PhotoPreviews();
 
             document.getElementById('q30-details')?.classList.toggle('d-none', mData['q30_type'] !== 'अन्य विवरण');
         }
@@ -3280,7 +3233,7 @@
         
         
         function handleDobInputChange(key, val) {
-            val=String(val||'').replace(/\D/g,'').slice(0,key==='q4_yyyy'?4:2);
+            val=String(val||'').replace(/\\D/g,'').slice(0,key==='q4_yyyy'?4:2);
             const input=document.getElementById(key==='q4_dd'?'q4_dd_input':key==='q4_mm'?'q4_mm_input':'q4_yyyy_input'); if(input)input.value=val;
             updateValue(key, val);
             if(val.length===(key==='q4_yyyy'?4:2)){const next=document.getElementById(key==='q4_dd'?'q4_mm_input':key==='q4_mm'?'q4_yyyy_input':'q4_age_input');if(next&&!next.disabled&&!next.readOnly)next.focus();}
@@ -3293,8 +3246,7 @@
             const ageBadge = document.getElementById('q4_age_badge');
             const ageContainer = document.getElementById('q4_age_container');
 
-            const dateIsValid = Number.isInteger(d) && Number.isInteger(m) && Number.isInteger(y) && y >= 1900 && y <= 2027 && m >= 1 && m <= 12 && d >= 1 && d <= new Date(y, m, 0).getDate();
-            if(dateIsValid) {
+            if(d > 0 && d <= 31 && m > 0 && m <= 12 && y >= 1900 && y <= 2027) {
                 // Uttar Pradesh PE reference date: 5 January 2027, 00:00 hours
                 const refYear = 2027;
                 const refMonth = 1;
