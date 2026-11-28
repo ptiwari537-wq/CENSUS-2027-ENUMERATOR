@@ -366,7 +366,7 @@
                     <div class="col-12 col-md-4"><label class="form-label">सदस्य का नाम</label><input id="fast-member-name" class="form-control" maxlength="100" placeholder="पूरा नाम" oninput="autoSelectFastGender(this.value)"></div>
                     <div class="col-6 col-md-4"><label class="form-label">मुखिया से संबंध</label><select id="fast-member-relation" class="form-select"><option value="">चुनें</option><option>मुखिया - 01</option><option>पति/पत्नी - 02</option><option>पुत्र/पुत्री - 03</option><option>पुत्रवधू/दामाद - 04</option><option>पोता/पोती - 05</option><option>माता/पिता - 06</option><option>भाई/बहन - 07</option><option>अन्य रिश्तेदार - 08</option><option>गैर-रिश्तेदार - 09</option></select></div>
                     <div class="col-6 col-md-2"><label class="form-label">लिंग</label><select id="fast-member-gender" class="form-select"><option value="">चुनें</option><option>पुरुष</option><option>महिला</option></select></div>
-                    <div class="col-12 col-md-2"><button class="btn btn-success w-100" onclick="fastAddFamilyMember()"><i class="fas fa-user-plus me-1"></i> जोड़ें</button></div>
+                    <div class="col-12 col-md-2"><button type="button" class="btn btn-success w-100" onclick="fastAddFamilyMember()"><i class="fas fa-user-plus me-1"></i> जोड़ें</button></div>
                 </div>
                 <hr>
         <div class="control-bar">
@@ -1649,24 +1649,39 @@
         }
 
         function guessIndianNameGender(name){
-            const n=String(name||'').trim().toLocaleLowerCase('hi-IN'); const last=n.split(/\\s+/).pop();
-            const female=['सीता','गीता','रीता','सुनीता','कविता','पूजा','राधा','लक्ष्मी','सरिता','अनीता','ममता','नेहा','प्रियंका','संगीता','शांति','कमला','पूनम','वंदना','रीना','शिवानी','अंजली','आरती','मनीषा','खुशबू','सोनम'];
-            const male=['राम','श्याम','मोहन','सोहन','राजेश','रमेश','सुरेश','प्रवीण','अमित','सुमित','रोहित','मनीष','दीपक','विकास','आकाश','अंकित','अजय','विजय','संजय','राहुल','अरविंद','दिनेश','महेश','गणेश','कृष्ण','शिवम','अभिषेक','आशीष','अनिल','सुनील'];
-            if(female.includes(last)||/(ा|ी|या)$/.test(last))return 'महिला'; if(male.includes(last)||/(ेश|ंंत|ीप|कुमार|पाल|नाथ|वीर|राज)$/.test(last))return 'पुरुष'; return '';
+            const tokens=String(name||'').trim().toLocaleLowerCase('hi-IN').split(/\s+/).filter(Boolean);
+            if(!tokens.length)return '';
+            const female=new Set(['सीता','गीता','रीता','सुनीता','कविता','पूजा','राधा','लक्ष्मी','सरिता','अनीता','ममता','नेहा','प्रियंका','संगीता','शांति','कमला','पूनम','वंदना','रीना','शिवानी','अंजली','अंजलि','आरती','मनीषा','खुशबू','सोनम','रानी','पिंकी','गुड़िया','निशा','विमला','उषा','सीमा','रीमा','सविता','मधु','ज्योति','प्रिया','दिव्या','स्वाति','पल्लवी','साक्षी','रुचि','रुचिका','आराधना','सरोज','सुशीला']);
+            const male=new Set(['राम','श्याम','मोहन','सोहन','राजेश','रमेश','सुरेश','प्रवीण','अमित','सुमित','रोहित','मनीष','दीपक','विकास','आकाश','अंकित','अजय','विजय','संजय','राहुल','अरविंद','दिनेश','महेश','गणेश','कृष्ण','शिवम','अभिषेक','आशीष','अनिल','सुनील','कुमार','मिश्रा','अंकुर','अर्पित','नितेश','नीरज','पंकज','संदीप','सचिन','धर्मेंद्र','जितेंद्र','राजीव','रवि','अशोक','महेंद्र','गोविंद','हरीश','मुकुल','अभय','आलोक','सौरभ','विनय','विवेक','अविनाश','प्रदीप','नरेश','ओमप्रकाश']);
+            const first=tokens[0];
+            if(female.has(first))return 'महिला';
+            if(male.has(first))return 'पुरुष';
+            for(const token of tokens){if(female.has(token))return 'महिला';if(male.has(token))return 'पुरुष';}
+            if(tokens.includes('देवी')||tokens.includes('कुमारी'))return 'महिला';
+            return '';
         }
-        function autoSelectFastGender(name){const el=document.getElementById('fast-member-gender');if(el){const g=guessIndianNameGender(name);if(g)el.value=g;}}
+        function autoSelectFastGender(name){
+            const el=document.getElementById('fast-member-gender');
+            if(!el)return;
+            el.value=guessIndianNameGender(name)||'';
+        }
         function fastAddFamilyMember() {
-            const name=(document.getElementById('fast-member-name')?.value||'').trim();
-            const relation=document.getElementById('fast-member-relation')?.value||'';
-            const gender=document.getElementById('fast-member-gender')?.value||guessIndianNameGender(name)||'';
+            const nameEl=document.getElementById('fast-member-name');
+            const relationEl=document.getElementById('fast-member-relation');
+            const genderEl=document.getElementById('fast-member-gender');
+            const name=(nameEl?.value||'').trim();
+            const relation=relationEl?.value||'';
+            const gender=genderEl?.value||guessIndianNameGender(name)||'';
             if(!name || !relation) { showToastNotice('नाम और संबंध भरें। लिंग का अनुमान नाम से होगा; जरूरत पर बदलें।'); return; }
             const next=String(Math.max(0,...Object.keys(familyCensusData).map(Number))+1);
             familyCensusData[next]={1:name,2:relation,3:gender};
             currentActiveMember=next;
+            if(nameEl)nameEl.value='';
+            if(relationEl)relationEl.selectedIndex=0;
+            if(genderEl)genderEl.selectedIndex=0;
             saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
-            ['fast-member-name','fast-member-relation','fast-member-gender'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
             refreshSmartFamilyDashboard();
-            showToastNotice('सदस्य '+next+' जोड़ा गया। अब बाकी प्रश्नों की व्यक्तिगत पुष्टि करें।');
+            showToastNotice('सदस्य '+next+' जोड़ा गया। अगले सदस्य के लिए नाम, संबंध और लिंग के बॉक्स खाली हैं। बाकी प्रश्न व्यक्ति से पूछकर अलग-अलग भरें।');
         }
         function saveFamilyMasterProfile() {
             const h=households[activeHouseholdId]; if(!h)return;
