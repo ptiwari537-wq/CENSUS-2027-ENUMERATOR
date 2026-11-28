@@ -1674,7 +1674,7 @@
             const gender=genderEl?.value||guessIndianNameGender(name)||'';
             if(!name || !relation) { showToastNotice('नाम और संबंध भरें। लिंग का अनुमान नाम से होगा; जरूरत पर बदलें।'); return; }
             const next=String(Math.max(0,...Object.keys(familyCensusData).map(Number))+1);
-            familyCensusData[next]={1:name,2:relation,3:gender};
+            familyCensusData[next]={1:name,2:relation,3:gender,q14_mother_tongue:'हिन्दी'};
             currentActiveMember=next;
             if(nameEl)nameEl.value='';
             if(relationEl)relationEl.selectedIndex=0;
@@ -1778,6 +1778,22 @@
             try { lastActiveHouseholdId = localStorage.getItem('census_manager_last_active_household') || ''; } catch(e) {}
             activeHouseholdId = (lastActiveHouseholdId && households[lastActiveHouseholdId]) ? lastActiveHouseholdId : (Object.keys(households)[0] || 'HH-001');
             try { localStorage.setItem('census_manager_last_active_household', activeHouseholdId); } catch(e) {}
+            // Convenience default only: fill blank Q14 mother-tongue fields with Hindi; never overwrite an existing answer.
+            let q14DefaultsChanged = false;
+            Object.values(households).forEach(h => {
+                if(!h || !h.members) return;
+                Object.values(h.members).forEach(member => {
+                    if(member && (member.q14_mother_tongue === undefined || String(member.q14_mother_tongue).trim() === '')) {
+                        member.q14_mother_tongue = 'हिन्दी';
+                        q14DefaultsChanged = true;
+                    }
+                });
+                if(q14DefaultsChanged) h.updatedAt = new Date().toISOString();
+            });
+            if(q14DefaultsChanged) {
+                Object.values(households).forEach(h => { if(h && h.members) dbRequest('readwrite','put',h).catch(()=>{}); });
+                try { localStorage.setItem('census_manager_fallback', JSON.stringify({activeHouseholdId,households})); } catch(e) {}
+            }
             loadActiveHousehold(); refreshHouseholdUI(); renderFormQuestions(); renderMemberSelector();
             setupSecurityWatchdog(); updateConditionalLocks(); updateMembersRemainingBadge(); renderFamilySuggestionsStatus(); refreshSmartFamilyDashboard();
             refreshSmartFamilyDashboard();
@@ -1951,7 +1967,7 @@
         }
         function addFamilyMember() {
             const next=String(Math.max(0,...Object.keys(familyCensusData).map(Number))+1);
-            familyCensusData[next]={}; if(households[activeHouseholdId]) households[activeHouseholdId].workCompleted=false; currentActiveMember=next; saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
+            familyCensusData[next]={q14_mother_tongue:'हिन्दी'}; if(households[activeHouseholdId]) households[activeHouseholdId].workCompleted=false; currentActiveMember=next; saveLocalState(); renderFormQuestions(); renderMemberSelector(); updateConditionalLocks(); updateMembersRemainingBadge();
             showToastNotice('सदस्य '+next+' जोड़ा गया।');
         }
         function editCurrentMember() {
