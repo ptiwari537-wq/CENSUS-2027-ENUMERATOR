@@ -355,6 +355,73 @@
             </div>
         </div>
 
+        <div class="card border-success shadow-sm mb-3" id="voter-assistance-panel">
+            <div class="card-header bg-success text-white fw-bold d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span><i class="fas fa-id-card me-2"></i>Voter ID सहायता (वैकल्पिक)</span>
+                <span class="badge bg-light text-success">Offline • सदस्यवार</span>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning py-2 small mb-3">
+                    यह निजी Offline Census Manager की वैकल्पिक सहायता सुविधा है, सरकारी Census/ECI सुविधा नहीं। नागरिक की स्पष्ट सहमति के बिना जानकारी न भरें। Voter ID आवेदन यहाँ जमा नहीं होता और डेटा निर्वाचन विभाग को स्वतः नहीं भेजा जाता। Aadhaar/फोटो अपलोड इस संस्करण में उपलब्ध नहीं है।
+                </div>
+                <div class="row g-2 mb-3" id="voter-family-summary">
+                    <div class="col-4"><div class="border rounded p-2 text-center"><div class="small text-muted">कुल सदस्य</div><strong id="voter-total-count">0</strong></div></div>
+                    <div class="col-4"><div class="border rounded p-2 text-center"><div class="small text-muted">Voter ID है</div><strong id="voter-have-count">0</strong></div></div>
+                    <div class="col-4"><div class="border rounded p-2 text-center"><div class="small text-muted">सहायता चाहिए</div><strong id="voter-help-count">0</strong></div></div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                    <h6 class="fw-bold mb-0">सक्रिय सदस्य: <span id="voter-member-name">—</span></h6>
+                    <span class="small text-muted" id="voter-member-number"></span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-semibold">Voter ID की स्थिति</label>
+                        <select id="voter-status" class="form-select" onchange="updateVoterField('voter_status',this.value)">
+                            <option value="">-- स्थिति चुनें --</option>
+                            <option value="उपलब्ध है">उपलब्ध है</option>
+                            <option value="उपलब्ध नहीं है">उपलब्ध नहीं है</option>
+                            <option value="पुष्टि नहीं">पता नहीं / पुष्टि नहीं</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-semibold">क्या पंजीकरण सहायता चाहिए?</label>
+                        <select id="voter-help" class="form-select" onchange="updateVoterField('voter_help',this.value);renderVoterPanel();">
+                            <option value="">-- चुनें --</option>
+                            <option value="हाँ">हाँ</option>
+                            <option value="नहीं">नहीं</option>
+                        </select>
+                    </div>
+                    <div class="col-12" id="voter-consent-wrap" style="display:none">
+                        <div class="form-check border rounded p-3">
+                            <input class="form-check-input ms-0 me-2" type="checkbox" id="voter-consent" onchange="updateVoterField('voter_consent',this.checked)">
+                            <label class="form-check-label fw-semibold" for="voter-consent">नागरिक को बताया गया है कि यह वैकल्पिक सहायता है और उसने संपर्क/सहायता के लिए सहमति दी है।</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6" id="voter-mobile-wrap" style="display:none">
+                        <label class="form-label fw-semibold">मोबाइल नंबर (सहमति के बाद)</label>
+                        <input id="voter-mobile" type="tel" inputmode="numeric" maxlength="10" class="form-control" placeholder="10 अंकों का मोबाइल नंबर" oninput="updateVoterField('voter_mobile',this.value)">
+                    </div>
+                    <div class="col-12 col-md-6" id="voter-referral-wrap" style="display:none">
+                        <label class="form-label fw-semibold">सहायता की स्थिति</label>
+                        <select id="voter-referral" class="form-select" onchange="updateVoterField('voter_referral',this.value)">
+                            <option value="">-- स्थिति चुनें --</option>
+                            <option value="सहायता अपेक्षित">सहायता अपेक्षित</option>
+                            <option value="BLO से संपर्क करना है">BLO से संपर्क करना है</option>
+                            <option value="नागरिक को ECI पोर्टल बताया">नागरिक को ECI पोर्टल बताया</option>
+                            <option value="आवेदन शुरू किया (नागरिक द्वारा)">आवेदन शुरू किया (नागरिक द्वारा)</option>
+                            <option value="आवेदन जमा (नागरिक द्वारा पुष्टि)">आवेदन जमा (नागरिक द्वारा पुष्टि)</option>
+                            <option value="सत्यापन लंबित">सत्यापन लंबित</option>
+                            <option value="पंजीकरण पूर्ण (पुष्टि प्राप्त)">पंजीकरण पूर्ण (पुष्टि प्राप्त)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <a class="btn btn-outline-primary btn-sm" href="https://voters.eci.gov.in/" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt me-1"></i> ECI Voters Portal खोलें</a>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearVoterAssistance()"><i class="fas fa-eraser me-1"></i> इस सदस्य की Voter जानकारी हटाएँ</button>
+                </div>
+                <div class="small text-muted mt-2">यह विवरण केवल इसी डिवाइस के Offline Database/Backup में रहेगा। कोई Server Sync/API Integration उपलब्ध नहीं है। Census विवरण से पिता/पति का नाम या पता स्वतः निर्वाचन विभाग को नहीं भेजा जाता।</div>
+            </div>
+        </div>
         <div class="card mb-3 border-primary shadow-sm" id="smart-family-fast-entry">
             <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <span><i class="fas fa-bolt me-2"></i>6.2 Smart Family Fast Entry</span>
@@ -2028,6 +2095,77 @@
         function downloadJSON(data,name) { const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url); }
 
 
+        function renderVoterPanel() {
+            const member = familyCensusData[currentActiveMember] || {};
+            const name = String(member[1] || '').trim() || ('सदस्य ' + currentActiveMember);
+            const nameEl = document.getElementById('voter-member-name');
+            if(nameEl) nameEl.textContent = name;
+            const numEl = document.getElementById('voter-member-number');
+            if(numEl) numEl.textContent = 'सदस्य क्रमांक: ' + currentActiveMember;
+            const status = document.getElementById('voter-status');
+            const help = document.getElementById('voter-help');
+            const consent = document.getElementById('voter-consent');
+            const mobile = document.getElementById('voter-mobile');
+            const referral = document.getElementById('voter-referral');
+            if(status) status.value = member.voter_status || '';
+            if(help) help.value = member.voter_help || '';
+            if(consent) consent.checked = member.voter_consent === true;
+            if(mobile) mobile.value = member.voter_mobile || '';
+            if(referral) referral.value = member.voter_referral || '';
+            const wantsHelp = member.voter_help === 'हाँ';
+            const consentGiven = member.voter_consent === true;
+            const consentWrap = document.getElementById('voter-consent-wrap');
+            const mobileWrap = document.getElementById('voter-mobile-wrap');
+            const referralWrap = document.getElementById('voter-referral-wrap');
+            if(consentWrap) consentWrap.style.display = wantsHelp ? '' : 'none';
+            if(mobileWrap) mobileWrap.style.display = wantsHelp && consentGiven ? '' : 'none';
+            if(referralWrap) referralWrap.style.display = wantsHelp && consentGiven ? '' : 'none';
+            const members = Object.values(familyCensusData || {});
+            const total = members.length;
+            const have = members.filter(m => m && m.voter_status === 'उपलब्ध है').length;
+            const helpCount = members.filter(m => m && m.voter_help === 'हाँ' && m.voter_consent === true).length;
+            const totalEl = document.getElementById('voter-total-count');
+            const haveEl = document.getElementById('voter-have-count');
+            const helpEl = document.getElementById('voter-help-count');
+            if(totalEl) totalEl.textContent = total;
+            if(haveEl) haveEl.textContent = have;
+            if(helpEl) helpEl.textContent = helpCount;
+        }
+
+        function updateVoterField(key, value) {
+            const member = getCurrentMemberData();
+            if(key === 'voter_mobile') {
+                value = String(value || '').replace(/[^0-9]/g,'').slice(0,10);
+                const input = document.getElementById('voter-mobile');
+                if(input && input.value !== value) input.value = value;
+            }
+            member[key] = value;
+            if(key === 'voter_help' && value !== 'हाँ') {
+                member.voter_consent = false;
+                member.voter_mobile = '';
+                member.voter_referral = '';
+            }
+            if(key === 'voter_consent' && value !== true) {
+                member.voter_mobile = '';
+                member.voter_referral = '';
+            }
+            saveLocalState();
+            if(key !== 'voter_mobile') renderVoterPanel();
+            else {
+                const count = document.getElementById('voter-help-count');
+                if(count) count.textContent = Object.values(familyCensusData).filter(m=>m && m.voter_help==='हाँ' && m.voter_consent===true).length;
+            }
+        }
+
+        function clearVoterAssistance() {
+            if(!confirm('क्या इस सदस्य की Voter ID सहायता संबंधी सभी जानकारी हटानी है?')) return;
+            const member = getCurrentMemberData();
+            ['voter_status','voter_help','voter_consent','voter_mobile','voter_referral'].forEach(k=>delete member[k]);
+            saveLocalState();
+            renderVoterPanel();
+            showToastNotice('इस सदस्य की Voter सहायता जानकारी हटा दी गई।');
+        }
+
         function getCurrentMemberData() {
             if(!familyCensusData[currentActiveMember]) {
                 familyCensusData[currentActiveMember] = {};
@@ -2145,6 +2283,7 @@
             if(currentDisplayMode === 'single') {
                 switchView('single');
             }
+            renderVoterPanel();
         }
 
         function renderQuestionBody(q) {
