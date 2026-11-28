@@ -2650,6 +2650,27 @@
                 case 'yes_no_input':
                     const hasId = mData['q' + q.id + '_has'] || '';
                     const idVal = mData['q' + q.id + '_val'] || '';
+                    const q38Extra = q.id === 38 ? `
+                        <div id="q38-extra-panel" class="mt-3 p-3 border rounded bg-light ${hasId === 'नहीं' ? '' : 'd-none'}">
+                            <div class="alert alert-warning py-2 small mb-3">यह निजी सहायक रिकॉर्ड है, Census का आधिकारिक दस्तावेज नहीं। फोटो लेने से पहले व्यक्ति की स्पष्ट सहमति लें। केवल Masked Aadhaar (आधार संख्या के पहले 8 अंक छिपे हों) की फोटो लें।</div>
+                            <label class="form-label fw-semibold" for="q38-mobile">मोबाइल नंबर (यदि उपलब्ध हो)</label>
+                            <input id="q38-mobile" type="tel" inputmode="numeric" maxlength="10" class="form-control mb-3" placeholder="10 अंकों का मोबाइल नंबर" value="${escapeAttr(mData.q38_mobile || '')}" oninput="updateQ38Mobile(this.value)">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">Masked Aadhaar की फोटो</label>
+                                    <input id="q38-aadhaar-file" class="form-control" type="file" accept="image/*" capture="environment" onchange="saveQ38Photo('aadhaar',this)">
+                                    <div id="q38-aadhaar-preview" class="mt-2 small text-muted">फोटो अभी सेव नहीं है।</div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="deleteQ38Photo('aadhaar')">आधार फोटो हटाएँ</button>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-semibold">व्यक्ति की फोटो</label>
+                                    <input id="q38-person-file" class="form-control" type="file" accept="image/*" capture="user" onchange="saveQ38Photo('person',this)">
+                                    <div id="q38-person-preview" class="mt-2 small text-muted">फोटो अभी सेव नहीं है।</div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="deleteQ38Photo('person')">व्यक्ति की फोटो हटाएँ</button>
+                                </div>
+                            </div>
+                            <div class="small text-danger mt-3">फोटो इसी डिवाइस के IndexedDB में बिना Password/Encryption सेव होंगी। फोन का Screen Lock रखें। JSON Backup में फोटो शामिल नहीं हैं।</div>
+                        </div>` : '';
                     return `
                     <div class="row g-3 align-items-center">
                         <div class="col-md-4">
@@ -2665,7 +2686,8 @@
                         <div class="col-md-8 ${hasId === 'हाँ' ? '' : 'd-none'}" id="box-id-${q.id}">
                             <input type="text" class="form-control" placeholder="${q.placeholder}" value="${escapeAttr(idVal)}" oninput="updateValue('q${q.id}_val', this.value)">
                         </div>
-                    </div>`;
+                    </div>
+                    ${q38Extra}`;
 
                 default:
                     return '';
